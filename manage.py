@@ -8,16 +8,18 @@ import pytest
 
 from flask_migrate import Migrate
 
-from appname import create_app
-from appname.models import db
-from appname.extensions import cache
+from app import create_app
+from app.models import db
+from app.extensions import cache
 # Explictly import models here to to get Flask Migrate to pick them up
-from appname.models import *  # noqa
-from appname.models.user import User
+from app.models import *  # noqa
+from app.models.clubs import *
+from app.models.user import User
+
 
 # default to dev config because this should not be run in production
-env = os.environ.get('APPNAME_ENV', 'dev')
-app = create_app('appname.settings.%sConfig' % env.capitalize())
+env = os.environ.get('app_ENV', 'dev')
+app = create_app('app.settings.%sConfig' % env.capitalize())
 
 migrate = Migrate(app, db)
 
@@ -95,10 +97,10 @@ def create_seeds():
 def test(coverage):
     args = []
     if env.lower() != 'test':
-        print("Not running in TEST env, try setting the environment to test: APPNAME_ENV=test")
+        print("Not running in TEST env, try setting the environment to test: app_ENV=test")
 
     if coverage:
-        args.extend(["--cov-report=term-missing", "--cov=appname"])
+        args.extend(["--cov-report=term-missing", "--cov=app"])
 
     pytest.main(args + ["tests/"])
 

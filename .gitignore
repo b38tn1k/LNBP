@@ -48,7 +48,7 @@ env*
 # Temp/Build files
 tmp/*
 !tmp/.touch
-appname/static/public/*
-!appname/static/public/images/*
-!appname/static/public/ignite/*
-!appname/static/public/fonts/*
+app/static/public/*
+!app/static/public/images/*
+!app/static/public/ignite/*
+!app/static/public/fonts/*

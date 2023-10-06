@@ -63,7 +63,7 @@ Github Actions is configured to run tests and produce code coverage metrics.
 
 To run tests locally, try this command:
 ```
-APPNAME_ENV=test ./manage.py test --coverage
+app_ENV=test ./manage.py test --coverage
 ```
 
 ### Local Secrets
@@ -77,7 +77,7 @@ source .env.local
 flask run
 ```
 
-You may also want to change some of the constants in `appname.constants`
+You may also want to change some of the constants in `app.constants`
 
 
 ## Deployment

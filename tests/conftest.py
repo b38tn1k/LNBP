@@ -1,12 +1,12 @@
 import pytest
 
-from appname import create_app
-from appname.models import db
-from appname.models.user import User
+from app import create_app
+from app.models import db
+from app.models.user import User
 
 @pytest.fixture()
 def testapp(request):
-    app = create_app('appname.settings.TestConfig')
+    app = create_app('app.settings.TestConfig')
     client = app.test_client()
 
     db.app = app

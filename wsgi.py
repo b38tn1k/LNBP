@@ -8,7 +8,7 @@ $ export FLASK_APP=wsgi
 $ flask run
 """
 import os
-from appname import create_app
+from app import create_app
 
-env = os.environ.get('APPNAME_ENV', 'dev')
-app = create_app('appname.settings.%sConfig' % env.capitalize())
+env = os.environ.get('app_ENV', 'dev')
+app = create_app('app.settings.%sConfig' % env.capitalize())

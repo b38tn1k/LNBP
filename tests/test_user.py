@@ -1,7 +1,7 @@
 import pytest
 
-from appname.models import db
-from appname.models.user import User
+from app.models import db
+from app.models.user import User
 
 create_user = True
 
