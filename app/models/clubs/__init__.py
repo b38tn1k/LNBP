@@ -9,3 +9,4 @@ from .league_facility_association import LeagueFacilityAssociation
 from .flight import Flight
 from .timeslot import Timeslot
 from .player_availability import PlayerAvailability
+from .league_game_event import LeagueGameEvent
