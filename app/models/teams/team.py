@@ -57,6 +57,18 @@ class Team(Model):
     @property
     def active_teams(self):
         return [membership.team for membership in self.members if membership.activated]
+    
+    @property
+    def club(self):
+        # Check if the team has club associations.
+        if self.club_associations:
+            # Loop through the club associations.
+            for association in self.club_associations:
+                # Return the first associated club.
+                if association.club:
+                    return association.club
+        return None
+
 
     @classmethod
     @transaction
