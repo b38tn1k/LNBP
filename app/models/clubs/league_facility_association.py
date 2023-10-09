@@ -13,3 +13,5 @@ class LeagueFacilityAssociation(Model):
     # Relationships
     league = db.relationship('League', backref=db.backref('facility_associations', lazy=True, cascade='all, delete-orphan'))
     facility = db.relationship('Facility', backref=db.backref('league_associations', lazy=True, cascade='all, delete-orphan'))
+    
+    GDPR_EXPORT_COLUMNS = {}

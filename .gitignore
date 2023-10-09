@@ -36,6 +36,8 @@ docs/_build
 # Virtual environments
 env
 env*
+venv
+venv*
 
 # Env Vars
 *.env*
@@ -52,3 +54,4 @@ app/static/public/*
 !app/static/public/images/*
 !app/static/public/ignite/*
 !app/static/public/fonts/*
+ignite-code.txt

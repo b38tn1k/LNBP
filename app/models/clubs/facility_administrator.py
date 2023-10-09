@@ -9,3 +9,5 @@ class FacilityAdministrator(Model):
     # Note: The string representations 'Facility' and 'User' in the relationships
     facility = db.relationship('Facility', back_populates='administrators')
     user = db.relationship('User', back_populates='administered_facilities')
+
+    GDPR_EXPORT_COLUMNS = {}

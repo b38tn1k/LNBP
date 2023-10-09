@@ -14,6 +14,8 @@ class Timeslot(Model):
     # Relationship to League
     league = db.relationship('League', backref=db.backref('timeslots', lazy=True, cascade='all, delete-orphan'))
 
+    GDPR_EXPORT_COLUMNS = {}
+
     def __repr__(self):
         return f'<Timeslot - {self.human_readable_hhmm_dayname_mdy()}>'
 

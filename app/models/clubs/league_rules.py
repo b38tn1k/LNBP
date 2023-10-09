@@ -21,3 +21,5 @@ class LeagueRules(Model):
 
     league_id = db.Column(db.Integer, db.ForeignKey('league.id'), nullable=False)
     league = db.relationship('League', backref=db.backref('rules', uselist=False, cascade='all, delete-orphan'))
+
+    GDPR_EXPORT_COLUMNS = {}

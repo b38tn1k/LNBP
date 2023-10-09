@@ -14,3 +14,5 @@ class PlayerAvailability(Model):
     # Relationships
     association = db.relationship('LeaguePlayerAssociation', backref=db.backref('availability_associations', lazy=True, cascade='all, delete-orphan'))
     timeslot = db.relationship('Timeslot', backref=db.backref('availability_associations', lazy=True, cascade='all, delete-orphan'))
+
+    GDPR_EXPORT_COLUMNS = {}

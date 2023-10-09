@@ -135,6 +135,19 @@ class User(Model, UserMixin):
         db.session.add(new_user)
         db.session.commit()
         return new_user
+    
+    @property
+    def club(self):
+        # Using the active_teams property to get the list of active teams.
+        for team in self.active_teams:
+            if team and team.club_associations:
+                # Assuming each team can be associated with multiple clubs.
+                # Returning the first club associated with the team.
+                for association in team.club_associations:
+                    if association.club:
+                        return association.club
+        return None
+
 
 class OAuth(Model, OAuthConsumerMixin):
     __table_args__ = (db.UniqueConstraint("provider", "provider_user_id"),)

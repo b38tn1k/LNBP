@@ -19,5 +19,7 @@ class Facility(Model):
     # Relationship for User administrators
     administrators = db.relationship('FacilityAdministrator', back_populates='facility')
 
+    GDPR_EXPORT_COLUMNS = {}
+
     def __repr__(self):
         return f'<Facility {self.id} - {self.name}>'

@@ -18,3 +18,5 @@ class LeagueGameEvent(Model):
     player = db.relationship('Player', backref=db.backref('game_events', lazy=True, cascade='all, delete-orphan'))
     facility = db.relationship('Facility', backref=db.backref('game_events', lazy=True, cascade='all, delete-orphan'))
     timeslot = db.relationship('Timeslot', backref=db.backref('game_events', lazy=True, cascade='all, delete-orphan'))
+
+    GDPR_EXPORT_COLUMNS = {}

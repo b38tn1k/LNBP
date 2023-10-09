@@ -9,6 +9,7 @@ class League(Model):
     # Attributes
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
+    type = db.Column(db.String)
     start_date = db.Column(db.DateTime, default=datetime.utcnow)
     bg_color = db.Column(db.String(7), default='#000000')
     fg_color = db.Column(db.String(7), default='#ffffff')
@@ -18,6 +19,8 @@ class League(Model):
 
     # Club Relationship
     club = db.relationship('Club', backref=db.backref('leagues', lazy=True, cascade='all, delete-orphan'))
+
+    GDPR_EXPORT_COLUMNS = {}
 
     def __repr__(self):
         return f'<League {self.id} - {self.name}>'

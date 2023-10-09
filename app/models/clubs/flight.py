@@ -12,5 +12,7 @@ class Flight(Model):
     # Relationship with cascade delete
     league = db.relationship('League', backref=db.backref('flights', lazy=True, cascade='all, delete-orphan'))
 
+    GDPR_EXPORT_COLUMNS = {}
+
     def __repr__(self):
         return f'<Flight {self.id} - {self.name}>'
