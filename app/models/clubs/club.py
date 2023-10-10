@@ -1,4 +1,5 @@
 from app.models import db, Model
+from app.models import ModelProxy, transaction
 
 class Club(Model):
     __tablename__ = 'club'
@@ -32,8 +33,12 @@ class Club(Model):
         return club
 
     # Relationships and other methods as required
-
-    # ... other attributes and methods ...
+    @transaction
+    def add_facility(self, name, asset_type, user, club):
+        facility = ModelProxy.clubs.Facility.create(name, asset_type, club)
+        facility_admin = ModelProxy.clubs.FacilityAdministrator(user=user, facility=facility)
+        print(user.club.facilities)
+        return facility
 
     def __repr__(self):
         return '<Club {0} - {1}>'.format(self.id, self.name)

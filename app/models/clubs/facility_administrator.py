@@ -11,3 +11,11 @@ class FacilityAdministrator(Model):
     user = db.relationship('User', back_populates='administered_facilities')
 
     GDPR_EXPORT_COLUMNS = {}
+
+    @staticmethod
+    def create(user, facility):
+        FA = FacilityAdministrator(user=user, facility=facility)
+        db.session.add(FA)
+        db.session.commit()
+        return FA
+

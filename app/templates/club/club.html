@@ -21,37 +21,27 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>Court 1</td>
-                                    <td class="text-center">Tennis Court</td>
-                                    <td class="text-center">
-                                        <button type="submit" class="btn btn-secondary btn-sm">Edit</button>
-                                        <button type="submit" class="btn btn-secondary btn-sm">Delete</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Court 2</td>
-                                    <td class="text-center">Tennis Court</td>
-                                    <td class="text-center">
-                                        <button type="submit" class="btn btn-secondary btn-sm">Edit</button>
-                                        <button type="submit" class="btn btn-secondary btn-sm">Delete</button>
-                                    </td>
-                                </tr>
                                 {% for facility in club.facilities %}
                                 <tr>
-                                    <td class="text-center">Name</td>
-                                    <td class="text-center">Tennis Court</td>
-                                    <td class="text-center">EDIT</td>
+                                    <td> {{ facility.name }} </td>
+                                    <td class="text-center"> {{ facility.asset_type }} </td>
+                                    <td class="text-center">
+                                        <form role="form" action="{{ url_for('club_home.delete_facility', facility_id=facility.id) }}" method="post">
+                                            {{ simple_form.hidden_tag() }}
+
+                                            <button type="submit" class="btn btn-secondary btn-sm">Remove</button>
+                                        </form>
+                                    </td>
                                 </tr>
                                 {% endfor %}
-                                <tr>
-                                    <form>
+                                <form role="form" action="{{ url_for('club_home.add_facility', club_id=club.id) }}" method="post">
+                                    <tr>
                                         {{ facility_form.hidden_tag() }}
                                         <th>{{ render_field(facility_form.name) }}</th>
                                         <th>{{ render_field(facility_form.facility_type) }}</th>
                                         <th><button type="submit" class="btn btn-secondary btn-sm">Add</button></th>
-                                    </form>
-                                </tr>
+                                    </tr>
+                                </form>
                             </tbody>
                         </table>
                     </div>

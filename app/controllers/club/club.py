@@ -1,8 +1,9 @@
-from flask import Blueprint, render_template, abort, redirect, url_for, flash
+from flask import Blueprint, render_template, abort, redirect, url_for, flash, request
 from flask_login import login_required, current_user
-from app.forms.club_settings import ClubSetup, FacilitySetup
+from app.forms import SimpleForm
+from app.forms.club_forms import ClubSetup, FacilitySetup
 from app.models import db
-from app.models.clubs import Club
+from app.models.clubs import Club, Facility
 
 blueprint = Blueprint('club_home', __name__)
 
@@ -64,42 +65,30 @@ def index():
 
         facility_form = FacilitySetup()
         
-        return render_template('club/club.html', club=current_user.club, setup_form=setup_form, facility_form=facility_form)
+        return render_template('club/club.html', club=current_user.club, setup_form=setup_form, facility_form=facility_form, simple_form=SimpleForm())
     else:
         flash("You are not part of any club", 'warning')
 
-@blueprint.route('/<hashid:club_id>/update', methods=['POST'])
+@blueprint.route('/<hashid:club_id>/add-facility', methods=['POST'])
 @login_required
-def update(club_id):
+def add_facility(club_id):
     club = Club.query.get(club_id)
-    setup_form = ClubSetup()
-    if setup_form.validate_on_submit():
-        if setup_form.name.data is not None:
-            current_user.club.name = setup_form.name.data
-            current_user.club
 
-        if setup_form.email.data is not None:
-            current_user.club.email = setup_form.email.data
+    form = FacilitySetup()  # Assuming the form's class name is FacilityForm
 
-        if setup_form.contact_number.data is not None:
-            current_user.club.contact_number = setup_form.contact_number.data
+    if form.validate_on_submit():
+        facility_name = form.name.data
+        facility_type = form.facility_type.data
+        club.add_facility(facility_name, facility_type, current_user, club)
 
-        if setup_form.street_address.data is not None:
-            street_address_parts = [setup_form.street_address.data]
-            if setup_form.street_address2.data is not None:
-                street_address_parts.append(setup_form.street_address2.data)
-            current_user.club.street_address = "\n".join(street_address_parts)
+    return redirect(url_for('.index'))
 
-        if setup_form.state.data is not None:
-            current_user.club.state = setup_form.state.data
-
-        if setup_form.zip_code.data is not None:
-            current_user.club.zip_code = setup_form.zip_code.data
-
-        if setup_form.country.data is not None:
-            current_user.club.country = setup_form.country.data
-
-        return redirect(url_for('.index'))
+@blueprint.route('/<hashid:facility_id>/delete-facility', methods=['POST'])
+@login_required
+def delete_facility(facility_id):
+    f = Facility.query.get(facility_id)
+    #TODO: delete this shiz
+    return redirect(url_for('.index'))
 
         
 
