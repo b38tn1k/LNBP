@@ -29,6 +29,7 @@ class LoginForm(BaseForm):
 
 class SignupForm(BaseForm):
     email = StringField('Email', validators=[validators.email(), validators.InputRequired()])
+    club = StringField('Club Name', validators=[validators.InputRequired()])
     password = PasswordField('Password', validators=[validators.InputRequired(), validators.length(min=4),
                                                      validators.EqualTo('confirm', message='Passwords must match')])
     confirm = PasswordField('Confirm Password', validators=[validators.InputRequired()])

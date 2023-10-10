@@ -1,0 +1,86 @@
+{% extends "tabler/dashboard_base.html" %} {% from "helpers/_formhelpers.html" import render_field %} {% block title
+%}{{ club.name }} Settings{% endblock %} {% block body %}
+<div class="my-3 my-md-5">
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">{{ club.name }}</h1>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Facilities</h3>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-outline table-vcenter text-nowrap card-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th class="text-center">Type</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Court 1</td>
+                                    <td class="text-center">Tennis Court</td>
+                                    <td class="text-center">
+                                        <button type="submit" class="btn btn-secondary btn-sm">Edit</button>
+                                        <button type="submit" class="btn btn-secondary btn-sm">Delete</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Court 2</td>
+                                    <td class="text-center">Tennis Court</td>
+                                    <td class="text-center">
+                                        <button type="submit" class="btn btn-secondary btn-sm">Edit</button>
+                                        <button type="submit" class="btn btn-secondary btn-sm">Delete</button>
+                                    </td>
+                                </tr>
+                                {% for facility in club.facilities %}
+                                <tr>
+                                    <td class="text-center">Name</td>
+                                    <td class="text-center">Tennis Court</td>
+                                    <td class="text-center">EDIT</td>
+                                </tr>
+                                {% endfor %}
+                                <tr>
+                                    <form>
+                                        {{ facility_form.hidden_tag() }}
+                                        <th>{{ render_field(facility_form.name) }}</th>
+                                        <th>{{ render_field(facility_form.facility_type) }}</th>
+                                        <th><button type="submit" class="btn btn-secondary btn-sm">Add</button></th>
+                                    </form>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Club Setup</h3>
+                    </div>
+                    <form role="form" action="{{ url_for('club_home.index') }}" method="post">
+                        <div class="card-body">
+                            {{ setup_form.hidden_tag() }} {{ render_field(setup_form.name) }}
+                            <br />
+                            {{ render_field(setup_form.email) }} {{ render_field(setup_form.contact_number) }}
+                            <br />
+                            {{ render_field(setup_form.street_address) }} {{ render_field(setup_form.street_address2) }}
+                            {{ render_field(setup_form.city) }} {{ render_field(setup_form.state) }} {{
+                            render_field(setup_form.zip_code) }} {{ render_field(setup_form.country) }}
+                        </div>
+                        <div class="card-footer text-left">
+                            <div class="d-flex">
+                                <button type="submit" class="btn btn-primary">Update</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

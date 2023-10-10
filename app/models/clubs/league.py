@@ -1,7 +1,6 @@
 from app.models import db, Model
 from datetime import datetime
-from .player_availability import PlayerAvailability
-from .league_game_event import LeagueGameEvent
+from app.models import ModelProxy, transaction
 
 class League(Model):
     __tablename__ = 'league'
@@ -25,6 +24,7 @@ class League(Model):
     def __repr__(self):
         return f'<League {self.id} - {self.name}>'
     
+    @transaction
     def add_player_availability(self, player, timeslot, availability):
         """
         Add a player's availability for a specific time slot in the league.
@@ -36,16 +36,17 @@ class League(Model):
         # Check if the player is associated with this league
         if player in self.players:
             # Create or update the PlayerAvailability entry
-            player_availability = PlayerAvailability.query.filter_by(player=player, timeslot=timeslot).first()
+            player_availability = ModelProxy.clubs.PlayerAvailability.query.filter_by(player=player, timeslot=timeslot).first()
             if not player_availability:
-                player_availability = PlayerAvailability(player=player, timeslot=timeslot, availability=availability)
+                player_availability = ModelProxy.clubs.PlayerAvailability(player=player, timeslot=timeslot, availability=availability)
             else:
                 player_availability.availability = availability
             db.session.add(player_availability)
             db.session.commit()
         else:
             raise ValueError("Player is not associated with this league.")
-        
+
+    @transaction    
     def get_player_availability(self, player, timeslot):
         """
         Get a player's availability for a specific time slot in the league.
@@ -54,7 +55,7 @@ class League(Model):
         :param timeslot: The time slot for which availability is requested.
         :return: The availability status (e.g., 0 for unavailable, 1 for available).
         """
-        player_availability = PlayerAvailability.query.filter_by(player=player, timeslot=timeslot).first()
+        player_availability = ModelProxy.clubs.PlayerAvailability.query.filter_by(player=player, timeslot=timeslot).first()
         if player_availability:
             return player_availability.availability
         else:
@@ -78,7 +79,8 @@ class League(Model):
                 ):
                     return game_event
             return None
-        
+    
+    @transaction
     def add_game_event(self, player, facility, timeslot):
         """
         Add a new game event to the league if one with the same player, facility, and timeslot doesn't already exist.
@@ -99,7 +101,7 @@ class League(Model):
             return existing_game_event
         else:
             # Create and add a new game event
-            new_game_event = LeagueGameEvent(player=player, facility=facility, timeslot=timeslot)
+            new_game_event = ModelProxy.clubs.LeagueGameEvent(player=player, facility=facility, timeslot=timeslot)
             self.game_events.append(new_game_event)
             db.session.add(new_game_event)
             db.session.commit()

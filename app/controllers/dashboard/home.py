@@ -18,7 +18,6 @@ def index():
 @login_required
 def home(team_id):
     team = Team.query.get(team_id)
-    print(current_user.club)
     if not team or not team.has_member(current_user):
         abort(404)
     return render_template('dashboard/home.html', team=team)

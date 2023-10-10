@@ -17,6 +17,13 @@
                             <i class="fe fe-home"></i> Home
                         </a>
                     </li>
+                    {% if current_user.club %}
+                    <li class="nav-item {{ 'active' if request.blueprint == 'club_home' }}">
+                        <a href="{{ url_for('club_home.index') }}" class="nav-link  {{ 'active' if request.endpoint == 'club_home.settings' }}">
+                            <i class="fe fe-box"></i> Club</a>
+                    </li>
+
+                    {% endif %}
                     {% if team %}
                     <li class="nav-item {{ 'active' if request.blueprint == 'dashboard_team' }}">
                         <a href="{{ url_for('dashboard_team.index', team_id=team.id) }}" class="nav-link  {{ 'active' if request.endpoint == 'dashboard_team.index' }}">
@@ -28,15 +35,7 @@
                             <i class="fe fe-file"></i> Shared Files
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a href="javascript:void(0)" class="nav-link" data-toggle="dropdown">
-                            <i class="fe fe-box"></i> Dropdown</a>
-                        <div class="dropdown-menu dropdown-menu-arrow">
-                            <a href="#" class="dropdown-item">Menu Item 1</a>
-                            <a href="#" class="dropdown-item ">Menu Item 2</a>
-                            <a href="#" class="dropdown-item ">Menu Item 3</a>
-                        </div>
-                    </li>
+                    
 
                     {% endif %}
                     <li class="nav-item {{ 'active' if request.endpoint.startswith('user_settings') }}">

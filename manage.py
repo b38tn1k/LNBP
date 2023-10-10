@@ -15,6 +15,7 @@ from app.extensions import cache
 from app.models import *  # noqa
 from app.models.clubs import *
 from app.models.user import User
+from app.models.teams import *
 
 
 # default to dev config because this should not be run in production

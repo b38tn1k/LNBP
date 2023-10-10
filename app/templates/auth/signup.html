@@ -1,7 +1,7 @@
 {% extends "tabler/minimal_base.html" %}
 {% from "helpers/_formhelpers.html" import render_field %}
 
-{% block title %}app Signup{% endblock %}
+{% block title %}League Ninja Signup{% endblock %}
 
 {% block body %}
 <div class="page-single">
@@ -9,7 +9,7 @@
         <div class="row">
             <div class="col col-login mx-auto">
                 <div class="text-center mb-6">
-                    <img src="{{ url_for('static', filename='public/ignite/ignite-logo@2x.png') }}" class="h-6" alt="Tabler">
+                    <img src="{{ url_for('static', filename='public/leagueninja/leagueninja-logo@2x.png') }}" class="h-6" alt="Tabler">
                 </div>
                 <div class="card">
                     <div class="card-body">
@@ -18,6 +18,7 @@
                                 <div class="card-title">Sign up for app</div>
                                 {{ form.hidden_tag() }}
                                 {{ render_field(form.email) }}
+                                {{ render_field(form.club) }}
                                 {{ render_field(form.password) }}
                                 {{ render_field(form.confirm) }}
 

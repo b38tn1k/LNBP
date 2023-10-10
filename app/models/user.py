@@ -46,10 +46,9 @@ class User(Model, UserMixin):
     # seperate function or a class method. 
     def __init__(self, email=None, password=None, admin=False,
                  email_confirmed=False, team=None, name=None, 
-                 deleted=False, role='user'):
+                 deleted=False, role='user', team_name=None):
         if not email:
             raise ValueError('No Email Provided')
-
         self.email = email.lower().strip()
         self.full_name = name
         self.email_confirmed = email_confirmed
@@ -62,7 +61,8 @@ class User(Model, UserMixin):
             self.set_password(password)
 
         if not team:
-            team_name = "{0}'s team".format(email)
+            if team_name is None:
+                team_name = "{0}'s team".format(email)
             ModelProxy.teams.Team.create(team_name, self)
 
     def set_password(self, password):

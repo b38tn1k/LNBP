@@ -69,14 +69,24 @@ class Team(Model):
                     return association.club
         return None
 
-
     @classmethod
     @transaction
     def create(cls, name, creator):
         new_team = cls(name=name, creator=creator)
         new_team_member = ModelProxy.teams.TeamMember(team=new_team, user=creator, role='administrator', activated=True)
-
+        
+        # Add the new_team and new_team_member to the session
         db.session.add(new_team)
         db.session.add(new_team_member)
+        
+        # Flush the session to populate the IDs
+        db.session.flush()
+        
+        # Create the new_club and the association
+        new_club = ModelProxy.clubs.Club.create(name=name)
+        ModelProxy.clubs.ClubTeamAssociation.create(club_id=new_club.id, team_id=new_team.id)
+        
+        # Commit the transaction
         db.session.commit()
+        
         return new_team

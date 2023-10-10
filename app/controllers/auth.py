@@ -60,7 +60,7 @@ def signup():
             invite.user = user
             db.session.add(invite)
         else:
-            user = User(form.email.data, form.password.data)
+            user = User(form.email.data, form.password.data, team_name=form.club.data)
         db.session.add(user)
         db.session.commit()
         session['current_team_membership_id'] = user.primary_membership_id

@@ -14,3 +14,10 @@ class ClubTeamAssociation(Model):
     # Relationships
     club = db.relationship('Club', backref=db.backref('team_associations', lazy=True, cascade='all, delete-orphan'))
     team = db.relationship('Team', backref=db.backref('club_associations', lazy=True, cascade='all, delete-orphan'))
+
+    @staticmethod
+    def create(club_id, team_id):
+        association = ClubTeamAssociation(club_id=club_id, team_id=team_id)
+        db.session.add(association)
+        db.session.commit()
+        return association
