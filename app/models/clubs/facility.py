@@ -16,8 +16,8 @@ class Facility(Model):
     # Relationship
     club = db.relationship('Club', backref=db.backref('facilities', lazy=True, cascade='all, delete-orphan'))
 
-    # Relationship for User administrators
-    administrators = db.relationship('FacilityAdministrator', back_populates='facility')
+    # # Relationship for User administrators
+    # administrators = db.relationship('FacilityAdministrator', back_populates='facility')
 
     GDPR_EXPORT_COLUMNS = {}
 

@@ -6,9 +6,9 @@ class FacilityAdministrator(Model):
     facility_id = db.Column(db.Integer, db.ForeignKey('facility.id', ondelete='CASCADE'), primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), primary_key=True)
     
-    # Note: The string representations 'Facility' and 'User' in the relationships
-    facility = db.relationship('Facility', back_populates='administrators')
-    user = db.relationship('User', back_populates='administered_facilities')
+    # Relationships with backrefs
+    facility = db.relationship('Facility', backref=db.backref('administrators', lazy=True, cascade='all, delete-orphan'))
+    user = db.relationship('User', backref=db.backref('administered_facilities', lazy=True, cascade='all, delete-orphan'))
 
     GDPR_EXPORT_COLUMNS = {}
 
@@ -18,4 +18,3 @@ class FacilityAdministrator(Model):
         db.session.add(FA)
         db.session.commit()
         return FA
-

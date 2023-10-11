@@ -87,6 +87,9 @@ def add_facility(club_id):
 @login_required
 def delete_facility(facility_id):
     f = Facility.query.get(facility_id)
+    if f:
+        db.session.delete(f)
+        db.session.commit()
     #TODO: delete this shiz
     return redirect(url_for('.index'))
 

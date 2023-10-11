@@ -30,8 +30,8 @@ class User(Model, UserMixin):
     encrypted_totp_secret = db.Column(EncryptedType(db.String,
                                                     key=global_encryption_key_iv,
                                                     engine=FernetEngine))
-    # Relationship for administered facilities
-    administered_facilities = db.relationship('FacilityAdministrator', back_populates='user')
+    # # Relationship for administered facilities
+    # administered_facilities = db.relationship('FacilityAdministrator', back_populates='user')
 
     GDPR_EXPORT_COLUMNS = {
         "id": "ID of the user",
