@@ -17,6 +17,7 @@ from app.controllers.admin.jobs import jobs
 from app.controllers.webhooks.stripe import stripe_blueprint
 from app.controllers.dashboard import dashboard_blueprints
 from app.controllers.club import club_blueprints
+from app.controllers.league import league_blueprints
 
 from app import utils
 from app.helpers import view as view_helpers
@@ -153,6 +154,10 @@ def create_app(object_name):
     # Register user club blueprints
     for blueprint in club_blueprints:
         app.register_blueprint(blueprint, url_prefix='/club')
+
+    # Register user club blueprints
+    for blueprint in league_blueprints:
+        app.register_blueprint(blueprint, url_prefix='/leagues')
 
     # API
     app.register_blueprint(api_blueprint, url_prefix='/api')
