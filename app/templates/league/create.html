@@ -11,7 +11,7 @@
 <div class="my-3 my-md-5">
     <div class="container">
         <div class="page-header">
-            <h1 class="page-title">New League</h1>
+            <h1 class="page-title">League Setup</h1>
         </div>
         <div class="row justify-content-center">
             <div class="col-12">
@@ -62,7 +62,7 @@
 
                 <!-- CSV Definition -->
                 <div
-                    id="css-labelling"
+                    id="flight-labelling"
                     data-path="csv"
                     data-index="2"
                     progress-index="2"
@@ -75,12 +75,29 @@
                             Please select each individual flight in the spreadsheet by clicking the top left and bottom
                             right cells for the flight.
                         </p>
-                        <p>You may only have one flight, and that's perfectly fine! Click Next when you are happy.</p>
+                        <p>You may only have one flight, and that's perfectly fine!</p>
+                        <p>Click Next when you are happy.</p>
                         <button id="identify-flight-button" onclick="highlightFlightCells()" class="btn btn-primary">
                             Identify Flight
                         </button>
                     </div>
                     <div id="csv-table-container"></div>
+                </div>
+
+                <div
+                    id="data-labelling"
+                    data-path="csv"
+                    data-index="3"
+                    progress-index="3"
+                    class="step"
+                    style="display: none"
+                >
+                    <div class="data-label-tabs">
+                        <!-- Tabs will be inserted here dynamically -->
+                    </div>
+                    <div class="data-label-tab-contents">
+                        <!-- Tab content will be inserted here dynamically -->
+                    </div>
                 </div>
 
                 <!-- Flask Form Method // TODO -->
@@ -156,6 +173,8 @@
             // Logic for the second step, e.g., validate CSV data
             const csvText = document.getElementById("csv-input").value;
             csvToTable(csvText);
+        } else if (stepIndex === 2) {
+            proceedToDataLabeling();
         }
 
         if (stepIndex === 1) {
@@ -200,6 +219,45 @@
                 selectedCells.push(cell);
             }
         }
+    }
+
+    function proceedToDataLabeling() {
+        // Hide previous div
+        document.getElementById("flight-labelling").style.display = "none";
+
+        // Show next div
+        const dataLabelDiv = document.getElementById("data-labelling");
+        dataLabelDiv.style.display = "block";
+
+        // Create tabs for each flight
+        const tabContainer = dataLabelDiv.querySelector(".data-label-tabs");
+        const tabContentContainer = dataLabelDiv.querySelector(".data-label-tab-contents");
+        flights.forEach((flight, index) => {
+            const tabId = `flight-tab-${index}`;
+            const tabContentId = `flight-tab-content-${index}`;
+
+            const tabElement = document.createElement("div");
+            tabElement.id = tabId;
+            tabElement.className = "data-label-tab";
+            tabElement.innerText = `Flight ${index + 1}`;
+            tabContainer.appendChild(tabElement);
+
+            const tabContentElement = document.createElement("div");
+            tabContentElement.id = tabContentId;
+            tabContentElement.className = "data-label-tab-content";
+            // Populate tabContentElement with the table for this flight
+            tabContentContainer.appendChild(tabContentElement);
+        });
+
+        // Select table based on visible parent
+        const allTables = document.querySelectorAll(".data-label-tab-content table");
+        let currentTable;
+        allTables.forEach((table) => {
+            if (table.parentElement.style.display !== "none") {
+                currentTable = table;
+            }
+        });
+        setUpTableInteraction(currentTable);
     }
 
     const flights = [];
@@ -255,7 +313,7 @@
         const delimiter = pipeCount > commaCount ? "|" : ",";
 
         const rows = csvText.split("\n");
-        let tableHTML = "<table id='csv-table' class='table table-bordered table-hover table-sm'>";
+        let tableHTML = "<table id='csv-table' class='csv-table table table-bordered table-hover table-sm'>";
 
         rows.forEach((row, rowIndex) => {
             tableHTML += "<tr>";
