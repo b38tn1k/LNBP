@@ -1,105 +1,87 @@
 {% extends "tabler/dashboard_base.html" %} {% from "helpers/_formhelpers.html" import render_field %} {% block title
 %}{{ club.name }} Leagues {% endblock %} {% block body %}
 <style>
-    #csv-table td::selection {
+    .csv-table td::selection {
         background: transparent;
     }
-    #csv-table td:hover {
+    .csv-table td:hover {
         cursor: pointer;
+    }
+    .initial-option-button {
+        width: 100%;
+        padding: 20px;
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    #csv-input {
+        width: 100%;
+        height: 100vh;
+        font-size: 18px;
+        resize: none;
     }
 </style>
 <div class="my-3 my-md-5">
     <div class="container">
-        <div class="page-header">
-            <h1 class="page-title">League Setup</h1>
-        </div>
+
         <div class="row justify-content-center">
             <div class="col-12">
-                <div id="stepper">
-                    <div class="progress mb-3">
-                        <div
-                            id="progress-bar"
-                            class="progress-bar"
-                            role="progressbar"
-                            style="width: 0%"
-                            aria-valuenow="0"
-                            aria-valuemin="0"
-                            aria-valuemax="100"
-                        ></div>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <button id="back-button" class="btn btn-secondary">Back</button>
-                        <button id="next-button" class="btn btn-primary">Next</button>
-                    </div>
-                    <br />
+
+                <div class="card-header">
+                    <h3 class="card-title">League Setup</h3>
                 </div>
+                <div class="card-body">
+                    <div id="stepper">
+                        <div class="progress mb-3">
+                            <div
+                                id="progress-bar"
+                                class="progress-bar"
+                                role="progressbar"
+                                style="width: 0%"
+                                aria-valuenow="0"
+                                aria-valuemin="0"
+                                aria-valuemax="100"
+                            ></div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <button id="back-button" class="btn btn-secondary">Back</button>
+                            <button id="next-button" class="btn btn-primary">Next</button>
+                        </div>
+                        <br />
+                    </div>
+                </div>
+
+
+
+
+
+                
+                
 
                 <!-- Start -->
                 <div id="initial-options" data-index="0" progress-index="0" class="step text-center">
                     <button id="csv-button" class="btn btn-primary btn-lg initial-option-button">
-                        Copy from Spread Sheet
+                        <h3>Copy from Spreadsheet</h3>
+                        <p style="white-space: normal">
+                            Recommended if you have previously run social flighted leagues and are transitioning to
+                            League Ninja.
+                        </p>
                     </button>
                     <button id="create-button" class="btn btn-secondary btn-lg initial-option-button" disabled>
-                        Create With League Ninja
+                        <h3>Create with League Ninja</h3>
+                        <p style="white-space: normal">
+                            Recommended if you haven't run Social Flighted Leagues before.
+                        </p>
+                    </button>
+                    <button id="create-button" class="btn btn-secondary btn-lg initial-option-button" disabled>
+                        <h3>Build from Previous League</h3>
+                        <p style="white-space: normal">
+                            The most efficient way to set up your league. Copy and edit an old league with most of the
+                            same players and/or courts.
+                        </p>
                     </button>
                 </div>
 
-                <!-- CSV Copy / Paste -->
-                <div
-                    id="csv-import"
-                    data-path="csv"
-                    data-index="1"
-                    progress-index="1"
-                    class="step"
-                    style="display: none"
-                >
-                    <h3>Copy & Paste</h3>
-                    <textarea
-                        id="csv-input"
-                        placeholder="Copy and paste your league plan from Google Sheets or Excel. For example: &#10;&#10;Player  , TimeSlot 09:00-10:00 , TimeSlot 10:00-11:00 , TimeSlot 11:00-12:00&#10;Jim     ,                      , ---                  , XXX&#10;Emma    ,                      , XXX                  , ---&#10;&#10;&#10;Where 'XXX' may indicate unavailable, '---' may indicate low preference, and '   ' indicates the player is available"
-                    ></textarea>
-                </div>
-
-                <!-- CSV Definition -->
-                <div
-                    id="flight-labelling"
-                    data-path="csv"
-                    data-index="2"
-                    progress-index="2"
-                    class="step"
-                    style="display: none"
-                >
-                    <div id="flight-instruction-div">
-                        <h3>Flight Identification</h3>
-                        <p>
-                            Please select each individual flight in the spreadsheet by clicking the top left and bottom
-                            right cells for the flight.
-                        </p>
-                        <p>You may only have one flight, and that's perfectly fine!</p>
-                        <p>Click Next when you are happy.</p>
-                        <button id="identify-flight-button" onclick="highlightFlightCells()" class="btn btn-primary">
-                            Identify Flight
-                        </button>
-                    </div>
-                    <div id="csv-table-container"></div>
-                </div>
-
-                <div
-                    id="data-labelling"
-                    data-path="csv"
-                    data-index="3"
-                    progress-index="3"
-                    class="step"
-                    style="display: none"
-                >
-                    <div class="data-label-tabs">
-                        <!-- Tabs will be inserted here dynamically -->
-                    </div>
-                    <div class="data-label-tab-contents">
-                        <!-- Tab content will be inserted here dynamically -->
-                    </div>
-                </div>
-
+                {% include 'league/create-spreadsheet.html' %}
                 <!-- Flask Form Method // TODO -->
                 <div
                     id="create-league"
@@ -116,223 +98,5 @@
     </div>
 </div>
 
-<!-- Additional CSS -->
-<style>
-    .initial-option-button {
-        width: 100%;
-        padding: 20px;
-        font-size: 24px;
-        margin-bottom: 20px;
-    }
-    #csv-input {
-        width: 100%;
-        height: 100vh;
-        font-size: 18px;
-        resize: none;
-    }
-</style>
-
-<!-- JavaScript -->
-<script>
-    let currentStep = 0;
-    let maxSteps = 5;
-
-    function updateProgressBar(progressIndex) {
-        let progressPercentage = (progressIndex / maxSteps) * 100;
-        let progressBar = document.getElementById("progress-bar");
-        progressBar.style.width = `${progressPercentage}%`;
-        progressBar.setAttribute("aria-valuenow", progressPercentage);
-    }
-
-    function showStep(index) {
-        let currentDiv;
-        document.querySelectorAll(".step").forEach((div, i) => {
-            if (i === index) {
-                currentDiv = div;
-                div.style.display = "block";
-            } else {
-                div.style.display = "none";
-            }
-        });
-
-        // Read progress-index attribute from the current div
-        let progressIndex = parseInt(currentDiv.getAttribute("progress-index"), 10);
-
-        // Update progress bar
-        updateProgressBar(progressIndex);
-
-        document.getElementById("stepper").style.display = index === 0 ? "none" : "block";
-        currentStep = index;
-    }
-
-    function performActionsAndMove(stepIndex) {
-        // Initial checks or actions based on stepIndex
-        if (stepIndex === 0) {
-            // Logic for the first step
-        } else if (stepIndex === 1) {
-            // Logic for the second step, e.g., validate CSV data
-            const csvText = document.getElementById("csv-input").value;
-            csvToTable(csvText);
-        } else if (stepIndex === 2) {
-            proceedToDataLabeling();
-        }
-
-        if (stepIndex === 1) {
-            setUpTableInteraction();
-        } else {
-            tearDownTableInteraction();
-        }
-
-        // Add more conditions for additional steps as needed
-        // Increment only if initial checks pass
-        showStep(stepIndex + 1);
-    }
-
-    let isMouseDown = false;
-    let selectedCells = [];
-    let startPoint = null;
-
-    function setUpTableInteraction() {
-        const table = document.getElementById("csv-table");
-        table.addEventListener("mousedown", handleMouseDown);
-        table.addEventListener("mousemove", handleMouseMove);
-        document.addEventListener("mouseup", handleMouseUp);
-    }
-
-    function tearDownTableInteraction() {
-        const table = document.getElementById("csv-table");
-        table.removeEventListener("mousedown", handleMouseDown);
-        table.removeEventListener("mousemove", handleMouseMove);
-        document.removeEventListener("mouseup", handleMouseUp);
-    }
-
-    function clearSelections() {
-        selectedCells.forEach((cell) => cell.classList.remove("table-primary"));
-        selectedCells = [];
-    }
-
-    function selectRectangle(topRow, bottomRow, leftCol, rightCol) {
-        for (let i = topRow; i <= bottomRow; i++) {
-            for (let j = leftCol; j <= rightCol; j++) {
-                const cell = document.querySelector(`[data-row='${i}'][data-col='${j}']`);
-                cell.classList.add("table-primary");
-                selectedCells.push(cell);
-            }
-        }
-    }
-
-    function proceedToDataLabeling() {
-        // Hide previous div
-        document.getElementById("flight-labelling").style.display = "none";
-
-        // Show next div
-        const dataLabelDiv = document.getElementById("data-labelling");
-        dataLabelDiv.style.display = "block";
-
-        // Create tabs for each flight
-        const tabContainer = dataLabelDiv.querySelector(".data-label-tabs");
-        const tabContentContainer = dataLabelDiv.querySelector(".data-label-tab-contents");
-        flights.forEach((flight, index) => {
-            const tabId = `flight-tab-${index}`;
-            const tabContentId = `flight-tab-content-${index}`;
-
-            const tabElement = document.createElement("div");
-            tabElement.id = tabId;
-            tabElement.className = "data-label-tab";
-            tabElement.innerText = `Flight ${index + 1}`;
-            tabContainer.appendChild(tabElement);
-
-            const tabContentElement = document.createElement("div");
-            tabContentElement.id = tabContentId;
-            tabContentElement.className = "data-label-tab-content";
-            // Populate tabContentElement with the table for this flight
-            tabContentContainer.appendChild(tabContentElement);
-        });
-
-        // Select table based on visible parent
-        const allTables = document.querySelectorAll(".data-label-tab-content table");
-        let currentTable;
-        allTables.forEach((table) => {
-            if (table.parentElement.style.display !== "none") {
-                currentTable = table;
-            }
-        });
-        setUpTableInteraction(currentTable);
-    }
-
-    const flights = [];
-
-    function highlightFlightCells() {
-        for (let cell of selectedCells) {
-            cell.classList.remove("table-primary");
-            cell.classList.add("table-secondary");
-        }
-        const newFlight = [];
-        selectedCells.forEach((cell) => newFlight.push(cell));
-        flights.push(newFlight);
-        console.log(flights);
-    }
-
-    function handleMouseDown(event) {
-        isMouseDown = true;
-
-        const cell = event.target;
-        const row = parseInt(cell.getAttribute("data-row"), 10);
-        const col = parseInt(cell.getAttribute("data-col"), 10);
-
-        if (!startPoint) {
-            startPoint = { row, col };
-        } else {
-            clearSelections();
-
-            const topRow = Math.min(startPoint.row, row);
-            const bottomRow = Math.max(startPoint.row, row);
-            const leftCol = Math.min(startPoint.col, col);
-            const rightCol = Math.max(startPoint.col, col);
-
-            selectRectangle(topRow, bottomRow, leftCol, rightCol);
-            startPoint = null;
-        }
-    }
-
-    function handleMouseMove(event) {
-        if (isMouseDown) {
-            // Existing logic can remain here if needed
-        }
-    }
-
-    function handleMouseUp() {
-        isMouseDown = false;
-        // Logic for finished selection can go here
-    }
-
-    function csvToTable(csvText) {
-        // Determine the most common delimiter (either "|" or ",")
-        const pipeCount = (csvText.match(/\|/g) || []).length;
-        const commaCount = (csvText.match(/,/g) || []).length;
-        const delimiter = pipeCount > commaCount ? "|" : ",";
-
-        const rows = csvText.split("\n");
-        let tableHTML = "<table id='csv-table' class='csv-table table table-bordered table-hover table-sm'>";
-
-        rows.forEach((row, rowIndex) => {
-            tableHTML += "<tr>";
-            const cells = row.split(delimiter);
-            cells.forEach((cell, cellIndex) => {
-                tableHTML += `<td data-row='${rowIndex}' data-col='${cellIndex}'>${cell.trim()}</td>`;
-            });
-            tableHTML += "</tr>";
-        });
-
-        tableHTML += "</table>";
-        document.getElementById("csv-table-container").innerHTML = tableHTML;
-    }
-
-    document.getElementById("csv-button").addEventListener("click", () => showStep(1));
-    document.getElementById("create-button").addEventListener("click", () => showStep(2));
-    document.getElementById("back-button").addEventListener("click", () => showStep(currentStep - 1));
-    document.getElementById("next-button").addEventListener("click", () => performActionsAndMove(currentStep));
-
-    showStep(0);
-</script>
+<script src="{{ url_for('static', filename='js/league_sheet_generation_tutorials.js') }}"></script>
 {% endblock %}

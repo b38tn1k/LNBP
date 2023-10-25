@@ -1,0 +1,62 @@
+<!-- CSV Copy / Paste -->
+
+<!-- <div class="card" id="csv-import" data-path="csv" data-index="1" progress-index="1" class="step" style="display: none"></div>
+    <div class="card-header">
+        <h3 class="card-title">Copy & Paste</h3>
+    </div>
+    <div class="card-body">
+        <textarea
+        id="csv-input"
+        placeholder="Copy and paste your league plan from Google Sheets or Excel. For example: &#10;&#10;Player  , TimeSlot 09:00-10:00 , TimeSlot 10:00-11:00 , TimeSlot 11:00-12:00&#10;Jim     ,                      , ---                  , XXX&#10;Emma    ,                      , XXX                  , ---&#10;&#10;&#10;Where 'XXX' may indicate unavailable, '---' may indicate low preference, and '   ' indicates the player is available"
+    ></textarea>
+    </div>
+</div> -->
+
+<div id="csv-import" data-path="csv" data-index="1" progress-index="1" class="step" style="display: none">
+    <div class="card">
+        <div class="card-header">Copy & Paste</div>
+        <div class="card-body">
+            <textarea
+                id="csv-input"
+                placeholder="Copy and paste your league plan from Google Sheets or Excel. For example: &#10;&#10;Player  , TimeSlot 09:00-10:00 , TimeSlot 10:00-11:00 , TimeSlot 11:00-12:00&#10;Jim     ,                      , ---                  , XXX&#10;Emma    ,                      , XXX                  , ---&#10;&#10;&#10;Where 'XXX' may indicate unavailable, '---' may indicate low preference, and '   ' indicates the player is available"
+            ></textarea>
+        </div>
+    </div>
+</div>
+
+<!-- CSV Definition -->
+<div id="flight-labelling" data-path="csv" data-index="2" progress-index="2" class="step" style="display: none">
+    <div class="card">
+        <div class="card-header">Flight Identification</div>
+        <div class="card-body">
+            <div id="flight-instruction-div">
+                <p>
+                    Please select each individual flight in the spreadsheet by clicking the top left and bottom right
+                    cells for the flight.
+                </p>
+                <p>You may only have one flight, and that's perfectly fine!</p>
+                <p>Click Next when you are happy.</p>
+
+                <button id="identify-flight-button" onclick="highlightAndSelectCells()" class="btn btn-primary">
+                    Identify Flight
+                </button>
+            </div>
+            <div class="csv-table-container"></div>
+        </div>
+    </div>
+</div>
+
+<div id="data-labelling" data-path="csv" data-index="3" progress-index="3" class="step" style="display: none">
+    <div class="card">
+        <div class="card-header">Flight Data Labelling</div>
+        <div class="card-body">
+            <div class="data-label-tabs">
+                'hi'
+                <!-- Tabs will be inserted here dynamically -->
+            </div>
+            <div class="data-label-tab-contents">
+                <!-- Tab content will be inserted here dynamically -->
+            </div>
+        </div>
+    </div>
+</div>

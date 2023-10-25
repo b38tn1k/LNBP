@@ -2,6 +2,7 @@ from flask_assets import Bundle
 
 common_css = Bundle(
     'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css',
+    'https://cdn.jsdelivr.net/npm/bootswatch@4.0.0/dist/minty/bootstrap.min.css',
     'css/vendor/helper.css',
     'css/main.css',
     'css/overrides.css',
@@ -34,6 +35,10 @@ landing_css = Bundle(
 
 tabler_css = Bundle(
     'https://rawcdn.githack.com/Sumukh/Ignite/70bf953851a356e785528b56ca105042074a3d5a/appname/static/tabler/css/dashboard.css',
+    # 'https://cdn.jsdelivr.net/npm/bootswatch@4.0.0/dist/minty/bootstrap.min.css',
+    # 'https://cdn.jsdelivr.net/npm/bootswatch@4.5.2/dist/lumen/bootstrap.min.css',
+    # 'https://cdn.jsdelivr.net/npm/bootswatch@4.5.2/dist/slate/bootstrap.min.css',
+    # 'https://cdn.jsdelivr.net/npm/bootswatch@4.5.2/dist/darkly/bootstrap.min.css',
     'css/overrides.css',
     filters='cssmin',
     output='public/css/tabler.css'
