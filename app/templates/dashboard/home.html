@@ -9,144 +9,147 @@
         <div class="page-header">
             <h1 class="page-title">{{ club.name }} Dashboard</h1>
         </div>
+
         <div class="row row-cards">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Leagues Summary</h3>
-                </div>
-                <div class="card-body">
-                    {% if leagues %}
-                    <div>
-                        <h4>Planned Leagues</h4>
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Start Date</th>
-                                    <th>End Date</th>
-                                    <th>Player Count</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for league in leagues['planned'] %}
-                                <tr>
-                                    <td>{{ league['name'] }}</td>
-                                    <td>{{ league['start_date'] }}</td>
-                                    <td>{{ league['end_date'] }}</td>
-                                    <td>{{ league['player_count'] }}</td>
-                                    <td>
-                                        <a href="{{ url_for('edit_league', id=league['id']) }}" class="btn btn-primary"
-                                            >Edit</a
-                                        >
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Leagues Summary</h3>
                     </div>
-                    <div>
-                        <h4>Current Leagues</h4>
-                        {% for league in leagues['current'] %}
-                        <tr>
-                            <td>{{ league['name'] }}</td>
-                            <td>{{ league['start_date'] }}</td>
-                            <td>{{ league['end_date'] }}</td>
-                            <td>{{ league['player_count'] }}</td>
-                            <td>
-                                <a href="{{ url_for('edit_league', id=league['id']) }}" class="btn btn-primary">Edit</a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </div>
-                    <div>
-                        <h4>Past Leagues</h4>
-                        {% for league in leagues['past'] %}
-                        <tr>
-                            <td>{{ league['name'] }}</td>
-                            <td>{{ league['start_date'] }}</td>
-                            <td>{{ league['end_date'] }}</td>
-                            <td>{{ league['player_count'] }}</td>
-                            <td>
-                                <a href="{{ url_for('edit_league', id=league['id']) }}" class="btn btn-primary">Edit</a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </div>
-                    {% else %}
-                    <div class="card-body p-3 text-center">
+                    <div class="card-body">
+                        {% if leagues %}
+                        <div>
+                            <h4>Planned Leagues</h4>
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Start Date</th>
+                                        <th>End Date</th>
+                                        <th>Player Count</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for league in leagues['planned'] %}
+                                    <tr>
+                                        <td>{{ league['name'] }}</td>
+                                        <td>{{ league['start_date'] }}</td>
+                                        <td>{{ league['end_date'] }}</td>
+                                        <td>{{ league['player_count'] }}</td>
+                                        <td>
+                                            <a
+                                                href="{{ url_for('edit_league', id=league['id']) }}"
+                                                class="btn btn-primary"
+                                                >Edit</a
+                                            >
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div>
+                            <h4>Current Leagues</h4>
+                            {% for league in leagues['current'] %}
+                            <tr>
+                                <td>{{ league['name'] }}</td>
+                                <td>{{ league['start_date'] }}</td>
+                                <td>{{ league['end_date'] }}</td>
+                                <td>{{ league['player_count'] }}</td>
+                                <td>
+                                    <a href="{{ url_for('edit_league', id=league['id']) }}" class="btn btn-primary"
+                                        >Edit</a
+                                    >
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </div>
+                        <div>
+                            <h4>Past Leagues</h4>
+                            {% for league in leagues['past'] %}
+                            <tr>
+                                <td>{{ league['name'] }}</td>
+                                <td>{{ league['start_date'] }}</td>
+                                <td>{{ league['end_date'] }}</td>
+                                <td>{{ league['player_count'] }}</td>
+                                <td>
+                                    <a href="{{ url_for('edit_league', id=league['id']) }}" class="btn btn-primary"
+                                        >Edit</a
+                                    >
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </div>
+                        {% else %}
                         <h3>Welcome to League Ninja</h3>
                         <p>You have no Leagues.</p>
                         <a href="{{ url_for('league.create_league') }}" class="btn btn-primary">Create a League</a>
+                        {% endif %}
                     </div>
-                    {% endif %}
                 </div>
             </div>
-            {% if facility_summary %}
             <div class="col-lg-6">
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">Facility Summary</h3>
                     </div>
-                    <div class="table-responsive">
-                        <div id="facility-chart" style="height: 12rem"></div>
-                        <table class="table card-table table-striped table-vcenter">
-                            <thead>
-                                <tr>
-                                    <th>Total Facilities</th>
-                                    <th>{{ facility_summary['total_count'] }}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for asset_type, count in facility_summary['asset_type'].items() %}
-                                <tr>
-                                    <td>{{ asset_type }}</td>
-                                    <td>{{ count }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                        <script>
-                            $(document).ready(function(){
-                                // Assume 'summary' is a JavaScript object that has the same structure as your Python summary dictionary
-                                var summary = {{ facility_summary['asset_type']|tojson }};
+                    <div class="card-body">
+                        {% if facility_summary %}
+                        <div class="table-responsive">
+                            <div id="facility-chart" style="height: 12rem"></div>
+                            <table class="table card-table table-striped table-vcenter">
+                                <thead>
+                                    <tr>
+                                        <th>Total Facilities</th>
+                                        <th>{{ facility_summary['total_count'] }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for asset_type, count in facility_summary['asset_type'].items() %}
+                                    <tr>
+                                        <td>{{ asset_type }}</td>
+                                        <td>{{ count }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            <script>
+                                $(document).ready(function(){
+                                    // Assume 'summary' is a JavaScript object that has the same structure as your Python summary dictionary
+                                    var summary = {{ facility_summary['asset_type']|tojson }};
 
-                                // Convert the summary object to an array of arrays, suitable for c3
-                                var columns = Object.keys(summary).map(function(key) {
-                                    return [key, summary[key]];
-                                });
+                                    // Convert the summary object to an array of arrays, suitable for c3
+                                    var columns = Object.keys(summary).map(function(key) {
+                                        return [key, summary[key]];
+                                    });
 
-                                var chart = c3.generate({
-                                    bindto: '#facility-chart', // id of chart wrapper
-                                    data: {
-                                        columns: columns,
-                                        type: 'pie',
-                                    },
-                                    axis: {},
-                                    legend: {
-                                        show: true, // show legend
-                                    },
-                                    padding: {
-                                        bottom: 0,
-                                        top: 0
-                                    },
+                                    var chart = c3.generate({
+                                        bindto: '#facility-chart', // id of chart wrapper
+                                        data: {
+                                            columns: columns,
+                                            type: 'pie',
+                                        },
+                                        axis: {},
+                                        legend: {
+                                            show: true, // show legend
+                                        },
+                                        padding: {
+                                            bottom: 0,
+                                            top: 0
+                                        },
+                                    });
                                 });
-                            });
-                        </script>
+                            </script>
+                            {% else %}
+                            <h3>Welcome to League Ninja</h3>
+                            <p>Head over to Club Settings to add some Facilities.</p>
+                            <a href="{{ url_for('club_home.index') }}" class="btn btn-primary">Go to Club Settings</a>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
-            {% else %}
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-body p-3 text-center">
-                        <h3>Welcome to League Ninja</h3>
-                        <p>Head over to Club Settings to add some Facilities.</p>
-                        <a href="{{ url_for('club_home.index') }}" class="btn btn-primary">Go to Club Settings</a>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
         </div>
     </div>
+    {% endblock %}
 </div>
-{% endblock %}
