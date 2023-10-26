@@ -16,6 +16,7 @@
     <div class="card">
         <div class="card-header">Copy & Paste</div>
         <div class="card-body">
+            <p>You can copy and paste your schedule from Google Sheets or from a CSV file.</p>
             <textarea
                 id="csv-input"
                 placeholder="Copy and paste your league plan from Google Sheets or Excel. For example: &#10;&#10;Player  , TimeSlot 09:00-10:00 , TimeSlot 10:00-11:00 , TimeSlot 11:00-12:00&#10;Jim     ,                      , ---                  , XXX&#10;Emma    ,                      , XXX                  , ---&#10;&#10;&#10;Where 'XXX' may indicate unavailable, '---' may indicate low preference, and '   ' indicates the player is available"
@@ -32,16 +33,22 @@
             <div id="flight-instruction-div">
                 <p>
                     Please select each individual flight in the spreadsheet by clicking the top left and bottom right
-                    cells for the flight.
+                    cells for the flight. Make sure atleast one flight contains the Time Slot information! Click
+                    "Identify Flight", or hit the Return key, after making each selection.
                 </p>
                 <p>You may only have one flight, and that's perfectly fine!</p>
                 <p>Click Next when you are happy.</p>
 
-                <button id="identify-flight-button" onclick="highlightAndSelectCells()" class="btn btn-primary">
+                <button
+                    id="identify-flight-button"
+                    onclick="highlightAndSelectCells('table-secondary', 'flight')"
+                    class="btn btn-secondary"
+                >
                     Identify Flight
                 </button>
             </div>
-            <div class="csv-table-container"></div>
+            <br />
+            <div class="csv-table-container" style="overflow: auto"></div>
         </div>
     </div>
 </div>
@@ -50,12 +57,67 @@
     <div class="card">
         <div class="card-header">Flight Data Labelling</div>
         <div class="card-body">
-            <div class="data-label-tabs">
-                'hi'
-                <!-- Tabs will be inserted here dynamically -->
+            <div id="labelling-instruction-div">
+                <p>Please select and identify sections in the flights.</p>
+                <p>You may not have Time Slot in all Flights, you may not have any markers. That is ok!</p>
+                <p>Click Next when you are happy.</p>
+                <button
+                    id="identify-time-slot-group"
+                    onclick="highlightAndSelectCells('table-dark', 'time')"
+                    class="btn btn-primary"
+                >
+                    Time Slot Section
+                </button>
+                <button
+                    id="identify-player-group"
+                    onclick="highlightAndSelectCells('table-secondary', 'player')"
+                    class="btn btn-secondary"
+                >
+                    Player Section
+                </button>
+                <button
+                    id="identify-availability-section"
+                    onclick="highlightAndSelectCells('table-success', 'availability')"
+                    class="btn btn-success"
+                >
+                    Availability Section
+                </button>
+                <button
+                    id="identify-available-marker"
+                    onclick="highlightAndSelectCells('table-info', 'available-marker')"
+                    class="btn btn-info"
+                >
+                    Available Marker
+                </button>
+                <button
+                    id="identify-unavailable-marker"
+                    onclick="highlightAndSelectCells('table-danger', 'unavailable-marker')"
+                    class="btn btn-danger"
+                >
+                    Unavailable Marker
+                </button>
+                <button
+                    id="identify-low-preference-marker"
+                    onclick="highlightAndSelectCells('table-warning', 'low-preference-marker')"
+                    class="btn btn-warning"
+                >
+                    Low Preference Marker
+                </button>
             </div>
-            <div class="data-label-tab-contents">
-                <!-- Tab content will be inserted here dynamically -->
+            <div class="data-label-tabs"></div>
+            <div class="data-label-tab-contents" style="overflow: auto"></div>
+        </div>
+    </div>
+</div>
+
+<div id="data-wait-for-server" data-path="csv" data-index="4" progress-index="4" class="step" style="display: none">
+    <div class="card">
+        <div class="card-header">Data To Server</div>
+        <div class="card-body">
+            <div id="loading-spinner">
+                <div class="spinner-border" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
             </div>
         </div>
     </div>

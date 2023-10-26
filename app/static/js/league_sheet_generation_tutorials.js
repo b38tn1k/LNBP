@@ -48,6 +48,8 @@ function checkCellGroups() {
     if (cellGroups.length === 0) {
         tabContentDiv.innerHTML = "Please go back and select at least one flight";
         return false;
+    } else {
+        tabContentDiv.innerHTML = "";
     }
     return true;
 }
@@ -157,18 +159,20 @@ function toggleFlightSubTableVisibility(targetId) {
     // Select all tables with the class 'flight-sub-table'
     const tables = document.querySelectorAll(".flight-sub-table");
 
-    // for (let id = 0; id < cellGroups.length; id++) {
-    //     tearDownTableInteraction(String(id));
-    // }
-    // setUpTableInteraction(String(targetId));
+    for (let id = 0; id < cellGroups.length; id++) {
+        tearDownTableInteraction(String(id));
+    }
+    setUpTableInteraction(String(targetId));
 
     // Iterate over each table element
     tables.forEach((table) => {
         if (table.id === targetId) {
             // Make the table with the matching id visible
             table.style.display = "block";
+            setUpTableInteraction(table.id, table);
         } else {
             // Hide other tables
+            tearDownTableInteraction(table.id, table);
             table.style.display = "none";
         }
     });
@@ -225,10 +229,21 @@ function performActionsAndMove(stepIndex) {
         stepIndex2Prep();
     } else if (stepIndex === 2) {
         stepIndex3Prep();
+    } else if (stepIndex === 3) {
+        toggleLoadingAnimation();
     }
     // Add more conditions for additional steps as needed
     // Increment only if initial checks pass
     showStep(stepIndex + 1);
+}
+
+function toggleLoadingAnimation() {
+    console.log("bloop")
+    const spinner = document.getElementById("loading-spinner");
+    spinner.style.display = "block"; // Turn the spinner on
+    setTimeout(() => {
+        spinner.style.display = "none"; // Turn the spinner off after 2 seconds
+    }, 2000);
 }
 
 function htmlTableToCsv(html) {
@@ -259,18 +274,18 @@ function htmlTableToCsv(html) {
     return csv;
 }
 
-function setUpTableInteraction(id) {
-    const table = document.getElementById(id);
+function setUpTableInteraction(id, table = null) {
+    if (table === null) {
+        table = document.getElementById(id);
+    }
     table.addEventListener("mousedown", handleMouseDown);
-    table.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
 }
 
-function tearDownTableInteraction(id) {
-    const table = document.getElementById(id);
+function tearDownTableInteraction(id, table = null) {
+    if (table === null) {
+        table = document.getElementById(id);
+    }
     table.removeEventListener("mousedown", handleMouseDown);
-    table.removeEventListener("mousemove", handleMouseMove);
-    document.removeEventListener("mouseup", handleMouseUp);
 }
 
 function clearSelections() {
@@ -279,33 +294,37 @@ function clearSelections() {
 }
 
 function selectRectangle(topRow, bottomRow, leftCol, rightCol) {
+    console.log((topRow, bottomRow, leftCol, rightCol));
     for (let i = topRow; i <= bottomRow; i++) {
         for (let j = leftCol; j <= rightCol; j++) {
-            const cell = document.querySelector(`[data-row='${i}'][data-col='${j}']`);
-            cell.classList.add("table-primary");
-            selectedCells.push(cell);
+            const cells = document.querySelectorAll(`[data-row='${i}'][data-col='${j}']`);
+            cells.forEach(cell => {
+                cell.classList.add("table-primary");
+                selectedCells.push(cell);
+            });
         }
     }
 }
 
-function highlightAndSelectCells() {
+
+function highlightAndSelectCells(colorClass, information) {
     for (let cell of selectedCells) {
-        cell.classList.remove("table-primary");
-        cell.classList.add("table-secondary");
+        cell.classList.add(colorClass);
     }
     const newGroup = [];
     selectedCells.forEach((cell) => newGroup.push(cell));
-    cellGroups.push([currentStep, newGroup]);
+    clearSelections();
+    cellGroups.push([currentStep, newGroup, information]);
     console.log(cellGroups);
+    startPoint = null;
 }
 
 function handleMouseDown(event) {
     isMouseDown = true;
-
     const cell = event.target;
+    selectedCells.push(cell);
     const row = parseInt(cell.getAttribute("data-row"), 10);
     const col = parseInt(cell.getAttribute("data-col"), 10);
-
     if (!startPoint) {
         startPoint = { row, col };
     } else {
@@ -317,17 +336,6 @@ function handleMouseDown(event) {
         selectRectangle(topRow, bottomRow, leftCol, rightCol);
         startPoint = null;
     }
-}
-
-function handleMouseMove(event) {
-    if (isMouseDown) {
-        // Existing logic can remain here if needed
-    }
-}
-
-function handleMouseUp() {
-    isMouseDown = false;
-    // Logic for finished selection can go here
 }
 
 function csvToTable(csvText, id) {
@@ -380,6 +388,12 @@ document.querySelectorAll("textarea").forEach((textarea) => {
             window.scrollTo(0, 0);
         }, 0);
     });
+});
+
+document.addEventListener("keydown", function (event) {
+    if (event.code === "Enter" && currentStep === 2) {
+        highlightAndSelectCells();
+    }
 });
 
 document.getElementById("csv-button").addEventListener("click", () => showStep(1));
