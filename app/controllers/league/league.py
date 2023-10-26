@@ -1,9 +1,10 @@
-from flask import Blueprint, render_template, abort, redirect, url_for, flash, request
+from flask import Blueprint, render_template, abort, redirect, url_for, flash, request, jsonify
 from flask_login import login_required, current_user
 from app.forms import SimpleForm
 from app.forms.club_forms import ClubSetup, FacilitySetup
 from app.models import db
 from app.models.clubs import Club, Facility
+import json
 
 blueprint = Blueprint('league', __name__)
 
@@ -17,5 +18,13 @@ def check_for_membership(*args, **kwargs):
 @blueprint.route('/new', methods=["GET", "POST"])
 @login_required
 def create_league():
-    return render_template('league/create.html', club=current_user.club)
-    
+    if request.method == 'POST':
+        try:
+            print(request)
+            data = request.json
+            print("Received data: ", data)
+            # Further processing
+            return jsonify({"status": "success"})
+        except Exception as e:
+            return jsonify({"status": "failure", "error": str(e)})
+    return render_template('league/create.html', club=current_user.club, simple_form=SimpleForm())

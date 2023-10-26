@@ -12,6 +12,11 @@
     </div>
 </div> -->
 
+<form id="hidden-form" style="display: none">
+    {{ simple_form.hidden_tag() }}
+    <!-- rest of your form -->
+</form>
+
 <div id="csv-import" data-path="csv" data-index="1" progress-index="1" class="step" style="display: none">
     <div class="card">
         <div class="card-header">Copy & Paste</div>
@@ -114,11 +119,7 @@
     <div class="card">
         <div class="card-header">Data To Server</div>
         <div class="card-body">
-            <div id="loading-spinner">
-                <div class="spinner-border" role="status">
-                    <span class="sr-only">Loading...</span>
-                </div>
-            </div>
+            Loading...
         </div>
     </div>
 </div>

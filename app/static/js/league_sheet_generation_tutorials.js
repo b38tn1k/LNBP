@@ -191,10 +191,7 @@ function stepIndex2Prep() {
     setUpTableInteraction("csv-table-start");
 }
 
-function stepIndex3Prep() {
-    tearDownTableInteraction("csv-table-start");
-    cellGroups = cellGroups.filter((group) => group[1].length !== 0 && group[0] == 2);
-    // Step 2: Remove duplicate entries
+function removeDuplicates() {
     const uniqueGroups = [];
     const seen = new Set();
 
@@ -208,7 +205,14 @@ function stepIndex3Prep() {
             uniqueGroups.push(group);
         }
     }
-    cellGroups = uniqueGroups;
+    return uniqueGroups;
+}
+
+function stepIndex3Prep() {
+    tearDownTableInteraction("csv-table-start");
+    cellGroups = cellGroups.filter((group) => group[1].length !== 0 && group[0] == 2);
+    // Step 2: Remove duplicate entries
+    cellGroups = removeDuplicates()
     if (checkCellGroups()) {
         console.log("generating tabs");
         generateDataLabelTabs();
@@ -230,20 +234,13 @@ function performActionsAndMove(stepIndex) {
     } else if (stepIndex === 2) {
         stepIndex3Prep();
     } else if (stepIndex === 3) {
-        toggleLoadingAnimation();
+        cellGroups = removeDuplicates()
+        sendCSVHTMLMap();
+        
     }
     // Add more conditions for additional steps as needed
     // Increment only if initial checks pass
     showStep(stepIndex + 1);
-}
-
-function toggleLoadingAnimation() {
-    console.log("bloop")
-    const spinner = document.getElementById("loading-spinner");
-    spinner.style.display = "block"; // Turn the spinner on
-    setTimeout(() => {
-        spinner.style.display = "none"; // Turn the spinner off after 2 seconds
-    }, 2000);
 }
 
 function htmlTableToCsv(html) {
@@ -372,6 +369,65 @@ function getElemByStepClass(currentStep, _class) {
     return null;
 }
 
+function parseCellGroups() {
+    cellGroups = removeDuplicates();
+    console.log(cellGroups);
+    const html = 1
+    const type = 2
+    result = []
+    for (let i = 0; i < cellGroups.length; i++) {
+        const htmlStrings = cellGroups[i][html].map(element => element.innerHTML);
+        group = {
+            'type' : cellGroups[i][type],
+            'data' : htmlStrings.join(",")
+        }
+        result.push(group)
+    }
+    const tableElement = document.getElementById("csv-table-start");
+    const tableHTML = tableElement ? tableElement.parentNode.innerHTML : "Table not found";
+    // console.log(tableHTML);
+    result.push({
+        'type' : 'tableHTML',
+        'data' : tableHTML
+    })
+    result.push({
+        'type' : 'tableCSV',
+        'data' : htmlTableToCsv(tableHTML)
+    })
+    return result
+}
+
+function sendCSVHTMLMap() {
+    const currentUrl = window.location.href;
+    const csrf_token = document.querySelector('#hidden-form input[name="csrf_token"]').value;
+    const data = parseCellGroups();
+    fetch(currentUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrf_token
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (!response.ok) {
+            return Promise.reject("Fetch failed; Server responded with " + response.status);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.status === "success") {
+            console.log("Data successfully ingested by server.");
+        } else {
+            console.log("Failure: ", data.error);
+        }
+    })
+    .catch(error => console.log("Fetch error: ", error));
+}
+
+
+
+
 document.querySelectorAll("textarea").forEach((textarea) => {
     textarea.addEventListener("paste", async function (e) {
         const text = e.clipboardData.getData("text/html"); // Gets the HTML content
@@ -397,7 +453,6 @@ document.addEventListener("keydown", function (event) {
 });
 
 document.getElementById("csv-button").addEventListener("click", () => showStep(1));
-document.getElementById("create-button").addEventListener("click", () => showStep(2));
 document.getElementById("back-button").addEventListener("click", () => showStep(currentStep - 1));
 document.getElementById("next-button").addEventListener("click", () => performActionsAndMove(currentStep));
 
