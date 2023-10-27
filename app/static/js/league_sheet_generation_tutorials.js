@@ -102,6 +102,7 @@ function generateTableFromCellGroup(cellGroup, id) {
 // Function to append generated table to the tab content div
 function appendTableToTabContent(table) {
     const tabContentDiv = document.querySelector(".data-label-tab-contents");
+    tabContentDiv.style.overflow = "auto";
     tabContentDiv.appendChild(table);
 }
 
@@ -376,7 +377,7 @@ function parseCellGroups() {
     const type = 2
     result = []
     for (let i = 0; i < cellGroups.length; i++) {
-        const htmlStrings = cellGroups[i][html].map(element => element.innerHTML);
+        const htmlStrings = cellGroups[i][html].map(element => element.outerHTML);
         group = {
             'type' : cellGroups[i][type],
             'data' : htmlStrings.join(",")
@@ -447,7 +448,7 @@ document.querySelectorAll("textarea").forEach((textarea) => {
 });
 
 document.addEventListener("keydown", function (event) {
-    if (event.code === "Enter" && currentStep === 2) {
+    if (event.code === "Enter") {
         highlightAndSelectCells();
     }
 });

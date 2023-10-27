@@ -4,6 +4,7 @@ from app.forms import SimpleForm
 from app.forms.club_forms import ClubSetup, FacilitySetup
 from app.models import db
 from app.models.clubs import Club, Facility
+from app.services.league_services import league_wizard_csv_to_dict
 import json
 
 blueprint = Blueprint('league', __name__)
@@ -19,10 +20,15 @@ def check_for_membership(*args, **kwargs):
 @login_required
 def create_league():
     if request.method == 'POST':
+        with open('csv_league_import_example.json', 'r') as f:
+            data = json.load(f)
+            league_wizard_csv_to_dict(data)
         try:
             print(request)
             data = request.json
             print("Received data: ", data)
+            # with open('received_data.json', 'w') as f:
+            #     json.dump(data, f)
             # Further processing
             return jsonify({"status": "success"})
         except Exception as e:
