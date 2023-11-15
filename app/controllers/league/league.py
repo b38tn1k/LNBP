@@ -4,7 +4,7 @@ from app.forms import SimpleForm
 from app.forms.club_forms import ClubSetup, FacilitySetup
 from app.models import db
 from app.models.clubs import Club, Facility
-from app.services.league_services import league_wizard_csv_to_dict
+from app.services.league_services import league_wizard_csv_to_dicts
 import json
 
 blueprint = Blueprint('league', __name__)
@@ -22,7 +22,7 @@ def create_league():
     if request.method == 'POST':
         with open('csv_league_import_example.json', 'r') as f:
             data = json.load(f)
-            league_wizard_csv_to_dict(data)
+            league_wizard_csv_to_dicts(data)
         try:
             print(request)
             data = request.json
