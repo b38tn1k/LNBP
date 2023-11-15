@@ -12,10 +12,37 @@ import csv
 def is_date_like(s):
     # Use regular expressions to identify date-like strings
     # This is just a very basic example; actual logic too boring to do
+    """
+    This function checks if a given string is date-like by checking if it contains
+    any digits.
+
+    Args:
+        s (str): In the `is_date_like` function , the `s` input parameter is the
+            string that we want to check if it looks like a date or not.
+
+    Returns:
+        bool: The output returned by the function `is_date_like()` would be `True`
+        if the input string contains at least one digit.
+
+    """
     return any(char.isdigit() for char in s)
 
 
 def combine_dates(dates):
+    """
+    This function combines multiple date strings into a single datetime object
+    using the current time as the basis for the combined date.
+
+    Args:
+        dates (list): The `dates` input parameter is a list of date strings that
+            are processed and combined into a single datetime object using the
+            methods you provided.
+
+    Returns:
+        str: The output returned by this function is a `datetime` object representing
+        the combined date and time.
+
+    """
     today = datetime.now()
     combined_date = datetime(today.year, today.month, today.day, 0, 0)
     for date_str in dates:
@@ -54,6 +81,19 @@ def combine_dates(dates):
 
 
 def special_char_sort(s):
+    """
+    This function sorts a string based on the frequency of special characters ("/",
+    "\", ":", ";", "," , "|" and "-") present inside the string.
+
+    Args:
+        s (str): The `s` input parameter is the string that needs to be sorted
+            based on the special characters it contains.
+
+    Returns:
+        int: The output returned by this function is the sorted list of special
+        characters extracted from the input string.
+
+    """
     special_chars_order = {"/": 1, "\\": 2, ":": 3, ";": 4, ",": 5, "|": 6, "-": 6}
     # Extract special characters from the string using a regular expression
     special_chars = re.findall(r"[\/\\:;,\|-]", s)
@@ -62,6 +102,26 @@ def special_char_sort(s):
 
 
 def csv_wizard_time(group):
+    """
+    This function takes a group of rows from a HTML table and extracts the date
+    information from it. It first determines the shape of the data (wide or tall)
+    and then uses regular expressions to identify and group together contiguous
+    cells that contain dates.
+
+    Args:
+        group (str): The `group` input parameter is a string containing the content
+            of a table row.
+
+    Returns:
+        list: Based on the given code snippet; the output returned by `csv_wizard_time`
+        function is two values -
+        
+        1/ 'shape', a string indicating either "tall" or "wide" based on the max
+        col and row lengths of the provided group's CSV data
+        2/ 'dates', a list of combined date strings extracted from the 'date-like'
+        cells within the provided group.
+
+    """
     shape = group_outline(group)
 
     # Determine the shape of the data
@@ -97,6 +157,26 @@ def csv_wizard_time(group):
 
 
 def group_outline(data):
+    """
+    This function extracts the maximum and minimum row and column numbers from a
+    given table data using regular expressions.
+
+    Args:
+        data (str): The `data` input parameter is the HTML content that contains
+            the tables with columns and rows to be processed by the function.
+
+    Returns:
+        dict: The output returned by this function is a dictionary with four
+        key-value pairs:
+        
+        {
+        "min_row": 1000000 (the minimum row number),
+        "min_col": 1000000 (the minimum column number),
+        "max_row": -1 (the maximum row number),
+        "max_col": -1 (the maximum column number)
+        }
+
+    """
     max_row, max_col = -1, -1
     min_row, min_col = 1000000, 1000000
     td_regex = r'<td data-row="(\d+)" data-col="(\d+)" class="[^"]*">([^<]*)</td>'
@@ -115,9 +195,42 @@ def group_outline(data):
 
 def convert_availability(a, t_dict):
     # t_dict has keys for the strings that match "available-marker","unavailable-marker" and "low-preference-marker"
+    """
+    The given function `convert_availability` takes a string `a` and a dictionary
+    `t_dict`, and performs some conversion on `a` based on the values presentin
+    `t_dict`. However the code does not specify what that conversion is.
+
+    Args:
+        a (str): The `a` input parameter is not used anywhere inside the function
+            `convert_availability`, therefore it is redundant and can be removed.
+        t_dict (dict): The `t_dict` input parameter is a dictionary that maps
+            strings to markers (available/unavailable/low preference) for availability
+            information.
+
+    """
     pass
 
 def get_marker_strings_from_csv(my_csv, t_dict):
+    """
+    This function takes a CSV string and a dictionary of marker information and
+    returns a dictionary of marker strings based on the row indices and column
+    headers from the CSV.
+
+    Args:
+        my_csv (str): The `my_csv` input parameter is a string that contains the
+            contents of a CSV file.
+        t_dict (dict): The `t_dict` input parameter is a dictionary that contains
+            information about each marker type (e.g., "available-marker",
+            "unavailable-marker", "low-preference-marker").
+
+    Returns:
+        dict: The output returned by this function is a dictionary with marker
+        strings for each marker type: {"available-marker": "<insert available
+        marker string here>", "unavailable-marker": "<insert unavailable marker
+        string here>", "low-preference-marker": "<insert low preference marker
+        string here>"}
+
+    """
     csvfile = io.StringIO(my_csv)
     reader = csv.reader(csvfile, delimiter=",")
 
@@ -142,6 +255,45 @@ def get_marker_strings_from_csv(my_csv, t_dict):
 
 
 def wide_get_players_and_availability(target_flight, my_csv, t_dict):
+    """
+    This function `wide_get_players_and_availability` reads a CSV file and returns
+    a list of player information dictionaries where each dictionary has the player
+    names and their availability status (available or not available). The function
+    takes three input arguments:
+    1/ `target_flight`: A dict containing information about the flight (min/max
+    row & col for players and availability)
+    2/ `my_csv`: The CSV file to read
+    3/ `t_dict`: A dict of marker strings to their locations (rows and columns)
+    within the CSV file.
+    The function first extracts the rows and columns of interest from `target_flight`,
+    then reads the entire CSV file into a stringIO object and passes it to the
+    `csv` module to create a reader object. It then uses the marker strings found
+    at the start and end of each row (stored as dict values under `t_dict["player"]`
+    and `t_dict["availability"]`) to extract only those rows with player or
+    availability data within the desired range specified by `target_flight`. Finally
+    it iterates over each matching row of the CSV file using list comprehensions
+    to create a dictionary for each player name (retrieved from a portion of that
+    row) that contains information about their availability status (determined
+    based on presence of special markers).
+
+    Args:
+        target_flight (dict): The `target_flight` input parameter specifies the
+            range of rows to consider when checking for player availability and
+            extracting their names and availability information from the CSV file.
+        my_csv (str): The `my_csv` input parameter is a string representing the
+            contents of the CSV file to be processed.
+        t_dict (dict): The `t_dict` input parameter is a dictionary that contains
+            information about the structure of the CSV file being processed. It
+            is used to define the columns and ranges for extracting player names
+            and availability information from the CSV.
+
+    Returns:
+        dict: The output returned by the `wide_get_players_and_availability`
+        function is a list of player information objects `{ "names": [<list of
+        player names>], "availability": [<list of availability values (1 for
+        available/unavailable)"] }` for each row within the desired range for players.
+
+    """
     player_start_col = t_dict["player"][0]["min_col"]
     player_end_col = t_dict["player"][0]["max_col"]
     player_top_row = target_flight["min_row"]
@@ -189,6 +341,19 @@ def wide_get_players_and_availability(target_flight, my_csv, t_dict):
 
 def extract_html_attributes(html_string):
     # Regular expression pattern to find attributes and their values
+    """
+    This function takes an HTML string as input and extracts all attribute-value
+    pairs found within it.
+
+    Args:
+        html_string (str): The `html_string` input parameter is the HTML content
+            from which we want to extract the attributes and their values.
+
+    Returns:
+        dict: The output returned by this function is a dictionary containing the
+        attributes found within the given HTML string as key-value pairs.
+
+    """
     attr_pattern = r'(\w+)=["\']([^"\']+)["\']'
 
     # Find all matches in the HTML string
@@ -206,6 +371,35 @@ def extract_html_attributes(html_string):
 
 
 def league_wizard_csv_to_dicts(data):
+    """
+    This function takes a list of dictionaries representing CSV data for a fantasy
+    football league schedule and returns a list of dictionaries representing the
+    league data with the following structure:
+    	- Each dictionary represents one flight (time slot)
+    	+ "timeslots": A list of time slots available during the flight
+    	+ "players": A list of player availability information for each player during
+    the flight
+    The function performs the following operations:
+    1/ First pass: Extract shape (wide or not), CSV table data and timeslots from
+    the first line of the input data
+    2/ Define dictionaries for each type of data: "time", "csv" and for the types
+    of markers ("available-marker", "unavailable-marker", "low-preference-marker")
+    3/ For each input dictionary:
+    	a. Check if it contains "type" and if it's one of the supported types
+    	b.
+
+    Args:
+        data (dict): The `data` input parameter is a list of dictionaries representing
+            CSV data. It is passed as an argument to the function and is used as
+            the input for the function's operations.
+
+    Returns:
+        dict: Based on the code provided:
+        
+        The output returned by this function is `league`, which is a list of
+        dictionaries containing information about flights and their players' availability.
+
+    """
     t_dict = {}
     for k in ["flight", "availability", "player", "available-marker","unavailable-marker","low-preference-marker"]:
         t_dict[k] = []
