@@ -28,6 +28,14 @@ def check_for_membership(*args, **kwargs):
 @blueprint.route('/tidy', methods=["GET", "POST"])
 @login_required
 def tidy_league():
+    """
+    This function returns a rendered HTML template called "tidy.html" inside the
+    "league" directory.
+
+    Returns:
+        str: The output returned by this function is an empty string (`''`).
+
+    """
     return render_template('league/tidy.html')
 
 @blueprint.route('/new', methods=["GET", "POST"])
