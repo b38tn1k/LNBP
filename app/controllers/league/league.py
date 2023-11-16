@@ -24,7 +24,12 @@ def check_for_membership(*args, **kwargs):
     if not current_user.is_authenticated or current_user.primary_membership_id is None:
         flash('You currently do not have accesss to app', 'warning')
         return redirect(url_for("main.home"))
-    
+
+@blueprint.route('/tidy', methods=["GET", "POST"])
+@login_required
+def tidy_league():
+    return render_template('league/tidy.html')
+
 @blueprint.route('/new', methods=["GET", "POST"])
 @login_required
 def create_league():
@@ -47,17 +52,11 @@ def create_league():
 
     """
     if request.method == 'POST':
-        with open('csv_league_import_example.json', 'r') as f:
-            data = json.load(f)
-            league_wizard_csv_to_dicts(data)
+
         try:
-            print(request)
             data = request.json
-            print("Received data: ", data)
-            # with open('received_data.json', 'w') as f:
-            #     json.dump(data, f)
-            # Further processing
-            return jsonify({"status": "success"})
+            league_dict = league_wizard_csv_to_dicts(data)
+            return jsonify({"status": "success", "data": league_dict})
         except Exception as e:
             return jsonify({"status": "failure", "error": str(e)})
     return render_template('league/create.html', club=current_user.club, simple_form=SimpleForm())

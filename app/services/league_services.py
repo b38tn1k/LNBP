@@ -151,7 +151,7 @@ def csv_wizard_time(group):
         date_likes = [s for s in group if is_date_like(s)]
         if date_likes:
             combined_date = combine_dates(date_likes)
-            dates.append(combined_date)
+            dates.append(combined_date.isoformat())
             # print(f"Group: {group}, Combined Date: {combined_date}")
     return shape, dates
 
@@ -192,23 +192,6 @@ def group_outline(data):
         "max_col": max_col,
     }
 
-
-def convert_availability(a, t_dict):
-    # t_dict has keys for the strings that match "available-marker","unavailable-marker" and "low-preference-marker"
-    """
-    The given function `convert_availability` takes a string `a` and a dictionary
-    `t_dict`, and performs some conversion on `a` based on the values presentin
-    `t_dict`. However the code does not specify what that conversion is.
-
-    Args:
-        a (str): The `a` input parameter is not used anywhere inside the function
-            `convert_availability`, therefore it is redundant and can be removed.
-        t_dict (dict): The `t_dict` input parameter is a dictionary that maps
-            strings to markers (available/unavailable/low preference) for availability
-            information.
-
-    """
-    pass
 
 def get_marker_strings_from_csv(my_csv, t_dict):
     """
@@ -426,7 +409,6 @@ def league_wizard_csv_to_dicts(data):
                 "low-preference-marker",
             ]:
                 t_dict[d["type"]] = (extract_html_attributes(d["data"]))
-                print(t_dict[d['type']])
                 
     league = []
     if shape == "wide":
@@ -437,5 +419,4 @@ def league_wizard_csv_to_dicts(data):
                 f, t_dict["csv"], t_dict
             )
             league.append(flight)
-    print(league)
     return league

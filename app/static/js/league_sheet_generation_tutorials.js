@@ -398,10 +398,67 @@ function parseCellGroups() {
     return result
 }
 
+function step4DataFromServer(data) {
+    var parent = document.getElementById("data-from-server");
+    var child = parent.querySelector('.card-body'); // Make sure to include the '.' for class selector
+
+    // Start building the table HTML
+    var tableHTML = "<table>";
+
+    // Loop through the leagues
+    data.forEach(function(league) {
+        // Add a row for each league
+        // tableHTML += "<tr><td colspan='2'> <input placeholder='flight name'></input> </td></tr>"; // Assuming 'league' has a 'name' property
+
+        // Initialize rows for dates and times
+        var dateRow = "<tr><td></td>";
+        var timeRow = "<tr><td></td>";
+
+        // Loop through the timeslots for each league
+        league.timeslots.forEach(function(ts) {
+            // Parse the ISO date-time string
+            var dateTime = new Date(ts); // Assuming 'ts' has an 'isoDateTime' property
+            var date = dateTime.toISOString().split('T')[0];
+            var time = dateTime.toTimeString().split(' ')[0];
+
+            // Build rows for dates and times
+            dateRow += "<td>" + date + "</td>";
+            timeRow += "<td>" + time + "</td>";
+        });
+
+        // Close the date and time rows
+        dateRow += "</tr>";
+        timeRow += "</tr>";
+
+        // Add the date and time rows to the table
+        tableHTML += dateRow + timeRow;
+    });
+
+    // Close the table tag
+    tableHTML += "</table>";
+
+    // Set the innerHTML of the child element
+    child.innerHTML = tableHTML;
+}
+
+
 function sendCSVHTMLMap() {
+    // const data = parseCellGroups();
+    // sendToServer(data);
+
+    // test
+    fetch('/static/csv_league_import_example.json')
+    .then(response => response.json())
+    .then(data => {
+        sendToServer(data);
+    })
+    .catch(error => console.log("Error loading JSON: ", error));
+}
+
+function sendToServer(data) {
     const currentUrl = window.location.href;
     const csrf_token = document.querySelector('#hidden-form input[name="csrf_token"]').value;
-    const data = parseCellGroups();
+
     fetch(currentUrl, {
         method: 'POST',
         headers: {
@@ -419,15 +476,15 @@ function sendCSVHTMLMap() {
     .then(data => {
         if (data.status === "success") {
             console.log("Data successfully ingested by server.");
+            stepIndex = 4;
+            showStep(stepIndex)
+            step4DataFromServer(data.data);
         } else {
             console.log("Failure: ", data.error);
         }
     })
     .catch(error => console.log("Fetch error: ", error));
 }
-
-
-
 
 document.querySelectorAll("textarea").forEach((textarea) => {
     textarea.addEventListener("paste", async function (e) {
