@@ -4,6 +4,7 @@ let isMouseDown = false;
 let selectedCells = [];
 let startPoint = null;
 let cellGroups = [];
+let undoStack = [];
 
 /**
  * @description This function updates the width of a progress bar element based on a
@@ -101,8 +102,8 @@ function checkCellGroups() {
 function generateTableFromCellGroup(cellGroup, id) {
     const table = document.createElement("table");
     const tbody = document.createElement("tbody");
-    tbody.classList.add("w-100")
-    
+    tbody.classList.add("w-100");
+
     table.classList.add(
         "csv-table",
         "flight-sub-table",
@@ -131,7 +132,7 @@ function generateTableFromCellGroup(cellGroup, id) {
 
         const td = document.createElement("td");
         td.innerHTML = cell.innerHTML;
-        
+
         td.setAttribute("data-row", cell.getAttribute("data-row"));
         td.setAttribute("data-col", cell.getAttribute("data-col"));
         tr.appendChild(td);
@@ -686,9 +687,11 @@ function parseCellGroups() {
  * @returns { any } The output returned by the function is an HTML string that
  * represents a table with rows for each league's dates and times.
  */
+
 function step4DataFromServer(data) {
     var parent = document.getElementById("data-from-server");
     var child = parent.querySelector(".card-body");
+    child.style.overflowX = "auto";
     let flightNumber = 1;
     data.forEach(function (league) {
         // Create League Header
@@ -699,7 +702,7 @@ function step4DataFromServer(data) {
         flightInput.value = "Flight " + flightNumber;
 
         // Add an event listener for the 'keypress' event
-        flightInput.addEventListener("keypress", function(event) {
+        flightInput.addEventListener("keypress", function (event) {
             // Check if the Enter key was pressed
             if (event.key === "Enter") {
                 console.log(flightInput.value); // Log the current value of the input
@@ -719,59 +722,161 @@ function step4DataFromServer(data) {
             "table-hover",
             "table-sm"
         );
+        table.style.maxWidth = "100%";
+        table.style.width = "auto";
         const tbody = document.createElement("tbody");
 
         // Create date and time rows
-        // const thead = document.createElement("thead");
-        // thead.classList.add('w-100');
         const dateRow = document.createElement("tr");
         const timeRow = document.createElement("tr");
         const playerLabel = document.createElement("td");
-        playerLabel.innerHTML = "Player Name";
         playerLabel.classList.add("bg-light", "fw-bold");
-        playerLabel.setAttribute("rowspan", "2"); 
+        playerLabel.setAttribute("rowspan", "2");
+        playerLabel.setAttribute("colspan", "2");
         dateRow.appendChild(playerLabel);
-        
         league.timeslots.forEach(function (ts) {
             const dateTime = new Date(ts);
             dateTime.setHours(dateTime.getHours() + 12);
-            const date = dateTime.toLocaleDateString("en-US", { month: "2-digit", day: "2-digit" });
-            const time = dateTime.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+            // Format the date for the date input
+            const dateValue = dateTime.toISOString().split("T")[0]; // YYYY-MM-DD format
+            // Format the time for the time input
+            const timeValue = dateTime.toLocaleTimeString("en-GB", {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false,
+            });
 
             const dateCell = document.createElement("td");
             dateCell.classList.add("bg-light", "fw-bold");
-            dateCell.textContent = date;
-            dateCell.setAttribute("data-isostring", dateTime.toISOString());
+            // Create and set the date input
+            const dateInput = document.createElement("input");
+            dateInput.type = "date";
+            dateInput.classList.add("form-control");
+            dateInput.value = dateValue;
+            dateCell.appendChild(dateInput);
             dateRow.appendChild(dateCell);
-
             const timeCell = document.createElement("td");
-            timeCell.textContent = time;
             timeCell.classList.add("bg-light", "fw-bold");
-            timeCell.setAttribute("data-isostring", dateTime.toISOString());
+            // Create and set the time input
+            const timeInput = document.createElement("input");
+            timeInput.type = "time";
+            timeInput.classList.add("form-control");
+            timeInput.value = timeValue;
+            timeCell.appendChild(timeInput);
             timeRow.appendChild(timeCell);
         });
         tbody.appendChild(dateRow);
         tbody.appendChild(timeRow);
-        // tbody.appendChild(thead);
 
         league.players.forEach(function (p) {
             const playerRow = document.createElement("tr");
+
+            // Create and append the delete button
+            const deleteButton = document.createElement("button");
+            deleteButton.innerHTML = "&times;";
+            deleteButton.classList.add("btn", "btn-danger", "btn-sm");
+            deleteButton.style.margin = "2px";
+
+            deleteButton.addEventListener("click", function () {
+                // Save the row data to the undo stack before deletion
+                undoStack.push({ action: "deleted", data: p });
+
+                // Remove the row from the table
+                playerRow.remove();
+            });
+
+            const moveUpButton = document.createElement("button");
+            moveUpButton.innerHTML = "&uarr;";
+            moveUpButton.classList.add("btn", "btn-primary", "btn-sm");
+            moveUpButton.style.margin = "2px";
+            moveUpButton.addEventListener("click", function () {
+                console.log(`move ${String(p.names)} up`)
+            });
+
+            const moveDownButton = document.createElement("button");
+            moveDownButton.innerHTML = "&darr;";
+            moveDownButton.classList.add("btn", "btn-primary", "btn-sm");
+            moveDownButton.style.margin = "2px";
+            moveDownButton.addEventListener("click", function () {
+                console.log(`move ${String(p.names)} up`)
+            });
+
+            const functionCell = document.createElement("td");
+            functionCell.appendChild(moveUpButton);
+            functionCell.appendChild(moveDownButton);
+            functionCell.appendChild(deleteButton);
+            functionCell.style.width = "110px";
+            functionCell.style.minWidth = "110px";
+            playerRow.appendChild(functionCell);
+
+            // Your existing code for appending player name and availability
             const playerName = document.createElement("td");
             playerName.classList.add("bg-light", "fw-bold");
-            playerName.innerHTML = p.names
+            playerName.innerHTML = p.names;
+            playerName.style.width = "200px";
+            playerName.style.minWidth = "200px";
             playerRow.append(playerName);
+
             p.availability.forEach(function (a) {
-                console.log(a);
                 const availability = document.createElement("td");
-                availability.innerHTML = a;
+                // availability.innerHTML = a;
+                availability.setAttribute("availability", a);
+                availability.classList.add("availability");
+                switch (a) {
+                    case 1:
+                        availability.classList.add("bg-success");
+                        break;
+                    case 2:
+                        availability.classList.add("bg-warning");
+                        break;
+                    case 3:
+                        availability.classList.add("bg-danger");
+                        break;
+                }
+                availability.title = p.names;
                 playerRow.append(availability);
             });
+
             tbody.appendChild(playerRow);
         });
+        const addPlayerRow = document.createElement("td");
+        addPlayerRow.innerHTML = "add player row"
+        tbody.appendChild(addPlayerRow);
 
-        
         table.appendChild(tbody);
+        
         child.appendChild(table);
+        
+        table.addEventListener("click", function(event) {
+            let target = event.target;
+            // Check if the clicked element is a td with class 'availability'
+            if (target.tagName === "TD" && target.classList.contains("availability")) {
+                let availability = parseInt(target.getAttribute("availability"), 10);
+        
+                // Increment the availability or reset to 1 if it's already 3
+                availability = availability >= 3 ? 1 : availability + 1;
+        
+                // Update the attribute
+                target.setAttribute("availability", availability);
+        
+                // Remove all bg- classes
+                target.classList.remove("bg-success", "bg-warning", "bg-danger");
+        
+                // Add the new bg- class based on the updated availability
+                switch (availability) {
+                    case 1:
+                        target.classList.add("bg-success");
+                        break;
+                    case 2:
+                        target.classList.add("bg-warning");
+                        break;
+                    case 3:
+                        target.classList.add("bg-danger");
+                        break;
+                }
+            }
+        });
+        
     });
 }
 

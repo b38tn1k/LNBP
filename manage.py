@@ -30,7 +30,9 @@ def server():
     ` $ FLASK_APP=manage FLASK_ENV=development flask run `
     Do not use this for production (since it runs in debug mode)
     """
-    return app.run(debug=True)
+    # return app.run(debug=True)
+    return app.run(host='0.0.0.0', port=8000, debug=True)
+
 
 @app.cli.command()
 def initdb():
