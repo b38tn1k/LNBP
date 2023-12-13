@@ -43,6 +43,11 @@ def initdb():
     db.create_all()
 
 def actually_drop_tables():
+    """
+    This function drops all the tables from the database if it is not running on
+    the dev environment and the user has confirmed they want to run the command.
+
+    """
     if env != 'dev':
         confirm = input("Are you sure you want to run this on {}?".format(env))
         if confirm.lower().strip() != 'yes':
@@ -93,11 +98,26 @@ def generate_session_key():
 
 @app.cli.command()
 def create_seeds():
+    """
+    This function `create_seeds` does not exist as `seed_data` is undefined.
+
+    """
     seed_data()
 
 @app.cli.command()
 @click.option('--coverage/--no-coverage', default=False, help='Enable code coverage')
 def test(coverage):
+    """
+    This function tests Python code with the `pytest` framework while reporting
+    coverage metrics. If the environment is not set to `TEST`, it prints a message
+    and skips the testing. Additionally included arguments like `--cov-report=term-missing
+    --cov=app`.
+
+    Args:
+        coverage (bool): The `coverage` input parameter is used to enable code
+            coverage reporting during the Pytest run.
+
+    """
     args = []
     if env.lower() != 'test':
         print("Not running in TEST env, try setting the environment to test: app_ENV=test")
@@ -109,6 +129,18 @@ def test(coverage):
 
 @app.shell_context_processor
 def make_shell_context():
+    """
+    This function creates a dictionary of context objects for a shell application.
+
+    Returns:
+        dict: The function `make_shell_context` returns a dictionary with the
+        following items:
+        
+        	- `app`: undefined
+        	- `db`: undefined
+        	- `User`: undefined
+
+    """
     return dict(app=app, db=db, User=User)
 
 
