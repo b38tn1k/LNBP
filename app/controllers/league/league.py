@@ -45,6 +45,14 @@ def tidy_league():
 @login_required
 def edit_league():
     #TODO
+    """
+    This function does not do anything.
+
+    Returns:
+        str: The output returned by this function is an HTTP template rendered as
+        string named 'tidy.html'.
+
+    """
     return render_template('league/tidy.html')
 
 @blueprint.route('/new', methods=["GET", "POST"])
