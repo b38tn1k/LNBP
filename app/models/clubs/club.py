@@ -27,6 +27,20 @@ class Club(Model):
 
     @staticmethod
     def create(name):
+        """
+        This function creates a new instance of the `Club` class and adds it to
+        the database.
+
+        Args:
+            name (str): The `name` input parameter is passed as a string value to
+                the constructor of the `Club` class and sets the `name` attribute
+                of the instance being created.
+
+        Returns:
+            : The output returned by this function is a `Club` object named after
+            the `name` argument passed to the function.
+
+        """
         club = Club(name=name)
         db.session.add(club)
         db.session.commit()
@@ -35,6 +49,24 @@ class Club(Model):
     # Relationships and other methods as required
     @transaction
     def add_facility(self, name, asset_type, user, club):
+        """
+        This function creates a new Facility object and assigns it to a user's club.
+
+        Args:
+            name (str): The `name` input parameter is used to set the name of the
+                newly created facility.
+            asset_type (str): The `asset_type` input parameter indicates the type
+                of asset being added (e.g.
+            user (): The `user` input parameter is used to set the owner of the
+                newly created facility.
+            club (): The `club` input parameter passes the club object to which
+                the new facility will be added.
+
+        Returns:
+            : The function `add_facility` returns the newly created `Facility`
+            object named `facility`.
+
+        """
         facility = ModelProxy.clubs.Facility.create(name, asset_type, club)
         facility_admin = ModelProxy.clubs.FacilityAdministrator(user=user, facility=facility)
         print(user.club.facilities)
@@ -64,4 +96,13 @@ class Club(Model):
         return new_league
 
     def __repr__(self):
+        """
+        This function defines the `__repr__` method for the `Club` object.
+
+        Returns:
+            str: The output returned by the `__repr__()` function would be:
+            
+            "`<Club 0 - name>`"
+
+        """
         return '<Club {0} - {1}>'.format(self.id, self.name)
