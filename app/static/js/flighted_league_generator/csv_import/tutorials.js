@@ -1,71 +1,3 @@
-let currentStep = 0;
-let maxSteps = 5;
-let isMouseDown = false;
-let selectedCells = [];
-let startPoint = null;
-let cellGroups = [];
-let undoStack = [];
-
-/**
- * @description This function updates the width of a progress bar element based on a
- * progress index and sets the aria-valuenow attribute to reflect the current progress
- * percentage.
- *
- * @param { number } progressIndex - The `progressIndex` input parameter passed to
- * the `updateProgressBar` function represents the current step number out of the
- * maximum steps (`maxSteps`).
- *
- * @returns {  } The output returned by this function is the string value of the
- * `style.width` property of the element with the ID "progress-bar", which is a
- * percentage value representing the progress made so far (e.g., "15%", "30%", etc.).
- */
-function updateProgressBar(progressIndex) {
-    let progressPercentage = (progressIndex / maxSteps) * 100;
-    let progressBar = document.getElementById("progress-bar");
-    progressBar.style.width = `${progressPercentage}%`;
-    progressBar.setAttribute("aria-valuenow", progressPercentage);
-}
-
-/**
- * @description The `showStep` function displays a specific step of a multi-step form
- * based on its index and updates the progress bar accordingly.
- *
- * @param { number } index - The `index` input parameter passed to the `showStep()`
- * function specifies which step should be displayed next.
- *
- * @returns { number } The output returned by this function is the current div that
- * corresponds to the specified index.
- */
-function showStep(index) {
-    let currentDiv;
-    document.querySelectorAll(".step").forEach((div, i) => {
-        if (i === index) {
-            currentDiv = div;
-            div.style.display = "block";
-        } else {
-            div.style.display = "none";
-        }
-    });
-
-    // Read progress-index attribute from the current div
-    let progressIndex = parseInt(currentDiv.getAttribute("progress-index"), 10);
-
-    // Update progress bar
-    updateProgressBar(progressIndex);
-
-    document.getElementById("stepper").style.display = index === 0 ? "none" : "block";
-    currentStep = index;
-    let toDelete = [];
-    for (let i = 0; i < cellGroups.length; i++) {
-        if (cellGroups[i][0] >= currentStep) {
-            toDelete.push(i);
-        }
-    }
-    for (let i = toDelete.length - 1; i >= 0; i--) {
-        cellGroups.splice(toDelete[i], 1);
-    }
-}
-
 // Function to check if cellGroups is empty and show a message if so
 /**
  * @description The provided JavaScript function `checkCellGroups` checks the length
@@ -349,32 +281,6 @@ function stepIndex3Prep() {
     } else {
         console.log("no cell groups!");
     }
-}
-
-/**
- * @description This function takes an integer `stepIndex` and performs the appropriate
- * actions for that step index. It shows the next step by incrementing `stepIndex`
- * unless a conditional check fails.
- *
- * @param { number } stepIndex - The `stepIndex` input parameter determines which
- * step of the workflow to execute next.
- *
- * @returns { object } The output returned by the `performActionsAndMove` function
- * is not specified.
- */
-function performActionsAndMove(stepIndex) {
-    if (stepIndex === 0) {
-    } else if (stepIndex === 1) {
-        stepIndex2Prep();
-    } else if (stepIndex === 2) {
-        stepIndex3Prep();
-    } else if (stepIndex === 3) {
-        cellGroups = removeDuplicates();
-        sendCSVHTMLMap();
-    }
-    // Add more conditions for additional steps as needed
-    // Increment only if initial checks pass
-    showStep(stepIndex + 1);
 }
 
 /**
@@ -676,6 +582,336 @@ function parseCellGroups() {
     return result;
 }
 
+function createFlightHeader(flightNumber) {
+    const flightInput = document.createElement("input");
+    flightInput.setAttribute("type", "text");
+    flightInput.classList.add("form-control", "mb-3", "flight-title");
+    flightInput.setAttribute("placeholder", "Flight " + flightNumber);
+    flightInput.setAttribute("flight-number", flightNumber);
+    flightInput.value = "Flight " + flightNumber;
+
+    // Add an event listener for the 'keypress' event
+    flightInput.addEventListener("keypress", function (event) {
+        // Check if the Enter key was pressed
+        if (event.key === "Enter") {
+            console.log(flightInput.value); // Log the current value of the input
+        }
+    });
+    return [flightNumber, flightInput];
+}
+
+function createFlightTable() {
+    const table = document.createElement("table");
+    table.classList.add(
+        "csv-table",
+        "flight-sub-table",
+        "table",
+        "table-light",
+        "table-bordered",
+        "table-hover",
+        "table-sm"
+    );
+    table.style.maxWidth = "100%";
+    table.style.width = "auto";
+    return table;
+}
+
+function createFlightDateTimeRows(league) {
+    const dateRow = document.createElement("tr");
+    const timeRow = document.createElement("tr");
+    const playerLabel = document.createElement("td");
+    playerLabel.classList.add("bg-light", "fw-bold");
+    playerLabel.setAttribute("rowspan", "2");
+    playerLabel.setAttribute("colspan", "2");
+
+    // const addDTCell = document.createElement("td");
+    // addDTCell.classList.add("bg-light", "fw-bold");
+
+    // const removeDTCell = document.createElement("td");
+    // removeDTCell.classList.add("bg-light", "fw-bold");
+
+    // const addDT = document.createElement("button");
+    // addDT.innerHTML = "+ timeslot";
+    // addDT.classList.add("btn", "btn-primary", "btn-sm", "add-date-time");
+    // addDT.style.margin = "2px";
+    // addDT.addEventListener("click", switchPlayerFlightDown);
+    // addDTCell.appendChild(addDT);
+
+    // const removeDT = document.createElement("button");
+    // removeDT.innerHTML = "- timeslot";
+    // removeDT.classList.add("btn", "btn-danger", "btn-sm", "add-date-time");
+    // removeDT.style.margin = "2px";
+    // removeDT.addEventListener("click", switchPlayerFlightDown);
+    // removeDTCell.appendChild(removeDT);
+
+    dateRow.appendChild(playerLabel);
+    // dateRow.appendChild(addDTCell);
+    // timeRow.appendChild(removeDTCell);
+
+    league.timeslots.forEach(function (ts) {
+        const dateTime = new Date(ts);
+        const dateValue = dateTime.toISOString().split("T")[0]; // YYYY-MM-DD format
+        dateTime.setHours(dateTime.getHours() + 12);
+        const timeValue = dateTime.toLocaleTimeString("en-GB", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+        });
+
+        const dateCell = document.createElement("td");
+        dateCell.classList.add("bg-light", "fw-bold");
+        // Create and set the date input
+        const dateInput = document.createElement("input");
+        dateInput.type = "date";
+        dateInput.classList.add("form-control");
+        dateInput.value = dateValue;
+        dateCell.appendChild(dateInput);
+        dateRow.appendChild(dateCell);
+        const timeCell = document.createElement("td");
+        timeCell.classList.add("bg-light", "fw-bold");
+        // Create and set the time input
+        const timeInput = document.createElement("input");
+        timeInput.type = "time";
+        timeInput.classList.add("form-control");
+        timeInput.value = timeValue;
+        timeCell.appendChild(timeInput);
+        timeRow.appendChild(timeCell);
+    });
+    return [dateRow, timeRow];
+}
+
+function addPlayerMacros(playerRow, flightNumber, maxFlightNumber, p) {
+    // Create and append the delete button
+    const deleteButton = document.createElement("button");
+    deleteButton.innerHTML = "&times;";
+    deleteButton.classList.add("btn", "btn-danger", "btn-sm");
+    deleteButton.style.margin = "2px";
+
+    deleteButton.addEventListener("click", function () {
+        // Save the row data to the undo stack before deletion
+        undoStack.push({ action: "deleted", data: p });
+
+        // Remove the row from the table
+        playerRow.remove();
+    });
+
+    const functionCell = document.createElement("td");
+
+    const moveUpButton = document.createElement("button");
+    moveUpButton.innerHTML = "&uarr;";
+    moveUpButton.classList.add("btn", "btn-primary", "btn-sm", "move-up-button");
+    moveUpButton.style.margin = "2px";
+    moveUpButton.addEventListener("click", switchPlayerFlightUp);
+    functionCell.appendChild(moveUpButton);
+
+    const moveDownButton = document.createElement("button");
+    moveDownButton.innerHTML = "&darr;";
+    moveDownButton.classList.add("btn", "btn-primary", "btn-sm", "move-down-button");
+    moveDownButton.style.margin = "2px";
+    moveDownButton.addEventListener("click", switchPlayerFlightDown);
+    functionCell.appendChild(moveDownButton);
+
+    if (flightNumber == 1) {
+        moveUpButton.hidden = true;
+    }
+    if (flightNumber == maxFlightNumber) {
+        moveDownButton.hidden = true;
+    }
+
+    functionCell.appendChild(deleteButton);
+    functionCell.style.width = "110px";
+    functionCell.style.minWidth = "110px";
+    functionCell.classList.add("player-macros");
+    playerRow.appendChild(functionCell);
+}
+
+function createFlightPlayerRow(p, flightNumber, maxFlightNumber) {
+    const playerRow = document.createElement("tr");
+    playerRow.classList.add("player-row");
+    playerRow.setAttribute("flight-number", flightNumber);
+    addPlayerMacros(playerRow, flightNumber, maxFlightNumber, p);
+    const playerName = document.createElement("td");
+    playerName.classList.add("bg-light", "fw-bold");
+    playerName.innerHTML = p.names;
+    playerName.style.width = "200px";
+    playerName.style.minWidth = "200px";
+    playerRow.append(playerName);
+    p.availability.forEach(function (a) {
+        const availability = document.createElement("td");
+        availability.setAttribute("availability", a);
+        availability.classList.add("availability");
+        switch (a) {
+            case 1:
+                availability.classList.add("bg-success");
+                break;
+            case 2:
+                availability.classList.add("bg-warning");
+                break;
+            case 3:
+                availability.classList.add("bg-danger");
+                break;
+        }
+        availability.title = p.names;
+        playerRow.append(availability);
+    });
+    return playerRow;
+}
+
+function createAddPlayerRowFlight(flightNumber) {
+    const addPlayerButton = document.createElement("button");
+    addPlayerButton.innerHTML = "+ player";
+    addPlayerButton.classList.add("btn", "btn-primary", "btn-sm");
+    addPlayerButton.style.margin = "2px";
+    addPlayerButton.addEventListener("click", addPlayerWithName);
+    const addPlayerButtonCell = document.createElement("td");
+    addPlayerButtonCell.appendChild(addPlayerButton);
+
+    const addPlayerNameCell = document.createElement("td");
+    const playerNameInput = document.createElement("input");
+    playerNameInput.classList.add("form-control", "new-player-name");
+
+    addPlayerNameCell.appendChild(playerNameInput);
+
+    const addPlayerRow = document.createElement("tr");
+    addPlayerRow.classList.add("add-player-row");
+    addPlayerRow.appendChild(addPlayerButtonCell);
+    addPlayerRow.appendChild(addPlayerNameCell);
+    addPlayerRow.setAttribute("flight-number", flightNumber);
+
+    return addPlayerRow;
+}
+
+function countColumns(table) {
+    // Check if the tbody has any rows
+    if (table.rows.length > 0) {
+        // Count the number of cells (td elements) in the first row
+        return table.rows[0].cells.length;
+    } else {
+        // Return 0 if there are no rows in the tbody
+        return 0;
+    }
+}
+
+function getTargetTableAndTbody(targetFlight) {
+    console.log(targetFlight);
+    const targetTable = document.getElementById(`flight-${targetFlight}`);
+    if (!targetTable) {
+        console.error(`Target table 'flight-${targetFlight}' not found`);
+        return;
+    }
+
+    // Get the tbody element of the target table
+    const targetTbody = targetTable.querySelector("tbody");
+    if (!targetTbody) {
+        console.error("No tbody found in the target table");
+        return;
+    }
+    // console.log(targetFlight, targetTable, targetTbody)
+    return [targetTable, targetTbody];
+}
+
+function addPlayerWithName(event) {
+    const newPlayerInfoRow = event.target.closest("tr");
+    let targetFlight = parseInt(newPlayerInfoRow.getAttribute("flight-number"));
+    const input = newPlayerInfoRow.querySelector(".new-player-name");
+    const newPlayerName = input.value;
+    input.value = "";
+    // if (new_player_name.length == 0) {
+    //     return;
+    // }
+    const p = {};
+    // getTargetTableAndTbody(targetFlight);
+    const [targetTable, targetTbody] = getTargetTableAndTbody(targetFlight);
+    p.names = newPlayerName;
+    p.availability = [];
+    const avails = countColumns(targetTbody);
+    for (let i = 0; i < avails; i++) {
+        p.availability.push(1);
+    }
+    let maxFlightNumber = targetFlight + 1;
+    if (targetTable.classList.contains("bottom-flight")) {
+        maxFlightNumber = targetFlight;
+    }
+    const pRow = createFlightPlayerRow(p, targetFlight, maxFlightNumber);
+    targetTbody.insertBefore(pRow, targetTbody.rows[targetTbody.rows.length - 1]);
+}
+
+function switchPlayerFlightUp(event) {
+    switchPlayerFlight(event, -1);
+}
+
+function switchPlayerFlightDown(event) {
+    switchPlayerFlight(event, 1);
+}
+
+function switchPlayerFlight(event, delta) {
+    const targetRow = event.target.closest("tr");
+    if (!targetRow) {
+        console.error("No table row found");
+        return;
+    }
+
+    const currentFlight = parseInt(targetRow.getAttribute("flight-number"));
+    const targetFlight = currentFlight + delta;
+
+    const [targetTable, targetTbody] = getTargetTableAndTbody(targetFlight);
+    // Insert the targetRow into the target tbody as the 3rd row
+    if (targetTbody.rows.length >= 2 && delta > 0) {
+        targetTbody.insertBefore(targetRow, targetTbody.rows[2]);
+    } else if (targetTbody.rows.length >= 2 && delta < 0) {
+        targetTbody.insertBefore(targetRow, targetTbody.rows[targetTbody.rows.length - 1]);
+    } else {
+        targetTbody.appendChild(targetRow);
+    }
+
+    const macros = targetRow.querySelector(".player-macros");
+    buttonUp = macros.querySelector(".move-up-button");
+    buttonDown = macros.querySelector(".move-down-button");
+    if (targetTable.classList.contains("top-flight")) {
+        buttonUp.hidden = true;
+    } else {
+        buttonUp.hidden = false;
+    }
+
+    if (targetTable.classList.contains("bottom-flight")) {
+        buttonDown.hidden = true;
+    } else {
+        buttonDown.hidden = false;
+    }
+
+    targetRow.setAttribute("flight-number", targetFlight);
+}
+
+function handleFlightTableClick(event) {
+    let target = event.target;
+    // Check if the clicked element is a td with class 'availability'
+    if (target.tagName === "TD" && target.classList.contains("availability")) {
+        let availability = parseInt(target.getAttribute("availability"), 10);
+
+        // Increment the availability or reset to 1 if it's already 3
+        availability = availability >= 3 ? 1 : availability + 1;
+
+        // Update the attribute
+        target.setAttribute("availability", availability);
+
+        // Remove all bg- classes
+        target.classList.remove("bg-success", "bg-warning", "bg-danger");
+
+        // Add the new bg- class based on the updated availability
+        switch (availability) {
+            case 1:
+                target.classList.add("bg-success");
+                break;
+            case 2:
+                target.classList.add("bg-warning");
+                break;
+            case 3:
+                target.classList.add("bg-danger");
+                break;
+        }
+    }
+}
+
 /**
  * @description This function takes a dataset from a server and creates an HTML table
  * from it. It first builds the header row for each league and then loops through
@@ -693,191 +929,52 @@ function step4DataFromServer(data) {
     var child = parent.querySelector(".card-body");
     child.style.overflowX = "auto";
     let flightNumber = 1;
+    let flightInput;
+    let maxFlightNumber = data.length;
     data.forEach(function (league) {
         // Create League Header
-        const flightInput = document.createElement("input");
-        flightInput.setAttribute("type", "text");
-        flightInput.classList.add("form-control", "mb-3");
-        flightInput.setAttribute("placeholder", "Flight " + flightNumber);
-        flightInput.value = "Flight " + flightNumber;
+        [flightNumber, flightInput] = createFlightHeader(flightNumber);
 
-        // Add an event listener for the 'keypress' event
-        flightInput.addEventListener("keypress", function (event) {
-            // Check if the Enter key was pressed
-            if (event.key === "Enter") {
-                console.log(flightInput.value); // Log the current value of the input
-            }
-        });
-        flightNumber += 1;
         child.appendChild(flightInput);
 
         // Create table
-        const table = document.createElement("table");
-        table.classList.add(
-            "csv-table",
-            "flight-sub-table",
-            "table",
-            "table-light",
-            "table-bordered",
-            "table-hover",
-            "table-sm"
-        );
-        table.style.maxWidth = "100%";
-        table.style.width = "auto";
+        const table = createFlightTable();
+        table.id = "flight-" + String(flightNumber);
+        table.classList.add("cleaned-flight");
+        if (flightNumber == 1) {
+            table.classList.add("top-flight");
+        }
+        if (flightNumber == maxFlightNumber) {
+            table.classList.add("bottom-flight");
+        }
         const tbody = document.createElement("tbody");
 
         // Create date and time rows
-        const dateRow = document.createElement("tr");
-        const timeRow = document.createElement("tr");
-        const playerLabel = document.createElement("td");
-        playerLabel.classList.add("bg-light", "fw-bold");
-        playerLabel.setAttribute("rowspan", "2");
-        playerLabel.setAttribute("colspan", "2");
-        dateRow.appendChild(playerLabel);
-        league.timeslots.forEach(function (ts) {
-            const dateTime = new Date(ts);
-            dateTime.setHours(dateTime.getHours() + 12);
-            // Format the date for the date input
-            const dateValue = dateTime.toISOString().split("T")[0]; // YYYY-MM-DD format
-            // Format the time for the time input
-            const timeValue = dateTime.toLocaleTimeString("en-GB", {
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: false,
-            });
-
-            const dateCell = document.createElement("td");
-            dateCell.classList.add("bg-light", "fw-bold");
-            // Create and set the date input
-            const dateInput = document.createElement("input");
-            dateInput.type = "date";
-            dateInput.classList.add("form-control");
-            dateInput.value = dateValue;
-            dateCell.appendChild(dateInput);
-            dateRow.appendChild(dateCell);
-            const timeCell = document.createElement("td");
-            timeCell.classList.add("bg-light", "fw-bold");
-            // Create and set the time input
-            const timeInput = document.createElement("input");
-            timeInput.type = "time";
-            timeInput.classList.add("form-control");
-            timeInput.value = timeValue;
-            timeCell.appendChild(timeInput);
-            timeRow.appendChild(timeCell);
-        });
+        let [dateRow, timeRow] = createFlightDateTimeRows(league);
         tbody.appendChild(dateRow);
         tbody.appendChild(timeRow);
 
         league.players.forEach(function (p) {
-            const playerRow = document.createElement("tr");
-
-            // Create and append the delete button
-            const deleteButton = document.createElement("button");
-            deleteButton.innerHTML = "&times;";
-            deleteButton.classList.add("btn", "btn-danger", "btn-sm");
-            deleteButton.style.margin = "2px";
-
-            deleteButton.addEventListener("click", function () {
-                // Save the row data to the undo stack before deletion
-                undoStack.push({ action: "deleted", data: p });
-
-                // Remove the row from the table
-                playerRow.remove();
-            });
-
-            const moveUpButton = document.createElement("button");
-            moveUpButton.innerHTML = "&uarr;";
-            moveUpButton.classList.add("btn", "btn-primary", "btn-sm");
-            moveUpButton.style.margin = "2px";
-            moveUpButton.addEventListener("click", function () {
-                console.log(`move ${String(p.names)} up`)
-            });
-
-            const moveDownButton = document.createElement("button");
-            moveDownButton.innerHTML = "&darr;";
-            moveDownButton.classList.add("btn", "btn-primary", "btn-sm");
-            moveDownButton.style.margin = "2px";
-            moveDownButton.addEventListener("click", function () {
-                console.log(`move ${String(p.names)} up`)
-            });
-
-            const functionCell = document.createElement("td");
-            functionCell.appendChild(moveUpButton);
-            functionCell.appendChild(moveDownButton);
-            functionCell.appendChild(deleteButton);
-            functionCell.style.width = "110px";
-            functionCell.style.minWidth = "110px";
-            playerRow.appendChild(functionCell);
-
-            // Your existing code for appending player name and availability
-            const playerName = document.createElement("td");
-            playerName.classList.add("bg-light", "fw-bold");
-            playerName.innerHTML = p.names;
-            playerName.style.width = "200px";
-            playerName.style.minWidth = "200px";
-            playerRow.append(playerName);
-
-            p.availability.forEach(function (a) {
-                const availability = document.createElement("td");
-                // availability.innerHTML = a;
-                availability.setAttribute("availability", a);
-                availability.classList.add("availability");
-                switch (a) {
-                    case 1:
-                        availability.classList.add("bg-success");
-                        break;
-                    case 2:
-                        availability.classList.add("bg-warning");
-                        break;
-                    case 3:
-                        availability.classList.add("bg-danger");
-                        break;
-                }
-                availability.title = p.names;
-                playerRow.append(availability);
-            });
-
+            const playerRow = createFlightPlayerRow(p, flightNumber, maxFlightNumber);
             tbody.appendChild(playerRow);
         });
-        const addPlayerRow = document.createElement("td");
-        addPlayerRow.innerHTML = "add player row"
+
+        const addPlayerRow = createAddPlayerRowFlight(flightNumber);
         tbody.appendChild(addPlayerRow);
 
         table.appendChild(tbody);
-        
+
         child.appendChild(table);
-        
-        table.addEventListener("click", function(event) {
-            let target = event.target;
-            // Check if the clicked element is a td with class 'availability'
-            if (target.tagName === "TD" && target.classList.contains("availability")) {
-                let availability = parseInt(target.getAttribute("availability"), 10);
-        
-                // Increment the availability or reset to 1 if it's already 3
-                availability = availability >= 3 ? 1 : availability + 1;
-        
-                // Update the attribute
-                target.setAttribute("availability", availability);
-        
-                // Remove all bg- classes
-                target.classList.remove("bg-success", "bg-warning", "bg-danger");
-        
-                // Add the new bg- class based on the updated availability
-                switch (availability) {
-                    case 1:
-                        target.classList.add("bg-success");
-                        break;
-                    case 2:
-                        target.classList.add("bg-warning");
-                        break;
-                    case 3:
-                        target.classList.add("bg-danger");
-                        break;
-                }
-            }
-        });
-        
+
+        table.addEventListener("click", handleFlightTableClick);
+        flightNumber += 1;
     });
+}
+
+function step4ServerResp(data) {
+    stepIndex = 4;
+    showStep(stepIndex);
+    step4DataFromServer(data.data);
 }
 
 /**
@@ -886,7 +983,7 @@ function step4DataFromServer(data) {
  * @returns { object } The output returned by this function is not defined because
  * it contains undefined statements and the function does not have a return statement.
  */
-function sendCSVHTMLMap() {
+function stepIndex4Prep() {
     // const data = parseCellGroups();
     // sendToServer(data);
 
@@ -894,9 +991,99 @@ function sendCSVHTMLMap() {
     fetch("/static/csv_league_import_example.json")
         .then((response) => response.json())
         .then((data) => {
-            sendToServer(data);
+            sendToServer(data, step4ServerResp);
         })
         .catch((error) => console.log("Error loading JSON: ", error));
+}
+
+// function getCleanTimeSlots(table) {
+//     const tbody = table.querySelector("tbody");
+//     const dateRow = tbody.rows[0];
+//     const timeRow = tbody.rows[1];
+//     const combinedDateTime = [];
+
+//     for (let i = 0; i < timeRow.cells.length; i++) {
+//         let dateInput = dateRow.cells[i + 1].querySelector("input");
+//         let timeInput = timeRow.cells[i].querySelector("input");
+
+//         if (dateInput && timeInput && dateInput.value && timeInput.value) {
+//             // Combine date and time
+//             let dateTime = new Date(dateInput.value + "T" + timeInput.value);
+//             // Convert to ISO string
+//             let isoDateTime = dateTime.toISOString();
+//             combinedDateTime.push(isoDateTime.slice(0, -1));
+//         }
+//     }
+
+//     return combinedDateTime;
+// }
+
+function getCleanTimeSlots(table) {
+    const tbody = table.querySelector("tbody");
+    const dateRow = tbody.rows[0];
+    const timeRow = tbody.rows[1];
+    const combinedDateTime = [];
+
+    for (let i = 0; i < timeRow.cells.length; i++) {
+        let dateInput = dateRow.cells[i + 1].querySelector("input");
+        let timeInput = timeRow.cells[i].querySelector("input");
+
+        if (dateInput && timeInput && dateInput.value && timeInput.value) {
+            // Combine date and time directly
+            let isoDateTime = dateInput.value + "T" + timeInput.value;
+            combinedDateTime.push(isoDateTime);
+        }
+    }
+
+    return combinedDateTime;
+}
+
+function extractFlightData(titles) {
+    return Array.from(titles).map((t) => ({
+        title: t.value,
+        number: parseInt(t.getAttribute("flight-number")),
+        players_and_availabilities: [],
+    }));
+}
+
+function extractPlayerData(table, flightNumber) {
+    return Array.from(table.rows)
+        .filter((row) => row.classList.contains("player-row"))
+        .map((row) => ({
+            name: row.cells[1].innerHTML,
+            availability: Array.from(row.cells)
+                .filter((cell) => cell.classList.contains("availability"))
+                .map((cell) => parseInt(cell.getAttribute("availability"))),
+        }));
+}
+
+function sentCleanFlightNext() {
+    console.log("sent");
+}
+
+function convertCleanFlightsToJSONAndSend() {
+    const tables = document.querySelectorAll(".cleaned-flight");
+    const titles = document.querySelectorAll(".flight-title");
+    let league = {};
+
+    if (tables.length != 0) {
+        league.timeslots = getCleanTimeSlots(tables[0]);
+    }
+
+    league.flights = titles.length != 0 ? extractFlightData(titles) : [];
+
+    league.flights.forEach((flight) => {
+        tables.forEach((table) => {
+            if (table.id === `flight-${flight.number}`) {
+                flight.players_and_availabilities = extractPlayerData(table, flight.number);
+            }
+        });
+    });
+    league.cleaned = "true";
+    league.name = "Test Name";
+    league.type = "Test Type";
+    league.game_duration = 1.5;
+    sendToServer(league, sentCleanFlightNext);
 }
 
 /**
@@ -920,7 +1107,7 @@ function sendCSVHTMLMap() {
  * such the only known response it has no 'data' which the developer expects. This
  * can either produce no output or errors.
  */
-function sendToServer(data) {
+function sendToServer(data, next) {
     const currentUrl = window.location.href;
     const csrf_token = document.querySelector('#hidden-form input[name="csrf_token"]').value;
 
@@ -941,42 +1128,10 @@ function sendToServer(data) {
         .then((data) => {
             if (data.status === "success") {
                 console.log("Data successfully ingested by server.");
-                stepIndex = 4;
-                showStep(stepIndex);
-                step4DataFromServer(data.data);
+                next(data);
             } else {
                 console.log("Failure: ", data.error);
             }
         })
         .catch((error) => console.log("Fetch error: ", error));
 }
-
-document.querySelectorAll("textarea").forEach((textarea) => {
-    textarea.addEventListener("paste", async function (e) {
-        const text = e.clipboardData.getData("text/html"); // Gets the HTML content
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(text, "text/html");
-        // Check if the document contains a <table> tag
-        if (doc.querySelector("table")) {
-            csv = htmlTableToCsv(text);
-            document.getElementById("csv-input").setAttribute("google-csv", csv);
-        } else {
-            document.getElementById("csv-input").setAttribute("google-csv", "None");
-        }
-        setTimeout(function () {
-            window.scrollTo(0, 0);
-        }, 0);
-    });
-});
-
-document.addEventListener("keydown", function (event) {
-    if (event.code === "Enter") {
-        highlightAndSelectCells();
-    }
-});
-
-document.getElementById("csv-button").addEventListener("click", () => showStep(1));
-document.getElementById("back-button").addEventListener("click", () => showStep(currentStep - 1));
-document.getElementById("next-button").addEventListener("click", () => performActionsAndMove(currentStep));
-
-showStep(0);

@@ -38,7 +38,7 @@
                                         <td>{{ league['player_count'] }}</td>
                                         <td>
                                             <a
-                                                href="{{ url_for('edit_league', id=league['id']) }}"
+                                                href="{{ url_for('league.edit_league', id=league['id']) }}"
                                                 class="btn btn-primary"
                                                 >Edit</a
                                             >
@@ -57,7 +57,7 @@
                                 <td>{{ league['end_date'] }}</td>
                                 <td>{{ league['player_count'] }}</td>
                                 <td>
-                                    <a href="{{ url_for('edit_league', id=league['id']) }}" class="btn btn-primary"
+                                    <a href="{{ url_for('league.edit_league', id=league['id']) }}" class="btn btn-primary"
                                         >Edit</a
                                     >
                                 </td>
@@ -73,7 +73,7 @@
                                 <td>{{ league['end_date'] }}</td>
                                 <td>{{ league['player_count'] }}</td>
                                 <td>
-                                    <a href="{{ url_for('edit_league', id=league['id']) }}" class="btn btn-primary"
+                                    <a href="{{ url_for('league.edit_league', id=league['id']) }}" class="btn btn-primary"
                                         >Edit</a
                                     >
                                 </td>

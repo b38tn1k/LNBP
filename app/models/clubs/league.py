@@ -10,6 +10,7 @@ class League(Model):
     name = db.Column(db.String, nullable=False)
     type = db.Column(db.String)
     start_date = db.Column(db.DateTime, default=datetime.utcnow)
+    end_date = db.Column(db.DateTime, default=datetime.utcnow)
     bg_color = db.Column(db.String(7), default='#000000')
     fg_color = db.Column(db.String(7), default='#ffffff')
 

@@ -25,6 +25,7 @@ def home(team_id):
     
     facility_summary = get_club_facility_summary(current_user.club.id)
     leagues_summary = get_leagues_by_status(current_user.club.id)
+    print(leagues_summary)
 
-    return render_template('dashboard/home.html', facility_summary=facility_summary, leagues_summary=leagues_summary, team=team, club=current_user.club)
+    return render_template('dashboard/home.html', facility_summary=facility_summary, leagues=leagues_summary, team=team, club=current_user.club)
     # return render_template('dashboard/home_backup.html', club=current_user.club, team=team)

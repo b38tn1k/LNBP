@@ -39,6 +39,29 @@ class Club(Model):
         facility_admin = ModelProxy.clubs.FacilityAdministrator(user=user, facility=facility)
         print(user.club.facilities)
         return facility
+    
+    @transaction
+    def create_league(self, name, league_type, start_date, end_date, add=True, commit=False):
+        """
+        Create a new league associated with this club.
+
+        :param name: Name of the league.
+        :param league_type: Type of the league.
+        :param start_date: Start date of the league.
+        :param bg_color: Background color of the league.
+        :param fg_color: Foreground color of the league.
+        :return: Created League instance.
+        """
+        # Create a new League instance
+        new_league = ModelProxy.clubs.League(name=name, type=league_type, 
+                                             start_date=start_date, end_date=end_date, club=self)
+
+        if add is True:
+            db.session.add(new_league)
+        if commit is True:
+            db.session.commit()
+
+        return new_league
 
     def __repr__(self):
         return '<Club {0} - {1}>'.format(self.id, self.name)

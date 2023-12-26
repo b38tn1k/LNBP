@@ -6,6 +6,7 @@ from app.models import db
 from app.models.clubs import Club, Facility
 from app.services.league_services import league_wizard_csv_to_dicts
 import json
+from datetime import datetime, timedelta
 
 blueprint = Blueprint('league', __name__)
 
@@ -38,6 +39,14 @@ def tidy_league():
     """
     return render_template('league/tidy.html')
 
+
+
+@blueprint.route('/edit', methods=["GET", "POST"])
+@login_required
+def edit_league():
+    #TODO
+    return render_template('league/tidy.html')
+
 @blueprint.route('/new', methods=["GET", "POST"])
 @login_required
 def create_league():
@@ -60,10 +69,24 @@ def create_league():
 
     """
     if request.method == 'POST':
-
         try:
             data = request.json
-            league_dict = league_wizard_csv_to_dicts(data)
+            if 'cleaned' in data:
+                print("Data contains the field 'cleaned'.")
+                my_club = current_user.club
+                datetime_objects = [datetime.fromisoformat(iso_string) for iso_string in data['timeslots']]
+                earliest_date = min(datetime_objects)
+                latest_date = max(datetime_objects)
+                game_duration_hours = data['game_duration'] 
+                duration = timedelta(hours=game_duration_hours)
+                latest_date = latest_date + duration
+                new_league = my_club.create_league(data['name'], data['type'], earliest_date, latest_date, add=True, commit=False)
+                print("Yes")
+                for l in my_club.leagues:
+                    print(l)
+            else:
+                print("Data does not contain the field 'cleaned'.")
+                league_dict = league_wizard_csv_to_dicts(data)
             return jsonify({"status": "success", "data": league_dict})
         except Exception as e:
             return jsonify({"status": "failure", "error": str(e)})
