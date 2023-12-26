@@ -23,6 +23,15 @@ class League(Model):
     GDPR_EXPORT_COLUMNS = {}
 
     def __repr__(self):
+        """
+        This function defines a custom `__repr__()` method for the `League` class.
+
+        Returns:
+            str: The output returned by the function `__repr__` is:
+            
+            `'<League {self.id} - {self.name}>'`.
+
+        """
         return f'<League {self.id} - {self.name}>'
     
     @transaction
