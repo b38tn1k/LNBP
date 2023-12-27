@@ -422,6 +422,18 @@ def league_wizard_csv_to_dicts(data):
     return league
 
 def build_league_from_json(my_club, data):
+    """
+    This function builds a league from a JSON object containing data such as the
+    name of the league and its type as well as the timeslots available for play
+    and the duration of games played.
+
+    Args:
+        my_club (): The `my_club` parameter is used to create a new league associated
+            with the provided club.
+        data (dict): The `data` input parameter is a dictionary containing the
+            data for building the league.
+
+    """
     datetime_objects = [datetime.fromisoformat(iso_string) for iso_string in data['timeslots']]
     earliest_date = min(datetime_objects)
     latest_date = max(datetime_objects)
