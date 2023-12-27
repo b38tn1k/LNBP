@@ -15,6 +15,15 @@ class Flight(Model):
     GDPR_EXPORT_COLUMNS = {}
 
     def __repr__(self):
+        """
+        This function defines a repr method for a Flight object.
+
+        Returns:
+            str: The output returned by this function is:
+            
+            "<Flight - whatever_name_i_have>"
+
+        """
         return f'<Flight {self.id} - {self.name}>'
     
     def add_player(self, player, add=True, commit=False):
