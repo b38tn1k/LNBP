@@ -1,3 +1,25 @@
+/**
+* @description This function takes data from a server and generates an HTML table
+* for each flight. It creates the table header and body rows for date and time and
+* adds players to the table. Additionally it includes add player button row to each
+* flight and lists other flights as well.
+* 
+* @param { object } data - The `data` input parameter is an array of objects
+* representing each league.
+* 
+* @returns { object } The output returned by the `step4DataFromServer` function is
+* a dynamically created HTML table for each league data received from the server.
+* Each table contains the following rows:
+* 
+* 1/ Header row with flight number and an Add Player button.
+* 2/ Date and time rows for each game played on that day.
+* 3/ A player row for each player participating on that particular flight.
+* 4/ An Add Player button at the bottom of the table.
+* 
+* The function appends each table to the parent element with a specific class name
+* ("top-flight", "bottom-flight", or "") based on its position within the list of
+* leagues received from the server.
+*/
 function step4DataFromServer(data) {
     var parent = document.getElementById("clean-league");
     var child = parent.querySelector(".card-body");
@@ -167,6 +189,19 @@ function extractPlayerData(table, flightNumber) {
 }
 
 
+/**
+* @description This function takes a `data` object as input and logs it to the
+* console. It then checks if the status is "success" and there's a redirect URL.
+* 
+* @param { object } data - The `data` input parameter receives and logs the flight
+* booking response data from the server to the console for debugging purposes.
+* 
+* @returns { object } This function takes a `data` object as an argument and logs
+* it to the console. It then checks if the `status` property of the `data` object
+* is equal to `'success'` and if there is a `redirect_url` property. If both conditions
+* are true`, it sets the URL of the web page to the value of the `redirect_url`
+* property using `window.location.href`. otherwise.
+*/
 function sentCleanFlightNext(data) {
     console.log(data);
 
