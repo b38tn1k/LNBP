@@ -39,11 +39,45 @@ class Player(Model):
 
     @property
     def full_name(self):
+        """
+        This function returns a string consisting of the first name and last name
+        of the object passed to it separated by a space.
+
+        Returns:
+            str: The output returned by the `full_name()` function is an empty
+            string ("") because the function doesn't have access to any attribute
+            named `first_name` or `last_name`.
+
+        """
         return f"{self.first_name} {self.last_name}"
     
     def in_flight(self, flight):
+        """
+        The `in_flight` function takes a `flight` object as an argument and returns
+        a boolean value indicating whether the given flight is currently associated
+        with any of the flight associations held by the object on which the function
+        is called.
+
+        Args:
+            flight (): The `flight` input parameter is used to check if the
+                associated object (e.g.
+
+        Returns:
+            bool: The output returned by this function is `True`.
+
+        """
         return any(association.flight_id == flight.id for association in self.flight_associations)
 
     
     def __repr__(self):
+        """
+        This function defines a custom representation of an object for the
+        `__repr__()` method.
+
+        Returns:
+            str: The output returned by this function is:
+            
+            "<Player undefined>"
+
+        """
         return f'<Player {self.full_name}>'
