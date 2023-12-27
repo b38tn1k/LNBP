@@ -1,17 +1,22 @@
 from app.models import db, Model
 from app.models import ModelProxy, transaction
 
+
 class Club(Model):
-    __tablename__ = 'club'
+    __tablename__ = "club"
 
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(255), nullable=False)
     email = db.Column(db.String(255))
-    contact_number = db.Column(db.String(50))  # Assuming phone number format suits a max length of 50
+    contact_number = db.Column(
+        db.String(50)
+    )  # Assuming phone number format suits a max length of 50
     street_address = db.Column(db.String(255))
     city = db.Column(db.String(100))
     state = db.Column(db.String(100))  # Assuming state name or abbreviation
-    zip_code = db.Column(db.String(15))  # Adjust length based on the country's ZIP/Postal code format
+    zip_code = db.Column(
+        db.String(15)
+    )  # Adjust length based on the country's ZIP/Postal code format
     country = db.Column(db.String(100))
 
     GDPR_EXPORT_COLUMNS = {
@@ -68,12 +73,16 @@ class Club(Model):
 
         """
         facility = ModelProxy.clubs.Facility.create(name, asset_type, club)
-        facility_admin = ModelProxy.clubs.FacilityAdministrator(user=user, facility=facility)
+        facility_admin = ModelProxy.clubs.FacilityAdministrator(
+            user=user, facility=facility
+        )
         print(user.club.facilities)
         return facility
-    
+
     @transaction
-    def create_league(self, name, league_type, start_date, end_date, add=True, commit=False):
+    def create_league(
+        self, name, league_type, start_date, end_date, add=True, commit=False
+    ):
         """
         Create a new league associated with this club.
 
@@ -85,15 +94,75 @@ class Club(Model):
         :return: Created League instance.
         """
         # Create a new League instance
-        new_league = ModelProxy.clubs.League(name=name, type=league_type, 
-                                             start_date=start_date, end_date=end_date, club=self)
+        new_league = ModelProxy.clubs.League(
+            name=name,
+            type=league_type,
+            start_date=start_date,
+            end_date=end_date,
+            club=self,
+        )
 
         if add is True:
             db.session.add(new_league)
         if commit is True:
             db.session.commit()
+            print('commit')
 
         return new_league
+
+    def get_league_by_id(self, league_id):
+        """
+        Get a league by its ID, ensuring it belongs to this club.
+
+        :param league_id: The ID of the league to retrieve.
+        :return: The League instance if found, otherwise None.
+        """
+        # Use the relationship 'leagues' to filter by league ID
+        return next((league for league in self.leagues if league.id == league_id), None)
+    
+    def find_or_create_player(self, full_name, add=True, commit=False):
+        """
+        Check if a player with a similar name is in the club, and return them if so.
+        If not, create a new temporary player with the name and return the new model.
+
+        :param full_name: The full name of the player.
+        :return: Player instance.
+        """
+        # Normalize the full_name by splitting and removing extra spaces
+        name_parts = full_name.split()
+
+        # Search for a player with a matching part in their first and last name in the club
+        player = next(
+            (p for p in self.players 
+             if set(p.first_name.split()).intersection(name_parts) 
+             and set(p.last_name.split()).intersection(name_parts)),
+            None
+        )
+
+        if player is None:
+            # If no player found, create a new one with the first part as first name and the rest as last name
+            first_name = name_parts[0]
+            last_name = ' '.join(name_parts[1:]) if len(name_parts) > 1 else 'Unknown'
+
+            player = ModelProxy.clubs.Player(
+                first_name=first_name,
+                last_name=last_name,
+                email='placeholder@example.com',
+                contact_number='000-000-0000',
+                communication_preference_mobile=False,
+                communication_preference_email=True,
+                gender='Unknown',
+                club_ranking=0,
+                club=self
+            )
+            if add is True:
+                db.session.add(player)
+
+            if commit is True:
+                db.session.commit()
+
+        return player
+    
 
     def __repr__(self):
         """
@@ -101,8 +170,8 @@ class Club(Model):
 
         Returns:
             str: The output returned by the `__repr__()` function would be:
-            
+
             "`<Club 0 - name>`"
 
         """
-        return '<Club {0} - {1}>'.format(self.id, self.name)
+        return "<Club {0} - {1}>".format(self.id, self.name)

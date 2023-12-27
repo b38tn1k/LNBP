@@ -137,6 +137,55 @@ class League(Model):
         self.game_events = []
         db.session.commit()
 
+    def create_timeslot(self, start_time, end_time, add=True, commit=False):
+            """
+            Create a new timeslot associated with this league.
+
+            Args:
+                start_time (datetime): The start time of the timeslot.
+                end_time (datetime): The end time of the timeslot.
+
+            Returns:
+                Timeslot: The newly created Timeslot object.
+            """
+            new_timeslot = ModelProxy.clubs.Timeslot(
+                start_time=start_time,
+                end_time=end_time,
+                league=self,
+            )
+            if add is True:
+                db.session.add(new_timeslot)
+            
+            if commit is True:
+                db.session.commit()
+            return new_timeslot
+
+    def create_flight(self, name, add=True, commit=False):
+            new_flight = ModelProxy.clubs.Flight(
+                name = name,
+                league=self,
+            )
+            if add is True:
+                db.session.add(new_flight)
+            
+            if commit is True:
+                db.session.commit()
+            return new_flight
+    
+    def add_player(self, player, add=True, commit=False):
+        """
+        Associate a player with this league.
+
+        :param player: The player to be added to the league.
+        """
+        # Create a new association between the flight and the player
+        association = ModelProxy.clubs.LeaguePlayerAssociation(league=self, player=player)
+        if add is True:
+            db.session.add(association)
+        if commit is True:
+            db.session.commit()
+        return association
+
 
 
 

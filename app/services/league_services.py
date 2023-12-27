@@ -2,7 +2,7 @@ import json
 import io
 import re
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timedelta
 from dateutil import parser
 import dateutil
 import re
@@ -420,3 +420,26 @@ def league_wizard_csv_to_dicts(data):
             )
             league.append(flight)
     return league
+
+def build_league_from_json(my_club, data):
+    datetime_objects = [datetime.fromisoformat(iso_string) for iso_string in data['timeslots']]
+    earliest_date = min(datetime_objects)
+    latest_date = max(datetime_objects)
+    game_duration_hours = data['game_duration'] 
+    duration = timedelta(hours=game_duration_hours)
+    latest_date = latest_date + duration
+    my_league = my_club.create_league(data['name'], data['type'], earliest_date, latest_date, add=True, commit=False)
+    
+    for t in datetime_objects:
+        my_league.create_timeslot(t, t + duration, add=True, commit=False)
+
+    for flight in data['flights']:
+        my_flight = my_league.create_flight(flight['name'])
+        for p in flight['players_and_availabilities']:
+            player = my_club.find_or_create_player(p['name'])
+            my_flight.add_player(player)
+            my_league.add_player(player)
+            print(player)
+    
+
+    

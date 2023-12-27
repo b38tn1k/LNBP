@@ -16,13 +16,14 @@ from app.models import *  # noqa
 from app.models.clubs import *
 from app.models.user import User
 from app.models.teams import *
+from sqlalchemy.inspection import inspect
 
 
 # default to dev config because this should not be run in production
 env = os.environ.get('app_ENV', 'dev')
 app = create_app('app.settings.%sConfig' % env.capitalize())
 
-migrate = Migrate(app, db)
+migrate = Migrate(app, db)            
 
 @app.cli.command()
 def server():
@@ -64,12 +65,12 @@ def dropdb():
 
 def seed_data():
     """ Create test users. """
-    default_user = User("user@example.com", "test", admin=False)
+    default_user = User("james@example.com", "test", admin=True, email_confirmed=True)
     db.session.add(default_user)
-    click.echo("Added user@example.com")
-    admin = User("admin@example.com", "admin", admin=True, email_confirmed=True)
-    db.session.add(admin)
-    click.echo("Added admin@example.com")
+    click.echo("Added james@example.com")
+    # admin = User("admin@example.com", "admin", admin=True, email_confirmed=True)
+    # db.session.add(admin)
+    # click.echo("Added admin@example.com")
 
 @app.cli.command()
 def resetdb():

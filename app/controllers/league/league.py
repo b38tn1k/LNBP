@@ -4,9 +4,8 @@ from app.forms import SimpleForm
 from app.forms.club_forms import ClubSetup, FacilitySetup
 from app.models import db
 from app.models.clubs import Club, Facility
-from app.services.league_services import league_wizard_csv_to_dicts
+from app.services.league_services import league_wizard_csv_to_dicts, build_league_from_json
 import json
-from datetime import datetime, timedelta
 
 blueprint = Blueprint('league', __name__)
 
@@ -26,34 +25,29 @@ def check_for_membership(*args, **kwargs):
         flash('You currently do not have accesss to app', 'warning')
         return redirect(url_for("main.home"))
 
-@blueprint.route('/tidy', methods=["GET", "POST"])
+@blueprint.route('/edit/<int:id>', methods=["GET", "POST"])
 @login_required
-def tidy_league():
-    """
-    This function returns a rendered HTML template called "tidy.html" inside the
-    "league" directory.
+def edit_league(id):
+    if not current_user.is_authenticated or current_user.primary_membership_id is None:
+        flash('You currently do not have accesss to app', 'warning')
+        return redirect(url_for("main.home"))
+    league = current_user.club.get_league_by_id(id)
+    if league is None:
+        return redirect(url_for("main.home"))
+    return render_template('league/edit.html', league=league)
 
-    Returns:
-        str: The output returned by this function is an empty string (`''`).
-
-    """
-    return render_template('league/tidy.html')
-
-
-
-@blueprint.route('/edit', methods=["GET", "POST"])
+@blueprint.route('/delete/<int:id>', methods=["GET", "POST"])
 @login_required
-def edit_league():
-    #TODO
-    """
-    This function does not do anything.
+def delete_league(id):
+    if not current_user.is_authenticated or current_user.primary_membership_id is None:
+        flash('You currently do not have accesss to app', 'warning')
+        return redirect(url_for("main.home"))
+    league = current_user.club.get_league_by_id(id)
+    if league is not None:
+        db.session.delete(league)
+        db.session.commit()
+    return redirect(url_for("main.home"))
 
-    Returns:
-        str: The output returned by this function is an HTTP template rendered as
-        string named 'tidy.html'.
-
-    """
-    return render_template('league/tidy.html')
 
 @blueprint.route('/new', methods=["GET", "POST"])
 @login_required
@@ -82,20 +76,13 @@ def create_league():
             if 'cleaned' in data:
                 print("Data contains the field 'cleaned'.")
                 my_club = current_user.club
-                datetime_objects = [datetime.fromisoformat(iso_string) for iso_string in data['timeslots']]
-                earliest_date = min(datetime_objects)
-                latest_date = max(datetime_objects)
-                game_duration_hours = data['game_duration'] 
-                duration = timedelta(hours=game_duration_hours)
-                latest_date = latest_date + duration
-                new_league = my_club.create_league(data['name'], data['type'], earliest_date, latest_date, add=True, commit=False)
-                print("Yes")
-                for l in my_club.leagues:
-                    print(l)
+                build_league_from_json(my_club, data)
+                db.session.commit()
+                return jsonify({"status": "success"})
             else:
                 print("Data does not contain the field 'cleaned'.")
                 league_dict = league_wizard_csv_to_dicts(data)
-            return jsonify({"status": "success", "data": league_dict})
+                return jsonify({"status": "success", "data": league_dict})
         except Exception as e:
             return jsonify({"status": "failure", "error": str(e)})
     return render_template('league/create.html', club=current_user.club, simple_form=SimpleForm())

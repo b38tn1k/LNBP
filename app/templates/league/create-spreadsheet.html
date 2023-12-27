@@ -124,9 +124,53 @@
                 detail would really shine here!
             </p>
             <p>
-                You can change the times, dates, flight names, player names, player availabilities, flight assignments, add missing players,
-                and delete any extraneous 'players' that might pop up. Click submit when you are happy. Almost done!
-            </p>            
+                You can change the times, dates, flight names, player names, player availabilities, flight assignments,
+                add missing players, and delete any extraneous 'players' that might pop up. Click submit when you are
+                happy. Almost done!
+            </p>
+            <fieldset class="form-group">
+                <div>
+                    <input type="text" class="form-control mb-3 h3" id="flight-name-input" placeholder="League Name" />
+                </div>
+                <div>
+                    <label for="game-duration-slider" class="form-label"
+                        >Game Duration: <span id="duration-display"></span> minutes</label
+                    >
+                    <input
+                        type="range"
+                        class="form-range"
+                        min="0"
+                        max="180"
+                        value="60"
+                        step="5"
+                        id="game-duration-slider"
+                    />
+                </div>
+                <div>
+                    <select class="form-select" id="league-type-input">
+                        <option>tennis</option>
+                        <option>paddle</option>
+                    </select>
+                </div>
+            </fieldset>
         </div>
     </div>
 </div>
+
+<script>
+    const rangeInput = document.getElementById("game-duration-slider");
+    const displaySpan = document.getElementById("duration-display");
+
+    // Function to update the display
+    function updateDisplay(value) {
+        displaySpan.textContent = value;
+    }
+
+    // Event listener for changes in the range input
+    rangeInput.addEventListener("input", function () {
+        updateDisplay(this.value);
+    });
+
+    // Initialize display
+    updateDisplay(rangeInput.value);
+</script>

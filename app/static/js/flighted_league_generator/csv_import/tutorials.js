@@ -742,7 +742,10 @@ function createFlightDateTimeRows(league) {
 function addPlayerMacros(playerRow, flightNumber, maxFlightNumber, p) {
     // Create and append the delete button
     const deleteButton = document.createElement("button");
-    deleteButton.innerHTML = "&times;";
+    let icon0 = document.createElement("i");
+    icon0.classList.add('fe', 'fe-trash')
+    deleteButton.appendChild(icon0);
+    // deleteButton.innerHTML = "&times;";
     deleteButton.classList.add("btn", "btn-danger", "btn-sm");
     deleteButton.style.margin = "2px";
 
@@ -757,14 +760,19 @@ function addPlayerMacros(playerRow, flightNumber, maxFlightNumber, p) {
     const functionCell = document.createElement("td");
 
     const moveUpButton = document.createElement("button");
-    moveUpButton.innerHTML = "&uarr;";
+    let icon = document.createElement("i");
+    icon.classList.add('fe', 'fe-arrow-up')
+    moveUpButton.appendChild(icon);
+    // moveUpButton.innerHTML = "&uarr;";
     moveUpButton.classList.add("btn", "btn-primary", "btn-sm", "move-up-button");
     moveUpButton.style.margin = "2px";
     moveUpButton.addEventListener("click", switchPlayerFlightUp);
     functionCell.appendChild(moveUpButton);
 
     const moveDownButton = document.createElement("button");
-    moveDownButton.innerHTML = "&darr;";
+    let icon2 = document.createElement("i");
+    icon2.classList.add('fe', 'fe-arrow-down')
+    moveDownButton.appendChild(icon2);
     moveDownButton.classList.add("btn", "btn-primary", "btn-sm", "move-down-button");
     moveDownButton.style.margin = "2px";
     moveDownButton.addEventListener("click", switchPlayerFlightDown);
@@ -778,8 +786,8 @@ function addPlayerMacros(playerRow, flightNumber, maxFlightNumber, p) {
     }
 
     functionCell.appendChild(deleteButton);
-    functionCell.style.width = "110px";
-    functionCell.style.minWidth = "110px";
+    functionCell.style.width = "150px";
+    functionCell.style.minWidth = "150px";
     functionCell.classList.add("player-macros");
     playerRow.appendChild(functionCell);
 }
@@ -846,7 +854,10 @@ function createFlightPlayerRow(p, flightNumber, maxFlightNumber) {
 */
 function createAddPlayerRowFlight(flightNumber) {
     const addPlayerButton = document.createElement("button");
-    addPlayerButton.innerHTML = "+ player";
+    let icon = document.createElement("i");
+    icon.classList.add('fe', 'fe-user-plus')
+    addPlayerButton.appendChild(icon);
+    // addPlayerButton.innerHTML = '<i class="fe >';
     addPlayerButton.classList.add("btn", "btn-primary", "btn-sm");
     addPlayerButton.style.margin = "2px";
     addPlayerButton.addEventListener("click", addPlayerWithName);
@@ -1291,7 +1302,7 @@ function getCleanTimeSlots(table) {
 */
 function extractFlightData(titles) {
     return Array.from(titles).map((t) => ({
-        title: t.value,
+        name: t.value,
         number: parseInt(t.getAttribute("flight-number")),
         players_and_availabilities: [],
     }));
@@ -1376,9 +1387,9 @@ function convertCleanFlightsToJSONAndSend() {
         });
     });
     league.cleaned = "true";
-    league.name = "Test Name";
-    league.type = "Test Type";
-    league.game_duration = 1.5;
+    league.name = document.getElementById("flight-name-input").value;
+    league.type = document.getElementById("league-type-input").value;
+    league.game_duration = parseFloat(document.getElementById("game-duration-slider").value)/60.0;
     sendToServer(league, sentCleanFlightNext);
 }
 
