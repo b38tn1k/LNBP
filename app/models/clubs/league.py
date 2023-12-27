@@ -65,11 +65,30 @@ class League(Model):
         
     @property
     def players(self):
+        """
+        This function returns a list of all the players associated with an object
+        (presumably a player itself), by iterating over the `player_associations`
+        attribute and extracting the `player` element from each `Association` object.
+
+        Returns:
+            list: The output returned by this function is a list of all the players
+            associated with the `self` object through the `player_associations` attribute.
+
+        """
         return [association.player for association in self.player_associations]
 
 
     @transaction    
     def get_game_duration(self):
+        """
+        This function retrieves the duration of the first time slot (ts[0]) from
+        a list of TimeSlots and returns it.
+
+        Returns:
+            : The function `get_game_duration` returns the duration of the first
+            timeslot element inside the `self.timeslots` list.
+
+        """
         ts = self.timeslots[0]
         return ts.get_duration()
 
