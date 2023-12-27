@@ -78,6 +78,12 @@ function showStep(index) {
  * is not specified.
  */
 function performActionsAndMove(stepIndex) {
+    let icon = document.createElement("i");
+    icon.classList.add("fe", "fe-loader");
+    let b = document.getElementById("next-button");
+    b.innerHTML = "";
+    b.appendChild(icon);
+
     if (stepIndex === 0) {
     } else if (stepIndex === 1) {
         stepIndex2Prep();
@@ -94,6 +100,8 @@ function performActionsAndMove(stepIndex) {
     // Increment only if initial checks pass
     if (stepIndex != 5) {
         showStep(stepIndex + 1);
+        b.innerHTML = "Next";
+        icon.remove();
     }
 }
 

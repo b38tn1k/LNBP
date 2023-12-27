@@ -25,7 +25,7 @@
 
                     {% endif %}
                     {% if team %}
-                    <li class="nav-item {{ 'active' if request.blueprint == 'dashboard_team' }}">
+                    <!-- <li class="nav-item {{ 'active' if request.blueprint == 'dashboard_team' }}">
                         <a href="{{ url_for('dashboard_team.index', team_id=team.id) }}" class="nav-link  {{ 'active' if request.endpoint == 'dashboard_team.index' }}">
                             <i class="fe fe-users"></i> Your Team
                         </a>
@@ -34,7 +34,7 @@
                         <a href="{{ url_for('dashboard_files.index', team_id=team.id) }}" class="nav-link  {{ 'active' if request.endpoint == 'dashboard_files.index' }}">
                             <i class="fe fe-file"></i> Shared Files
                         </a>
-                    </li>
+                    </li> -->
                     
 
                     {% endif %}

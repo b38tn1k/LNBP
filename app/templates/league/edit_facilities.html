@@ -1,0 +1,39 @@
+{% block body %}
+<div class="col-4">
+    <div
+        id="facilitiesElement"
+    ></div>
+
+    <div class="card">
+        <div class="card-header">Facilities</div>
+        <div class="card-body">
+            {% if club.facilities %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Use</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for facility in club.facilities %}
+                    <tr>
+                        <td>
+                            <div class="form-check form-switch">
+                                <input type="checkbox" class="form-check-input" id="facility-{{ facility.id }}" />
+                            </div>
+                        </td>
+                        <td>{{ facility.name }}</td>
+                        <td>{{ facility.asset_type }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>No facilities available.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

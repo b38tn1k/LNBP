@@ -451,7 +451,11 @@ def build_league_from_json(my_club, data):
             player = my_club.find_or_create_player(p['name'])
             my_flight.add_player(player)
             my_league.add_player(player)
-            print(player)
+            for i in range(len(p['availability'])):
+                player_availability = p['availability'][i]
+                ts = my_league.timeslots[i]
+                my_league.add_player_availability(player, ts, player_availability, add=True, commit=False, force=True)
+    return my_league
     
 
     

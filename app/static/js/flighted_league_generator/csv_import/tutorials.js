@@ -556,7 +556,6 @@ function getElemByStepClass(currentStep, _class) {
  */
 function parseCellGroups() {
     cellGroups = removeDuplicates();
-    console.log(cellGroups);
     const html = 1;
     const type = 2;
     result = [];
@@ -662,31 +661,7 @@ function createFlightDateTimeRows(league) {
     playerLabel.classList.add("bg-light", "fw-bold");
     playerLabel.setAttribute("rowspan", "2");
     playerLabel.setAttribute("colspan", "2");
-
-    // const addDTCell = document.createElement("td");
-    // addDTCell.classList.add("bg-light", "fw-bold");
-
-    // const removeDTCell = document.createElement("td");
-    // removeDTCell.classList.add("bg-light", "fw-bold");
-
-    // const addDT = document.createElement("button");
-    // addDT.innerHTML = "+ timeslot";
-    // addDT.classList.add("btn", "btn-primary", "btn-sm", "add-date-time");
-    // addDT.style.margin = "2px";
-    // addDT.addEventListener("click", switchPlayerFlightDown);
-    // addDTCell.appendChild(addDT);
-
-    // const removeDT = document.createElement("button");
-    // removeDT.innerHTML = "- timeslot";
-    // removeDT.classList.add("btn", "btn-danger", "btn-sm", "add-date-time");
-    // removeDT.style.margin = "2px";
-    // removeDT.addEventListener("click", switchPlayerFlightDown);
-    // removeDTCell.appendChild(removeDT);
-
     dateRow.appendChild(playerLabel);
-    // dateRow.appendChild(addDTCell);
-    // timeRow.appendChild(removeDTCell);
-
     league.timeslots.forEach(function (ts) {
         const dateTime = new Date(ts);
         const dateValue = dateTime.toISOString().split("T")[0]; // YYYY-MM-DD format
@@ -696,7 +671,6 @@ function createFlightDateTimeRows(league) {
             minute: "2-digit",
             hour12: false,
         });
-
         const dateCell = document.createElement("td");
         dateCell.classList.add("bg-light", "fw-bold");
         // Create and set the date input
@@ -1147,7 +1121,7 @@ function handleFlightTableClick(event) {
  */
 
 function step4DataFromServer(data) {
-    var parent = document.getElementById("data-from-server");
+    var parent = document.getElementById("clean-league");
     var child = parent.querySelector(".card-body");
     child.style.overflowX = "auto";
     let flightNumber = 1;
@@ -1235,28 +1209,6 @@ function stepIndex4Prep() {
         .catch((error) => console.log("Error loading JSON: ", error));
 }
 
-// function getCleanTimeSlots(table) {
-//     const tbody = table.querySelector("tbody");
-//     const dateRow = tbody.rows[0];
-//     const timeRow = tbody.rows[1];
-//     const combinedDateTime = [];
-
-//     for (let i = 0; i < timeRow.cells.length; i++) {
-//         let dateInput = dateRow.cells[i + 1].querySelector("input");
-//         let timeInput = timeRow.cells[i].querySelector("input");
-
-//         if (dateInput && timeInput && dateInput.value && timeInput.value) {
-//             // Combine date and time
-//             let dateTime = new Date(dateInput.value + "T" + timeInput.value);
-//             // Convert to ISO string
-//             let isoDateTime = dateTime.toISOString();
-//             combinedDateTime.push(isoDateTime.slice(0, -1));
-//         }
-//     }
-
-//     return combinedDateTime;
-// }
-
 /**
 * @description This function takes a HTML table as input and returns an array of ISO
 * datetime strings (format: "YYYY-MM-DDTHH:mm:ss") by combining the values from the
@@ -1336,16 +1288,20 @@ function extractPlayerData(table, flightNumber) {
         }));
 }
 
-/**
-* @description The function `sentCleanFlightNext()` simply logs the message "sent"
-* to the console.
-* 
-* @returns { any } The function `sentCleanFlightNext()` does not return anything
-* because it is void and only contains a console.log statement.
-*/
-function sentCleanFlightNext() {
-    console.log("sent");
+
+function sentCleanFlightNext(data) {
+    console.log(data);
+
+    // Check if the status is 'success' and there's a redirect URL
+    if (data.status === 'success' && data.redirect_url) {
+        // Redirect to the URL provided by the server
+        window.location.href = data.redirect_url;
+    } else {
+        // Handle other statuses or lack of redirect URL
+        console.log("No redirection or handling other statuses.");
+    }
 }
+
 
 /**
 * @description This function takes a list of HTML tables with flight information and
@@ -1387,7 +1343,10 @@ function convertCleanFlightsToJSONAndSend() {
         });
     });
     league.cleaned = "true";
-    league.name = document.getElementById("flight-name-input").value;
+    league.name = document.getElementById("league-name-input").value;
+    if (league.name.length == 0) {
+        league.name = "New League"
+    }
     league.type = document.getElementById("league-type-input").value;
     league.game_duration = parseFloat(document.getElementById("game-duration-slider").value)/60.0;
     sendToServer(league, sentCleanFlightNext);

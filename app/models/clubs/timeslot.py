@@ -1,4 +1,5 @@
 from app.models import db, Model
+from datetime import timedelta
 
 class Timeslot(Model):
     __tablename__ = 'timeslot'
@@ -33,3 +34,10 @@ class Timeslot(Model):
 
     def human_readable_hhmm_mmdd(self):
         return self.start_time.strftime('%H:%M %m/%d')
+    
+    def human_readable_mmdd_hhmm(self):
+        return self.start_time.strftime('%m/%d %H:%M')
+    
+    def get_duration(self):
+        duration = self.end_time - self.start_time
+        return int(duration.total_seconds() / 60)

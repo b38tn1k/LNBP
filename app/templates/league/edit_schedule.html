@@ -1,0 +1,68 @@
+{% block body %}
+<div class="col-12">
+    <div class="card">
+        <div class="card-header">Schedule</div>
+        <div class="card-body" style="overflow: scroll">
+            {% if league.flights %} {% for flight in league.flights %}
+            <div class="mb-3">
+                <label for="flight-{{ flight.id }}-input" class="form-label">Flight Name:</label>
+                <input
+                    type="text"
+                    class="form-control form-control-lg"
+                    id="flight-{{ flight.id }}-input"
+                    value="{{ flight.name }}"
+                />
+            </div>
+
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Player</th>
+                        {% if league.timeslots %} {% for ts in league.timeslots %}
+                        <th startTime="{{ ts.start_time }}" class="fp_dates">{{ ts.human_readable_mmdd_hhmm() }}</th>
+                        {% endfor %} {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if league.players %} {% if league.players|length > 0 %} {% for p in league.players %} {% if
+                    p.in_flight(flight) %}
+
+                    <tr>
+                        <td>{{ p.full_name }}</td>
+                        {% for ts in league.timeslots %}
+                        <td title="{{ p.full_name }}">{{ league.get_player_availability(p, ts) }}</td>
+                        {% endfor %}
+                        <!-- Additional player details here -->
+                    </tr>
+                    {% endif %} {% endfor %} {% else %}
+                    <tr>
+                        <td>No players found.</td>
+                    </tr>
+                    {% endif %} {% else %}
+                    <tr>
+                        <td>Players attribute not found.</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+            {% endfor %} {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    const dates = document.querySelectorAll(".fp_dates");
+    for (let date of dates) {
+        dateString = date.getAttribute("startTime");
+        flatpickr(date, {
+            defaultDate: new Date(date.getAttribute("startTime")),
+            enableTime: true,
+            dateFormat: "m/d H:i",
+            onChange: function (selectedDates, dateStr) {
+                // Update the th content with the selected date and time
+                date.innerHTML = dateStr;
+            },
+        });
+    }
+</script>
+{% endblock %}

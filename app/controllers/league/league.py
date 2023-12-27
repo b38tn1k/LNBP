@@ -48,7 +48,7 @@ def edit_league(id):
     league = current_user.club.get_league_by_id(id)
     if league is None:
         return redirect(url_for("main.home"))
-    return render_template('league/edit.html', league=league)
+    return render_template('league/edit.html', league=league, club=current_user.club)
 
 @blueprint.route('/delete/<int:id>', methods=["GET", "POST"])
 @login_required
@@ -107,9 +107,9 @@ def create_league():
             if 'cleaned' in data:
                 print("Data contains the field 'cleaned'.")
                 my_club = current_user.club
-                build_league_from_json(my_club, data)
+                league = build_league_from_json(my_club, data)
                 db.session.commit()
-                return jsonify({"status": "success"})
+                return jsonify({"status": "success", "redirect_url": url_for('league.edit_league', id=league.id)})
             else:
                 print("Data does not contain the field 'cleaned'.")
                 league_dict = league_wizard_csv_to_dicts(data)

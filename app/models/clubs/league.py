@@ -35,7 +35,7 @@ class League(Model):
         return f'<League {self.id} - {self.name}>'
     
     @transaction
-    def add_player_availability(self, player, timeslot, availability):
+    def add_player_availability(self, player, timeslot, availability, add=True, commit=False, force=False):
         """
         Add a player's availability for a specific time slot in the league.
 
@@ -44,19 +44,36 @@ class League(Model):
         :param availability: The availability status (e.g., 0 for unavailable, 1 for available).
         """
         # Check if the player is associated with this league
-        if player in self.players:
+        if force or self.player_associations.filter_by(player_id=player.id).first():
             # Create or update the PlayerAvailability entry
-            player_availability = ModelProxy.clubs.PlayerAvailability.query.filter_by(player=player, timeslot=timeslot).first()
+            player_availability = ModelProxy.clubs.PlayerAvailability.query.filter_by(
+                association_id=player.id, timeslot_id=timeslot.id).first()
+
             if not player_availability:
-                player_availability = ModelProxy.clubs.PlayerAvailability(player=player, timeslot=timeslot, availability=availability)
+                player_availability = ModelProxy.clubs.PlayerAvailability(
+                    association_id=player.id, timeslot_id=timeslot.id, availability=availability)
+
             else:
                 player_availability.availability = availability
-            db.session.add(player_availability)
-            db.session.commit()
+
+            if add:
+                db.session.add(player_availability)
+            if commit:
+                db.session.commit()
         else:
             raise ValueError("Player is not associated with this league.")
+        
+    @property
+    def players(self):
+        return [association.player for association in self.player_associations]
+
 
     @transaction    
+    def get_game_duration(self):
+        ts = self.timeslots[0]
+        return ts.get_duration()
+
+
     def get_player_availability(self, player, timeslot):
         """
         Get a player's availability for a specific time slot in the league.
@@ -65,13 +82,18 @@ class League(Model):
         :param timeslot: The time slot for which availability is requested.
         :return: The availability status (e.g., 0 for unavailable, 1 for available).
         """
-        player_availability = ModelProxy.clubs.PlayerAvailability.query.filter_by(player=player, timeslot=timeslot).first()
-        if player_availability:
-            return player_availability.availability
-        else:
-            # Default to unavailable if no availability record found
-            return 0
-        
+        # Using self.player_associations to directly access the relevant associations
+        player_association = next((assoc for assoc in self.player_associations if assoc.player_id == player.id), None)
+
+        if player_association:
+            # Check availability within the player's availability associations
+            player_availability = next((avail for avail in player_association.availability_associations if avail.timeslot_id == timeslot.id), None)
+            if player_availability:
+                return player_availability.availability
+        # Default to unavailable if no availability record found
+        return 0
+    
+    @transaction
     def get_existing_game_event(self, player, facility, timeslot):
             """
             Get an existing game event that matches the specified player, facility, and timeslot.

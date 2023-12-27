@@ -1,4 +1,5 @@
 from app.models import Model, db
+from app.models import ModelProxy, transaction
 
 class Player(Model):
     __tablename__ = 'player'
@@ -39,6 +40,10 @@ class Player(Model):
     @property
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
+    
+    def in_flight(self, flight):
+        return any(association.flight_id == flight.id for association in self.flight_associations)
+
     
     def __repr__(self):
         return f'<Player {self.full_name}>'

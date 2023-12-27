@@ -1,0 +1,47 @@
+{% block body %}
+<fieldset class="form-group">
+
+    <div class="mb-3">
+        <label for="league-name-input" class="form-label"
+            >League Name:</label
+        >
+        <input type="text" class="form-control form-control-lg" id="league-name-input" placeholder="League Name" />
+    </div>
+
+    <div class="mb-3">
+        <label for="game-duration-slider" class="form-label"
+            >Game Duration: <span id="duration-display"></span> minutes</label
+        >
+        <input type="range" class="form-range" style="width: 100%;" min="0" max="180" value="60" step="5" id="game-duration-slider" />
+    </div>
+
+    <div class="mb-3">
+        <label for="league-type-input" class="form-label"
+            >League Type:</label
+        >
+        <select class="custom-select" id="league-type-input">
+            <option>Tennis</option>
+            <option>Paddle</option>
+        </select>
+    </div>
+
+</fieldset>
+
+<script>
+    const rangeInput = document.getElementById("game-duration-slider");
+    const displaySpan = document.getElementById("duration-display");
+
+    // Function to update the display
+    function updateDisplay(value) {
+        displaySpan.textContent = value;
+    }
+
+    // Event listener for changes in the range input
+    rangeInput.addEventListener("input", function () {
+        updateDisplay(this.value);
+    });
+
+    // Initialize display
+    updateDisplay(rangeInput.value);
+</script>
+{% endblock %}

@@ -18,6 +18,7 @@ class Club(Model):
         db.String(15)
     )  # Adjust length based on the country's ZIP/Postal code format
     country = db.Column(db.String(100))
+    todos = db.relationship('Todo', back_populates='club', lazy='dynamic')
 
     GDPR_EXPORT_COLUMNS = {
         "id": "ID of the club",
@@ -140,6 +141,7 @@ class Club(Model):
         )
 
         if player is None:
+            
             # If no player found, create a new one with the first part as first name and the rest as last name
             first_name = name_parts[0]
             last_name = ' '.join(name_parts[1:]) if len(name_parts) > 1 else 'Unknown'
@@ -158,10 +160,36 @@ class Club(Model):
             if add is True:
                 db.session.add(player)
 
+            # self.add_todo("Player " + full_name + " setup incomplete.", add=add, commit=commit)
+
             if commit is True:
                 db.session.commit()
 
         return player
+    
+    def add_todo(self, task, add=True, commit=False):
+        """
+        Create and add a new todo item to this club.
+
+        Args:
+            task (str): The task or description of the todo item.
+
+        Returns:
+            Todo: The newly created Todo instance.
+
+        Usage:
+            club = Club.query.get(club_id)
+            todo = club.add_todo('Prepare annual budget report')
+        """
+        todo = ModelProxy.clubs.Todo(task=task, club_id=self.id)
+
+        if add is True:
+            db.session.add(todo)
+
+        if commit is True:
+            db.session.commit()
+
+        return todo
     
 
     def __repr__(self):
