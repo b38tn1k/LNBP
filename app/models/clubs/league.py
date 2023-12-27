@@ -161,6 +161,26 @@ class League(Model):
             return new_timeslot
 
     def create_flight(self, name, add=True, commit=False):
+            """
+            This function creates a new Flight object and optionally adds it to
+            the database (based on the 'add' and 'commit' parameters) and returns
+            the created Flight object.
+
+            Args:
+                name (str): The `name` parameter specifies the name of the new
+                    flight being created.
+                add (bool): The `add` input parameter is a boolean parameter that
+                    controls whether or not to add the new `Flight` object to the
+                    database.
+                commit (bool): The `commit` input parameter determines whether to
+                    immediately commit the changes made to the database after
+                    creating a new `Flight` object.
+
+            Returns:
+                : The output returned by this function is a `ModelProxy` instance
+                representing the new flight.
+
+            """
             new_flight = ModelProxy.clubs.Flight(
                 name = name,
                 league=self,
