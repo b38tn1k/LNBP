@@ -28,6 +28,20 @@ def check_for_membership(*args, **kwargs):
 @blueprint.route('/edit/<int:id>', methods=["GET", "POST"])
 @login_required
 def edit_league(id):
+    """
+    This function named `edit_league` redirects the user to the home page if they
+    don't have access or if the specified league doesn't exist.
+
+    Args:
+        id (int): The `id` input parameter is used to identify the specific League
+            object to be edited.
+
+    Returns:
+        str: The output returned by this function is a rendered HTML template
+        called "league/edit.html" with the "league" variable set to the league
+        object retrieved by the current user's club.
+
+    """
     if not current_user.is_authenticated or current_user.primary_membership_id is None:
         flash('You currently do not have accesss to app', 'warning')
         return redirect(url_for("main.home"))
@@ -39,6 +53,23 @@ def edit_league(id):
 @blueprint.route('/delete/<int:id>', methods=["GET", "POST"])
 @login_required
 def delete_league(id):
+    """
+    This function deletes a league with the given ID from the database and redirects
+    the user to the home page if the deletion was successful.
+
+    Args:
+        id (int): The `id` input parameter passes the league ID as a foreign key
+            value to be deleted from the database.
+
+    Returns:
+        : Based on the code provided above and assuming current_user is not None
+        and current_user.primary_membership_id is not None (i.e., the user is
+        authenticated and has a primary membership), the output returned by this
+        function is:
+        
+        A 302 redirect to the home page.
+
+    """
     if not current_user.is_authenticated or current_user.primary_membership_id is None:
         flash('You currently do not have accesss to app', 'warning')
         return redirect(url_for("main.home"))
