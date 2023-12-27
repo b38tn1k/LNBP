@@ -1289,6 +1289,17 @@ function extractPlayerData(table, flightNumber) {
 }
 
 
+/**
+* @description This function takes a 'data' object and checks if the 'status' is
+* 'success' with a redirect URL. If so it redirects the user to that URL.
+* 
+* @param { object } data - The `data` input parameter receives the flight booking
+* data from the server-side API call.
+* 
+* @returns { object } This function takes data as an argument and logs it to the
+* console before checking if the status is 'success' and there's a redirect URL. If
+* both conditions are true), it redirects the user to the provided URL using `window.location.href`.
+*/
 function sentCleanFlightNext(data) {
     console.log(data);
 
