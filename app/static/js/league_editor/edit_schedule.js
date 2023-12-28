@@ -132,6 +132,18 @@ document.addEventListener("DOMContentLoaded", function () {
     displaySpan.textContent = gameDuration;
     durationSlider.value = parseInt(gameDuration);
 
+/**
+* @description This function updates the text content of an element with the ID
+* "displaySpan" to a given value.
+* 
+* @param { string } value - The `value` input parameter passes a string value to the
+* `displaySpan.textContent` property setter to update the text content of the element
+* with the ID "displaySpan".
+* 
+* @returns {  } The function `updateDisplay(value)` takes a single argument `value`,
+* and it sets the `textContent` of an element with an ID `displaySpan` to the provided
+* value.
+*/
     function updateDisplay(value) {
         displaySpan.textContent = value;
     }
@@ -235,19 +247,69 @@ document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".reveal-after").forEach((div) => (div.style.display = "block"));
 });
 
+/**
+* @description The `moveUpCallback` function moves the player's flight direction
+* down by one step when triggered by an event.
+* 
+* @param { object } event - The `event` input parameter is not used or referenced
+* within the function body of `moveUpCallback`.
+* 
+* @returns { any } The output returned by the `moveUpCallback` function is `undefined`.
+*/
 function moveUpCallback(event) {
     switchPlayerFlight(event, -1);
 }
 
+/**
+* @description The function `moveDownCallback` is called when the user moves down
+* (via arrow key or other keyboard input) during a game or simulation.
+* 
+* @param { any } event - The `event` parameter is not used within the function
+* `moveDownCallback`. It is passed as an argument to the function but is not referred
+* to or acted upon within the code.
+* 
+* @returns { any } The function `moveDownCallback` does not return any value.
+*/
 function moveDownCallback(event) {
     switchPlayerFlight(event, 1);
 }
 
+/**
+* @description This function removes a callback event listener from an HTML table
+* row element ( `<tr>` ) that is closest to the event target .
+* 
+* @param { object } event - The `event` input parameter is not used within the
+* `removeCallback` function.
+* 
+* @returns { object } The function `removeCallback` does not return anything since
+* it is defined as a function with no `return` statement. Instead of returning any
+* value itself.  It logs the `row` element that is closest to the `event.target`
+* element inside the event handler of whatever `event` is passed into this function
+* call on line `<event>`.
+*/
 function removeCallback(event) {
     const row = event.target.closest("tr");
     console.log(row);
 }
 
+/**
+* @description This function retrieves the `tbody` element of a table with an ID
+* containing a specified flight number and returns an array containing the table and
+* its tbody element.
+* 
+* @param { string } targetFlight - The `targetFlight` input parameter specifies the
+* ID of the table to be retrieved.
+* 
+* @returns { array } The output of the `getTargetTableAndTbody` function is an array
+* containing two elements:
+* 
+* 1/ The `targetTable` element (an HTML table element with an id containing the value
+* of `targetFlight`).
+* 2/ The `targetTbody` element (a tbody element within the target table).
+* 
+* The function takes a `targetFlight` parameter and returns these two elements if
+* they exist and are found within the DOM.
+*/
 function getTargetTableAndTbody(targetFlight) {
     const targetTable = document.getElementById(`flight-${targetFlight}`);
     if (!targetTable) {
@@ -265,6 +327,27 @@ function getTargetTableAndTbody(targetFlight) {
     return [targetTable, targetTbody];
 }
 
+/**
+* @description This function allows a user to switch a player's flight by clicking
+* on their row and increasing or decreasing their flight number.
+* 
+* @param { any } event - The `event` input parameter is not used within the functionality
+* of the `switchPlayerFlight` function. It is passed to the function as an undefined
+* value and then ignored.
+* 
+* @param { integer } delta - The `delta` input parameter specifies the difference
+* between the current flight number and the new flight number that the row should
+* be moved to.
+* 
+* @returns {  } Based on the code provided:
+* 
+* The `switchPlayerFlight` function takes two parameters: `event` and `delta`. It
+* retrieves the currently selected table row using `event.target.closest("tr")` and
+* calculates the new flight number by adding or subtracting the given delta to the
+* current flight number. Then it updates the DOM elements related to the target
+* flight and modifies the button visibility based on whether the table is a top or
+* bottom flight table. Finally ,it returns undefined .
+*/
 function switchPlayerFlight(event, delta) {
     const targetRow = event.target.closest("tr");
     if (!targetRow) {
