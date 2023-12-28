@@ -5,6 +5,16 @@ for (let date of dates) {
         defaultDate: new Date(date.getAttribute("startTime")),
         enableTime: true,
         dateFormat: "m/d H:i",
+/**
+* @description The `onChange` function is called whenever the selected dates or time
+* change.
+* 
+* @param { array } selectedDates - The `selectedDates` input parameter is an array
+* of dates that the user has selected from the dropdown menu.
+* 
+* @param { string } dateStr - The `dateStr` input parameter is a string representing
+* the selected date and time.
+*/
         onChange: function (selectedDates, dateStr) {
             // Update the th content with the selected date and time
             date.innerHTML = dateStr;
@@ -14,6 +24,13 @@ for (let date of dates) {
 
 document.querySelectorAll('.schedule-table').forEach(table => table.addEventListener("click", handleFlightTableClick));
 
+/**
+* @description This function updates the availability of a seat at a flight by
+* clicking on the TD element representing that seat.
+* 
+* @param {  } event - The `event` input parameter passed to the function provides
+* information about the user's click event on the table cell element being handled.
+*/
 function handleFlightTableClick(event) {
     let target = event.target;
     // Check if the clicked element is a td with class 'availability'
