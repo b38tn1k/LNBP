@@ -1243,7 +1243,7 @@ function switchPlayerFlight(event, delta) {
     const [targetTable, targetTbody] = getTargetTableAndTbody(targetFlight);
     // Insert the targetRow into the target tbody as the 3rd row
     if (targetTbody.rows.length >= 2 && delta > 0) {
-        targetTbody.insertBefore(targetRow, targetTbody.rows[2]);
+        targetTbody.insertBefore(targetRow, targetTbody.rows[0]);
     } else if (targetTbody.rows.length >= 2 && delta < 0) {
         targetTbody.insertBefore(targetRow, targetTbody.rows[targetTbody.rows.length - 1]);
     } else {
