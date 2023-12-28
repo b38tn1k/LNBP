@@ -1,11 +1,10 @@
 {% block body %}
+{% if league.flights %} {% for flight in league.flights %}
 <div class="col-12">
     <div class="card">
-        <div class="card-header">Schedule</div>
-        <div class="card-body" style="overflow: scroll">
-            {% if league.flights %} {% for flight in league.flights %}
+        <div class="card-header">
             <div class="mb-3">
-                <label for="flight-{{ flight.id }}-input" class="form-label">Flight Name:</label>
+                <label for="flight-{{ flight.id }}-input" class="form-label flight-name-input">Flight Name:</label>
                 <input
                     type="text"
                     class="form-control form-control-lg"
@@ -13,13 +12,14 @@
                     value="{{ flight.name }}"
                 />
             </div>
-
-            <table class="schedule-table csv-table flight-sub-table table table-light table-bordered table-hover table-sm">
+        </div>
+        <div class="card-body" style="overflow: scroll">
+            <table class="schedule-table csv-table flight-sub-table table table-bordered table-hover table-sm">
                 <thead>
                     <tr>
-                        <th>Player</th>
+                        <th colspan="2"></th>
                         {% if league.timeslots %} {% for ts in league.timeslots %}
-                        <th startTime="{{ ts.start_time }}" class="fp_dates">{{ ts.human_readable_mmdd_hhmm() }}</th>
+                        <th ts="{{ts.id}}" startTime="{{ ts.start_time }}" class="fp_dates">{{ ts.human_readable_mmdd_hhmm() }}</th>
                         {% endfor %} {% endif %}
                     </tr>
                 </thead>
@@ -27,18 +27,44 @@
                     {% if league.players %} {% if league.players|length > 0 %} {% for p in league.players %} {% if
                     p.in_flight(flight) %}
 
-                    <tr>
-                        <td style="width: 100px; overflow-x: scroll; white-space: nowrap;">{{ p.first_name[0] }} {{ p.last_name }}</td>
-                        {% for ts in league.timeslots %}
-                        {% set player_availability = league.get_player_availability(p, ts) %}
-                        {% if player_availability == 1 %}
-                        <td class="availability bg-free", title="{{ p.full_name }}" availability="{{ player_availability }}"></td>
+                    <tr playerID="{{p.id}}">
+                        <td style="min-width: 120px;" class="d-flex justify-content-between align-items-center">
+                            <button class="btn btn-primary btn-sm move-up-button"><i class="fe fe-arrow-up"></i></button>
+                            <button class="btn btn-primary btn-sm move-down-button"><i class="fe fe-arrow-down"></i></button>
+                            <button class="btn btn-danger btn-sm remove-user-button"><i class="fe fe-trash"></i></button>
+                        </td>
+                        <td style="width: 100px; overflow-x: scroll; white-space: nowrap">
+                            {{ p.first_name[0] }} {{ p.last_name }}
+                        </td>
+                        {% for ts in league.timeslots %} {% set player_availability = league.get_player_availability(p,
+                        ts) %} {% if player_availability == 1 %}
+                        <td
+                            class="availability bg-free"
+                            ,
+                            title="{{ p.full_name }}"
+                            availability="{{ player_availability }}"
+                            timeslot="{{ts.id}}"
+                            player="{{p.id}}"
+                        ></td>
                         {% elif player_availability == 2 %}
-                        <td class="availability bg-busy", title="{{ p.full_name }}" availability="{{ player_availability }}"></td>
+                        <td
+                            class="availability bg-busy"
+                            ,
+                            title="{{ p.full_name }}"
+                            availability="{{ player_availability }}"
+                            timeslot="{{ts.id}}"
+                            player="{{p.id}}"
+                        ></td>
                         {% else %}
-                        <td class="availability bg-unavailable", title="{{ p.full_name }}" availability="{{ player_availability }}"></td>
-                        {% endif %}
-                        {% endfor %}
+                        <td
+                            class="availability bg-unavailable"
+                            ,
+                            title="{{ p.full_name }}"
+                            availability="{{ player_availability }}"
+                            timeslot="{{ts.id}}"
+                            player="{{p.id}}"
+                        ></td>
+                        {% endif %} {% endfor %}
                         <!-- Additional player details here -->
                     </tr>
                     {% endif %} {% endfor %} {% else %}
@@ -52,10 +78,11 @@
                     {% endif %}
                 </tbody>
             </table>
-            {% endfor %} {% endif %}
+            
         </div>
     </div>
 </div>
+{% endfor %} {% endif %}
 
 <script src="{{ url_for('static', filename='js/league_editor/edit_schedule.js') }}"></script>
 {% endblock %}

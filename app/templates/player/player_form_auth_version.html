@@ -1,0 +1,113 @@
+{% block body %}
+<div class="col-12">
+    <div class="card">
+        <div class="card-header">Profile Settings</div>
+        <div class="card-body">
+            <form role="form" action="{{ url_for('player.index', player_id=my_player.id) }}" method="post">
+                {{ form.hidden_tag() }}
+                <div class="form-row">
+                    <div class="form-group col-md-5">
+                        {{ form.first_name.label(class="form-label") }} {{ form.first_name(class="form-control") }}
+                    </div>
+                    <div class="form-group col-md-5">
+                        {{ form.last_name.label(class="form-label") }} {{ form.last_name(class="form-control") }}
+                    </div>
+                    <div class="form-group col-md-2">
+                        <!-- Adjust the width here -->
+                        {{ form.gender.label(class="form-label") }} {{ form.gender(class="custom-select") }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-10">
+                        {{ form.email.label(class="form-label") }} {{ form.email(class="form-control") }}
+                    </div>
+                    <div class="form-check">
+                        <br />
+                        {{ form.communication_preference_email(class="form-check-input") }} {{
+                        form.communication_preference_email.label(class="form-check-label") }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-10">
+                        {{ form.contact_number.label(class="form-label") }} {{ form.contact_number(class="form-control")
+                        }}
+                    </div>
+
+                    <div class="form-check">
+                        <br />
+                        {{ form.communication_preference_mobile(class="form-check-input") }} {{
+                        form.communication_preference_mobile.label(class="form-check-label") }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-2">
+                        {{ form.club_ranking.label(class="form-label") }} {{ form.club_ranking(class="form-control") }}
+                    </div>
+                </div>
+
+                <!-- Add more form fields as needed -->
+                <div class="d-flex justify-content-between align-items-center">
+                    <button type="submit" class="btn btn-primary">Update</button>
+                    <button
+                        type="button"
+                        class="btn btn-danger remove-user"
+                        id="{{my_player.id}}"
+                        redirectURL="{{ url_for('main.home' )}}"
+                    >
+                        <i class="fe fe-user-minus"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const removeUserButtons = document.querySelectorAll(".remove-user");
+
+        removeUserButtons.forEach((button) => {
+            button.addEventListener("click", function () {
+                if (this.classList.contains("really")) {
+                    console.log("Deleting user", this.id);
+                    deletePlayer(button.id, button.getAttribute("redirectURL"));
+                    // Add here the code to actually delete the user
+                } else {
+                    this.classList.remove("btn-danger");
+                    this.classList.add("btn-warning", "really");
+                    this.innerHTML = '<i class="fe fe-help-circle"></i>';
+
+                    setTimeout(() => {
+                        if (this.classList.contains("really")) {
+                            this.classList.remove("btn-warning", "really");
+                            this.classList.add("btn-danger");
+                            this.innerHTML = '<i class="fe fe-user-minus"></i>';
+                        }
+                    }, 3000); // 3 seconds timeout
+                }
+            });
+        });
+    });
+
+    function deletePlayer(playerId, redirect_url) {
+        const csrf_token = document.querySelector('#hidden-form input[name="csrf_token"]').value;
+        fetch(`/player/delete/${playerId}`, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrf_token,
+            },
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.status === "success") {
+                    console.log("Player deleted");
+                    window.location.href = redirect_url;
+                } else {
+                    console.error(data.message);
+                }
+            })
+            .catch((error) => console.error("Error:", error));
+    }
+</script>
+
+{% endblock %}

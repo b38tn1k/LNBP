@@ -1,3 +1,5 @@
+const playerNames = JSON.parse(document.getElementById("playerInfo").getAttribute("players"));
+
 // Function to check if cellGroups is empty and show a message if so
 /**
  * @description The provided JavaScript function `checkCellGroups` checks the length
@@ -40,7 +42,8 @@ function generateTableFromCellGroup(cellGroup, id) {
         "csv-table",
         "flight-sub-table",
         "table",
-        "table-light",
+        // "table-light",
+        "bg-transparent",
         "table-bordered",
         "table-hover",
         "table-sm"
@@ -488,7 +491,7 @@ function csvToTable(csvText, id) {
     const commaCount = (csvText.match(/,/g) || []).length;
     const delimiter = pipeCount > commaCount ? "|" : ",";
     const rows = csvText.split("\n");
-    let tableHTML = `<table id='${id}' class='csv-table table table-light table-bordered table-hover table-sm'>`;
+    let tableHTML = `<table id='${id}' class='csv-table table bg-transparent table-bordered table-hover table-sm'>`;
     rows.forEach((row, rowIndex) => {
         tableHTML += "<tr>";
         const cells = row.split(delimiter);
@@ -631,7 +634,7 @@ function createFlightTable() {
         "csv-table",
         "flight-sub-table",
         "table",
-        "table-light",
+        "bg-transparent",
         "table-bordered",
         "table-hover",
         "table-sm"
@@ -658,7 +661,7 @@ function createFlightDateTimeRows(league) {
     const dateRow = document.createElement("tr");
     const timeRow = document.createElement("tr");
     const playerLabel = document.createElement("td");
-    playerLabel.classList.add("bg-light", "fw-bold");
+    playerLabel.classList.add("fw-bold");
     playerLabel.setAttribute("rowspan", "2");
     playerLabel.setAttribute("colspan", "2");
     dateRow.appendChild(playerLabel);
@@ -672,7 +675,7 @@ function createFlightDateTimeRows(league) {
             hour12: false,
         });
         const dateCell = document.createElement("td");
-        dateCell.classList.add("bg-light", "fw-bold");
+        dateCell.classList.add("fw-bold");
         // Create and set the date input
         const dateInput = document.createElement("input");
         dateInput.type = "date";
@@ -681,7 +684,7 @@ function createFlightDateTimeRows(league) {
         dateCell.appendChild(dateInput);
         dateRow.appendChild(dateCell);
         const timeCell = document.createElement("td");
-        timeCell.classList.add("bg-light", "fw-bold");
+        timeCell.classList.add("fw-bold");
         // Create and set the time input
         const timeInput = document.createElement("input");
         timeInput.type = "time";
@@ -692,6 +695,76 @@ function createFlightDateTimeRows(league) {
     });
     return [dateRow, timeRow];
 }
+
+function formatLocalDateTime(dateTime) {
+    const year = dateTime.getFullYear();
+    const month = String(dateTime.getMonth() + 1).padStart(2, '0'); // Month is 0-based
+    const day = String(dateTime.getDate()).padStart(2, '0');
+    const hours = String(dateTime.getHours()).padStart(2, '0');
+    const minutes = String(dateTime.getMinutes()).padStart(2, '0');
+    const seconds = '00'
+    const milliseconds = '000'
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}`;
+}
+
+function createFlightDateTimeComboRow(league) {
+    const row = document.createElement("tr");
+    const playerLabel = document.createElement("th");
+    playerLabel.classList.add("fw-bold");
+    playerLabel.setAttribute("colspan", "2");
+
+    // Optional: Set player label text if needed
+    playerLabel.innerText = "Player";
+
+    row.appendChild(playerLabel);
+
+    league.timeslots.forEach(function (ts) {
+        const cell = document.createElement("th");
+        cell.classList.add("fw-bold");
+        const dateTime = new Date(ts);
+        dateTime.setHours(dateTime.getHours() + 12);
+        
+        
+        // Format the date and time as "m/d H:i" in the browser's local timezone
+        const formattedDate = dateTime.toLocaleDateString("en-US", {
+            month: "2-digit",
+            day: "2-digit",
+        });
+
+        const formattedTime = dateTime.toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+        });
+
+        // Set the formatted date and time as the cell content
+        cell.innerText = `${formattedDate} ${formattedTime}`;
+        
+        cell.setAttribute('datetime', formatLocalDateTime(dateTime))
+
+        // Initialize flatpickr
+        flatpickr(cell, {
+            enableTime: true,
+            dateFormat: "m/d H:i",
+            defaultDate: dateTime,
+            onChange: function (selectedDates, dateStr) {
+                // Update the cell's content and datetime attribute when a date or time is selected
+                console.log(cell.getAttribute('datetime')) //still appears in zulu time
+                cell.innerText = dateStr;
+                const newDate = new Date(selectedDates);
+                cell.setAttribute('datetime', formatLocalDateTime(newDate));
+                console.log(cell.getAttribute('datetime')) //still appears in zulu time
+            },
+        });
+
+        row.appendChild(cell);
+    });
+
+    return row;
+}
+
+
+
 
 /**
 * @description This function adds a set of buttons to a table row representing a
@@ -721,7 +794,6 @@ function addPlayerMacros(playerRow, flightNumber, maxFlightNumber, p) {
     deleteButton.appendChild(icon0);
     // deleteButton.innerHTML = "&times;";
     deleteButton.classList.add("btn", "btn-danger", "btn-sm");
-    deleteButton.style.margin = "2px";
 
     deleteButton.addEventListener("click", function () {
         // Save the row data to the undo stack before deletion
@@ -732,6 +804,7 @@ function addPlayerMacros(playerRow, flightNumber, maxFlightNumber, p) {
     });
 
     const functionCell = document.createElement("td");
+    functionCell.classList.add("d-flex","justify-content-between","align-items-center")
 
     const moveUpButton = document.createElement("button");
     let icon = document.createElement("i");
@@ -739,7 +812,6 @@ function addPlayerMacros(playerRow, flightNumber, maxFlightNumber, p) {
     moveUpButton.appendChild(icon);
     // moveUpButton.innerHTML = "&uarr;";
     moveUpButton.classList.add("btn", "btn-primary", "btn-sm", "move-up-button");
-    moveUpButton.style.margin = "2px";
     moveUpButton.addEventListener("click", switchPlayerFlightUp);
     functionCell.appendChild(moveUpButton);
 
@@ -748,7 +820,6 @@ function addPlayerMacros(playerRow, flightNumber, maxFlightNumber, p) {
     icon2.classList.add('fe', 'fe-arrow-down')
     moveDownButton.appendChild(icon2);
     moveDownButton.classList.add("btn", "btn-primary", "btn-sm", "move-down-button");
-    moveDownButton.style.margin = "2px";
     moveDownButton.addEventListener("click", switchPlayerFlightDown);
     functionCell.appendChild(moveDownButton);
 
@@ -760,8 +831,8 @@ function addPlayerMacros(playerRow, flightNumber, maxFlightNumber, p) {
     }
 
     functionCell.appendChild(deleteButton);
-    functionCell.style.width = "150px";
-    functionCell.style.minWidth = "150px";
+    functionCell.style.width = "120px";
+    functionCell.style.minWidth = "120px";
     functionCell.classList.add("player-macros");
     playerRow.appendChild(functionCell);
 }
@@ -788,7 +859,7 @@ function createFlightPlayerRow(p, flightNumber, maxFlightNumber) {
     playerRow.setAttribute("flight-number", flightNumber);
     addPlayerMacros(playerRow, flightNumber, maxFlightNumber, p);
     const playerName = document.createElement("td");
-    playerName.classList.add("bg-light", "fw-bold");
+    playerName.classList.add("fw-bold");
     playerName.innerHTML = p.names;
     playerName.style.width = "200px";
     playerName.style.minWidth = "200px";
@@ -814,6 +885,40 @@ function createFlightPlayerRow(p, flightNumber, maxFlightNumber) {
     return playerRow;
 }
 
+
+
+function updateDropdown(playerNameInput, suggestions) {
+    const dropdown = document.getElementById("suggestions-dropdown" + playerNameInput.getAttribute("flightNumber"));
+
+    // Clear existing suggestions
+    while (dropdown.firstChild) {
+        dropdown.removeChild(dropdown.firstChild);
+    }
+
+    // Create and append new suggestion items
+    suggestions.forEach(suggestion => {
+        const suggestionItem = document.createElement("div");
+        suggestionItem.classList.add("suggestion-item");
+        suggestionItem.textContent = suggestion;
+
+        // Add a click event listener to select the suggestion
+        suggestionItem.addEventListener("click", function () {
+            playerNameInput.value = suggestion;
+            dropdown.innerHTML = ""; // Clear the dropdown
+        });
+
+        dropdown.appendChild(suggestionItem);
+    });
+
+    // Show/hide the dropdown based on the number of suggestions
+    if (suggestions.length > 0) {
+        dropdown.style.display = "block";
+    } else {
+        dropdown.style.display = "none";
+    }
+}
+
+
 /**
 * @description This function creates an HTML table row with two cells: one for a "+"
 * button to add a player and one for a text input to enter the player's name.
@@ -837,17 +942,36 @@ function createAddPlayerRowFlight(flightNumber) {
     addPlayerButton.addEventListener("click", addPlayerWithName);
     const addPlayerButtonCell = document.createElement("td");
     addPlayerButtonCell.appendChild(addPlayerButton);
+    const suggestions = document.createElement("div");
+    suggestions.id = "suggestions-dropdown" + String(flightNumber)
+    suggestions.classList.add("suggestions-dropdown")
 
-    const addPlayerNameCell = document.createElement("td");
+    const newPlayerNameCell = document.createElement("td");
     const playerNameInput = document.createElement("input");
     playerNameInput.classList.add("form-control", "new-player-name");
+    playerNameInput.setAttribute("flightNumber", flightNumber)
+    playerNameInput.placeholder = "New Player"
 
-    addPlayerNameCell.appendChild(playerNameInput);
+    playerNameInput.addEventListener("input", function () {
+        const inputText = playerNameInput.value.toLowerCase();
+        const suggestions = playerNames.filter(player => player.toLowerCase().includes(inputText));
+        
+        // Call a function to update the dropdown with suggestions
+        updateDropdown(this, suggestions);
+
+        if (inputText === "") {
+            document.getElementById("suggestions-dropdown" + this.getAttribute("flightNumber")).style.display = "none";
+        }
+    });
+
+    newPlayerNameCell.appendChild(playerNameInput);
+    newPlayerNameCell.appendChild(suggestions);
+
 
     const addPlayerRow = document.createElement("tr");
     addPlayerRow.classList.add("add-player-row");
     addPlayerRow.appendChild(addPlayerButtonCell);
-    addPlayerRow.appendChild(addPlayerNameCell);
+    addPlayerRow.appendChild(newPlayerNameCell);
     addPlayerRow.setAttribute("flight-number", flightNumber);
 
     return addPlayerRow;
@@ -1144,11 +1268,10 @@ function step4DataFromServer(data) {
             table.classList.add("bottom-flight");
         }
         const tbody = document.createElement("tbody");
+        const thead = document.createElement("thead");
 
-        // Create date and time rows
-        let [dateRow, timeRow] = createFlightDateTimeRows(league);
-        tbody.appendChild(dateRow);
-        tbody.appendChild(timeRow);
+        let dateTimeRow = createFlightDateTimeComboRow(league);
+        thead.appendChild(dateTimeRow);
 
         league.players.forEach(function (p) {
             const playerRow = createFlightPlayerRow(p, flightNumber, maxFlightNumber);
@@ -1158,6 +1281,7 @@ function step4DataFromServer(data) {
         const addPlayerRow = createAddPlayerRowFlight(flightNumber);
         tbody.appendChild(addPlayerRow);
 
+        table.appendChild(thead);
         table.appendChild(tbody);
 
         child.appendChild(table);
@@ -1209,36 +1333,18 @@ function stepIndex4Prep() {
         .catch((error) => console.log("Error loading JSON: ", error));
 }
 
-/**
-* @description This function takes a HTML table as input and returns an array of ISO
-* datetime strings (format: "YYYY-MM-DDTHH:mm:ss") by combining the values from the
-* date and time columns of each row.
-* 
-* @param { object } table - The `table` input parameter is used to pass a table
-* element to the function.
-* 
-* @returns { array } The function `getCleanTimeSlots` takes a HTML table as input
-* and returns an array of ISO date-time strings (YYYY-MM-DDTHH:mm:ss) extracted from
-* the table's rows. It filters out incomplete or invalid date-time inputs and combines
-* the date and time columns from each row to form the final ISO string.
-*/
 function getCleanTimeSlots(table) {
-    const tbody = table.querySelector("tbody");
-    const dateRow = tbody.rows[0];
-    const timeRow = tbody.rows[1];
+    const thead = table.querySelector("thead");
+    const dateRow = thead.rows[0];
     const combinedDateTime = [];
 
-    for (let i = 0; i < timeRow.cells.length; i++) {
-        let dateInput = dateRow.cells[i + 1].querySelector("input");
-        let timeInput = timeRow.cells[i].querySelector("input");
+    for (let i = 0; i < dateRow.cells.length; i++) {
+        let dateInput = dateRow.cells[i]
 
-        if (dateInput && timeInput && dateInput.value && timeInput.value) {
-            // Combine date and time directly
-            let isoDateTime = dateInput.value + "T" + timeInput.value;
-            combinedDateTime.push(isoDateTime);
+        if (dateInput.hasAttribute('datetime')) {
+            combinedDateTime.push(dateInput.getAttribute('datetime'));
         }
     }
-
     return combinedDateTime;
 }
 

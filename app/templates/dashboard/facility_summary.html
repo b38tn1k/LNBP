@@ -9,8 +9,13 @@
         </div>
         
         <div class="card-body">
+
+            {% if club.facilities %}
+
+            {% endif %}
+
             {% if facility_summary %}
-            <table class="table card-table table-striped table-vcenter">
+            <table id="fsum" summary='{{ facility_summary['asset_type']|tojson }}' class="table card-table table-striped table-vcenter">
                 <thead>
                     <tr>
                         <th>Total Facilities</th>
@@ -34,4 +39,34 @@
             {% endif %}
         </div>
     </div>
+    <!-- <div id="facility-chart"></div> -->
 </div>
+<!-- 
+<script>
+    $(document).ready(function(){
+        // Assume 'summary' is a JavaScript object that has the same structure as your Python summary dictionary
+        var summary = document.getElementById("fsum").getAttribute('summary');
+        console.log(summary);
+
+        // Convert the summary object to an array of arrays, suitable for c3
+        var columns = Object.keys(summary).map(function(key) {
+            return [key, summary[key]];
+        });
+
+        var chart = c3.generate({
+            bindto: '#facility-chart', // id of chart wrapper
+            data: {
+                columns: columns,
+                type: 'pie',
+            },
+            axis: {},
+            legend: {
+                show: true, // show legend
+            },
+            padding: {
+                bottom: 0,
+                top: 0
+            },
+        });
+    });
+</script> -->

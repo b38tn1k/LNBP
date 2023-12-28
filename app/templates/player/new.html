@@ -1,0 +1,68 @@
+{% extends "tabler/dashboard_base.html" %} {% block title %} New Player {% endblock %} {% block js %} {% assets
+"tabler_plugins_css" %}
+<link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}" />
+{% endassets %} {% assets "tabler_plugins_js" %}
+<script type="text/javascript" src="{{ ASSET_URL }}"></script>
+{% endassets %} {% endblock %} {% block body %}
+
+<form id="hidden-form" style="display: none">{{ simple_form.hidden_tag() }}</form>
+
+<div class="my-3 my-md-5">
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">New Player</h1>
+        </div>
+        <div class="row row-cards">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">Profile Settings</div>
+                    <div class="card-body">
+                        <form role="form" action="{{ url_for('player.new_player') }}" method="post">
+                            {{ form.hidden_tag() }}
+                            <div class="form-row">
+                                <div class="form-group col-md-5">
+                                    {{ form.first_name.label(class="form-label") }} {{
+                                    form.first_name(class="form-control") }}
+                                </div>
+                                <div class="form-group col-md-5">
+                                    {{ form.last_name.label(class="form-label") }} {{
+                                    form.last_name(class="form-control") }}
+                                </div>
+                                <div class="form-group col-md-2">
+                                    <!-- Adjust the width here -->
+                                    {{ form.gender.label(class="form-label") }} {{ form.gender(class="custom-select") }}
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-10">
+                                    {{ form.email.label(class="form-label") }} {{ form.email(class="form-control") }}
+                                </div>
+                                <div class="form-check">
+                                    <br />
+                                    {{ form.communication_preference_email(class="form-check-input") }} {{
+                                    form.communication_preference_email.label(class="form-check-label") }}
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-10">
+                                    {{ form.contact_number.label(class="form-label") }} {{
+                                    form.contact_number(class="form-control") }}
+                                </div>
+
+                                <div class="form-check">
+                                    <br />
+                                    {{ form.communication_preference_mobile(class="form-check-input") }} {{
+                                    form.communication_preference_mobile.label(class="form-check-label") }}
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <button type="submit" class="btn btn-primary">Create</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

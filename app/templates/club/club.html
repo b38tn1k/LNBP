@@ -37,9 +37,9 @@
                                 <form role="form" action="{{ url_for('club.add_facility', club_id=club.id) }}" method="post">
                                     <tr>
                                         {{ facility_form.hidden_tag() }}
-                                        <th>{{ render_field(facility_form.name) }}</th>
-                                        <th>{{ render_field(facility_form.facility_type) }}</th>
-                                        <th><button type="submit" class="btn btn-secondary btn-sm">Add</button></th>
+                                        <td>{{ facility_form.name(class="form-control", placeholder=facility_form.name.label.text) }}</td>
+                                        <td>{{ facility_form.facility_type(class="custom-select") }}</td>
+                                        <td><button type="submit" class="btn btn-secondary">Add</button></td>
                                     </tr>
                                 </form>
                             </tbody>

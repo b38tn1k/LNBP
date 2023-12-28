@@ -145,8 +145,11 @@ class Club(Model):
             # If no player found, create a new one with the first part as first name and the rest as last name
             first_name = name_parts[0]
             last_name = ' '.join(name_parts[1:]) if len(name_parts) > 1 else 'Unknown'
-
-            player = ModelProxy.clubs.Player(
+            player = self.new_player(first_name, last_name, add=add, commit=commit)
+        return player
+    
+    def new_player(self, first_name, last_name, add=True, commit=False):
+        player = ModelProxy.clubs.Player(
                 first_name=first_name,
                 last_name=last_name,
                 email='placeholder@example.com',
@@ -157,15 +160,13 @@ class Club(Model):
                 club_ranking=0,
                 club=self
             )
-            if add is True:
-                db.session.add(player)
+        if add is True:
+            db.session.add(player)
 
-            # self.add_todo("Player " + full_name + " setup incomplete.", add=add, commit=commit)
-
-            if commit is True:
-                db.session.commit()
-
+        if commit is True:
+            db.session.commit()
         return player
+
     
     def add_todo(self, task, add=True, commit=False):
         """

@@ -434,6 +434,7 @@ def build_league_from_json(my_club, data):
             data for building the league.
 
     """
+    print(data)
     datetime_objects = [datetime.fromisoformat(iso_string) for iso_string in data['timeslots']]
     earliest_date = min(datetime_objects)
     latest_date = max(datetime_objects)

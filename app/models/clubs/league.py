@@ -76,6 +76,23 @@ class League(Model):
 
         """
         return [association.player for association in self.player_associations]
+    
+    @property
+    def not_players(self):
+        # Get the set of players in the current object
+        current_players = set(self.players)
+
+        # Get the set of players in the club
+        club_players = set(self.club.players)
+
+        # Find players in the club that aren't in the current object's players
+        not_in_current = club_players - current_players
+
+        # Convert the result back to a list
+        not_in_current_list = list(not_in_current)
+
+        return not_in_current_list
+
 
 
     @transaction    

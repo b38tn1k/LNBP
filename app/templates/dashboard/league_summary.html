@@ -2,104 +2,66 @@
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h3 class="card-title">Leagues Summary</h3>
-            <a
-                href="{{ url_for('league.create_league') }}"
-                class="btn btn-primary btn-sm"
-                aria-label="New League"
-                title="New League"
-            >
+            <a href="{{ url_for('league.create_league') }}" class="btn btn-primary btn-sm" aria-label="New League" title="New League">
                 <i class="fe fe-plus-circle"></i>
             </a>
         </div>
 
         <div class="card-body">
             {% if leagues %}
-            <div>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Start Date</th>
-                            <th>End Date</th>
-                            <th>Player Count</th>
-                            <th>Edit</th>
-                            <th>Delete</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% if leagues['planned'] %}
-                        <tr>
-                            <td colspan="4"><h4>Planned Leagues</h4></td>
-                        </tr>
-                        {% for league in leagues['planned'] %}
-                        <tr>
-                            <td>{{ league['name'] }}</td>
-                            <td>{{ league['start_date'] }}</td>
-                            <td>{{ league['end_date'] }}</td>
-                            <td>{{ league['player_count'] }}</td>
-                            <td>
-                                <a href="{{ url_for('league.edit_league', id=league['id']) }}" class="btn btn-primary"
-                                    ><i class="fe fe-edit"></i
-                                ></a>
-                            </td>
-                            <td>
-                                <a href="{{ url_for('league.delete_league', id=league['id']) }}" class="btn btn-danger"
-                                    ><i class="fe fe-trash"></i
-                                ></a>
-                            </td>
-                        </tr>
-                        {% endfor %} {% endif %} {% if leagues['current'] %}
-                        <tr>
-                            <td colspan="4"><h4>Current Leagues</h4></td>
-                        </tr>
-                        {% for league in leagues['current'] %}
-                        <tr>
-                            <td>{{ league['name'] }}</td>
-                            <td>{{ league['start_date'] }}</td>
-                            <td>{{ league['end_date'] }}</td>
-                            <td>{{ league['player_count'] }}</td>
-                            <td>
-                                <a href="{{ url_for('league.edit_league', id=league['id']) }}" class="btn btn-primary"
-                                    ><i class="fe fe-edit"></i
-                                ></a>
-                            </td>
-                            <td>
-                                <a href="{{ url_for('league.delete_league', id=league['id']) }}" class="btn btn-danger"
-                                    ><i class="fe fe-trash"></i
-                                ></a>
-                            </td>
-                        </tr>
-                        {% endfor %} {% endif %} {% if leagues['past'] %}
-                        <tr>
-                            <td colspan="4"><h4>Past Leagues</h4></td>
-                        </tr>
-                        {% for league in leagues['past'] %}
-                        <tr>
-                            <td>{{ league['name'] }}</td>
-                            <td>{{ league['start_date'] }}</td>
-                            <td>{{ league['end_date'] }}</td>
-                            <td>{{ league['player_count'] }}</td>
-                            <td>
-                                <a href="{{ url_for('league.edit_league', id=league['id']) }}" class="btn btn-primary"
-                                    ><i class="fe fe-edit"></i
-                                ></a>
-                            </td>
-                            <td>
-                                <a href="{{ url_for('league.delete_league', id=league['id']) }}" class="btn btn-danger"
-                                    ><i class="fe fe-trash"></i
-                                ></a>
-                            </td>
-                        </tr>
-                        {% endfor %} {% endif %}
-                    </tbody>
-                </table>
-            </div>
+                {% for league_type, league_list in leagues.items() %}
+                    {% if league_list %}
+                        <div>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Start Date</th>
+                                        <th>End Date</th>
+                                        <th>Player Count</th>
+                                        <th>Edit</th>
+                                        <th>Schedule</th>
+                                        <th>Delete</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="6"><h4>{{ league_type|capitalize }} Leagues</h4></td>
+                                    </tr>
+                                    {% for league in league_list %}
+                                        <tr>
+                                            <td>{{ league['name'] }}</td>
+                                            <td>{{ league['start_date'] }}</td>
+                                            <td>{{ league['end_date'] }}</td>
+                                            <td>{{ league['player_count'] }}</td>
+                                            <td>
+                                                <a href="{{ url_for('league.edit_league', id=league['id']) }}" class="btn btn-primary">
+                                                    <i class="fe fe-edit"></i>
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <a href="{{ url_for('league.schedule_league', id=league['id']) }}" class="btn btn-primary">
+                                                    <i class="fe fe-star"></i>
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <a href="{{ url_for('league.delete_league', id=league['id']) }}" class="btn btn-danger">
+                                                    <i class="fe fe-trash"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                {% endfor %}
             {% else %}
-            <div>
-                <h3>Welcome to League Ninja</h3>
-                <p>You have no Leagues.</p>
-                <a href="{{ url_for('league.create_league') }}" class="btn btn-primary">Create a League</a>
-            </div>
+                <div>
+                    <h3>Welcome to League Ninja</h3>
+                    <p>You have no Leagues.</p>
+                    <a href="{{ url_for('league.create_league') }}" class="btn btn-primary">Create a League</a>
+                </div>
             {% endif %}
         </div>
     </div>

@@ -1,17 +1,22 @@
-{% extends "tabler/dashboard_base.html" %} {% block title %}{{ player.full_name }} Profile{% endblock %} {% block js %} {% assets
+{% extends "tabler/dashboard_base.html" %} {% block title %}{{ my_player.first_name }}'s Profile{% endblock %} {% block js %} {% assets
     "tabler_plugins_css" %}
     <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}" />
     {% endassets %} {% assets "tabler_plugins_js" %}
     <script type="text/javascript" src="{{ ASSET_URL }}"></script>
     {% endassets %} {% endblock %} {% block body %}
     
+
+    <form id="hidden-form" style="display: none">
+        {{ simple_form.hidden_tag() }}
+    </form>
+    
     <div class="my-3 my-md-5">
         <div class="container">
             <div class="page-header">
-                <h1 class="page-title">{{ player.full_name }} Profile</h1>
+                <h1 class="page-title">{{ my_player.full_name }}</h1>
             </div>
             <div class="row row-cards">
-                
+                {% include 'player/player_form_auth_version.html' %}
             </div>
         </div>
     </div>

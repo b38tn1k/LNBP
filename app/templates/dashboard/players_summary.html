@@ -2,9 +2,9 @@
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h3 class="card-title">Players</h3>
-            <!-- <a href="{{ url_for('club.index') }}" class="btn btn-primary btn-sm" aria-label="Club Settings" title="Club Settings">
+            <a href="{{ url_for('player.new_player') }}" class="btn btn-primary btn-sm" aria-label="Add Player" title="Add Player">
                             <i class="fe fe-plus-circle"></i>
-                        </a> -->
+                        </a>
         </div>
         <div class="card-body">
             {% if club.players %}
@@ -17,7 +17,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for p in club.players %}
+                    {% for p in club.players|sort(attribute='last_name') %}
                     <tr>
                         <td>{{p.full_name}}</td>
                         <td>

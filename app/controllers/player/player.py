@@ -1,6 +1,8 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
 from app.models import db
+from app.forms.player_form import PlayerForm
+from app.forms import SimpleForm
 
 blueprint = Blueprint('player', __name__)
 
@@ -30,7 +32,13 @@ def index(player_id):
         return redirect(url_for("main.home"))
     club = current_user.club
     player = next((p for p in club.players if p.id == player_id), None)
-    return render_template('player/player.html', club=club, player=player)
+    form = PlayerForm(obj=player)
+    if form.validate_on_submit():
+        form.populate_obj(player)
+        db.session.commit()
+        flash('Player information updated successfully.', 'success')
+
+    return render_template('player/player.html', club=club, my_player=player, form=form, simple_form=SimpleForm())
 
 
 @blueprint.route('/delete/<int:player_id>', methods=["POST"])
@@ -67,3 +75,21 @@ def delete_player(player_id):
         return jsonify({'status': 'success', 'message': 'Player deleted'}), 200
     else:
         return jsonify({'status': 'error', 'message': 'Player not found'}), 404
+    
+
+@blueprint.route('/new', methods=["GET", "POST"])
+@login_required
+def new_player():
+    if not current_user.is_authenticated or current_user.primary_membership_id is None:
+        flash('You currently do not have accesss to app', 'warning')
+        return redirect(url_for("main.home"))
+    club = current_user.club    
+    form = PlayerForm()
+    if form.validate_on_submit():
+        player = club.new_player("", "")
+        form.obj = player
+        form.populate_obj(player)
+        db.session.commit()
+        flash('Player information updated successfully.', 'success')
+
+    return render_template('player/new.html', club=club, form=form, simple_form=SimpleForm())
