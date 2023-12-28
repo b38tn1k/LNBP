@@ -696,6 +696,31 @@ function createFlightDateTimeRows(league) {
     return [dateRow, timeRow];
 }
 
+/**
+* @description This function takes a `dateTime` object and returns a string representing
+* the local date and time formatted according to the ISO 8601 standard.
+* 
+* @param { object } dateTime - The `dateTime` input parameter is a JavaScript Date
+* object that is passed to the function and is used to extract various parts (years
+* ,months ,days etc) from the date object and convert it into the desired format
+* using methods like `getFullYear`, `getMonth()`, `getDate()`, `getHours()`,
+* `getMinutes()`, `getSeconds()` and `padStart()`.
+* 
+* @returns { string } This function takes a `dateTime` parameter and returns a string
+* representation of the local date and time using the ISO 8601 format. The output
+* is a string consisting of:
+* 
+* 	- Year (4 digits)
+* 	- Month (2 digits padded with leading zeros)
+* 	- Day (2 digits padded with leading zeros)
+* 	- Hours (2 digits padded with leading zeros)
+* 	- Minutes (2 digits padded with leading zeros)
+* 	- Seconds (3 digits padded with leading zeros)
+* 	- Milliseconds (3 digits padded with leading zeros)
+* 
+* The output is a concatenation of these components separated by literal `'-'` and
+* `-` characters.
+*/
 function formatLocalDateTime(dateTime) {
     const year = dateTime.getFullYear();
     const month = String(dateTime.getMonth() + 1).padStart(2, '0'); // Month is 0-based
@@ -707,6 +732,20 @@ function formatLocalDateTime(dateTime) {
     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}`;
 }
 
+/**
+* @description This function creates an HTML table row with flight date and time
+* selectors for each time slot.
+* 
+* @param { object } league - The `league` input parameter is used to pass an object
+* of type FlatpickrTimeSlot[], which contains all available time slots for the league.
+* 
+* @returns {  } The output of this function is a HTML table row element with two
+* columns. The first column contains a header cell with the text "Player", and the
+* second column contains two cells for each time slot provided. Each cell represents
+* a date and time picker widget and displays the selected date and time as "m/d H:i"
+* format. Additionally a 'datetime' attribute is added to each cell with the value
+* of the current date and time picked by the user.
+*/
 function createFlightDateTimeComboRow(league) {
     const row = document.createElement("tr");
     const playerLabel = document.createElement("th");
@@ -747,6 +786,29 @@ function createFlightDateTimeComboRow(league) {
             enableTime: true,
             dateFormat: "m/d H:i",
             defaultDate: dateTime,
+/**
+* @description This function updates the content and datetime attribute of an HTML
+* cell when a date or time is selected. It takes two parameters: `selectedDates`
+* which is an array of dates chosen by the user and `dateStr` which is the user's
+* input format.
+* 
+* @param { array } selectedDates - The `selectedDates` input parameter is an array
+* of dates selected by the user.
+* 
+* @param { string } dateStr - The `dateStr` input parameter is passed as the value
+* of the `date` field that was selected by the user.
+* 
+* @returns { any } The function `onChange` takes two parameters `selectedDates` and
+* `dateStr`, and it updates the content of a cell and its `datetime` attribute when
+* a date or time is selected. The output returned by this function is two `console.log()`
+* statements that print the value of the `datetime` attribute of the cell.
+* 
+* The first log statement prints the current value of the `datetime` attribute which
+* is still represented as Zulu time.
+* 
+* The second log statement prints the updated value of the `datetime` attribute after
+* formatting the new date using `formatLocalDateTime()`.
+*/
             onChange: function (selectedDates, dateStr) {
                 // Update the cell's content and datetime attribute when a date or time is selected
                 console.log(cell.getAttribute('datetime')) //still appears in zulu time
@@ -887,6 +949,24 @@ function createFlightPlayerRow(p, flightNumber, maxFlightNumber) {
 
 
 
+/**
+* @description This function updates a dropdown menu based on a user input and some
+* suggested values. It clears existing suggestions before adding new ones from the
+* given `suggestions` array.
+* 
+* @param { string } playerNameInput - The `playerNameInput` parameter is used to get
+* the value of an input field that triggers the updating of the suggestions dropdown.
+* 
+* @param { array } suggestions - The `suggestions` input parameter is an array of
+* strings that contains the suggestions to displayin the dropdown menu.
+* 
+* @returns { any } This function takes two arguments: `playerNameInput` and
+* `suggestions`. It updates a dropdown element with the `suggestions` based on the
+* `playerNameInput` value.
+* 
+* The output of this function is an updated dropdown element with the suggestions
+* listed inside.
+*/
 function updateDropdown(playerNameInput, suggestions) {
     const dropdown = document.getElementById("suggestions-dropdown" + playerNameInput.getAttribute("flightNumber"));
 
@@ -1333,6 +1413,17 @@ function stepIndex4Prep() {
         .catch((error) => console.log("Error loading JSON: ", error));
 }
 
+/**
+* @description The function `getCleanTimeSlots` takes a HTML table as input and
+* returns an array of DateTime objects obtained from the datetime attributes of the
+* cells inside the first row (thead) of the table.
+* 
+* @param {  } table - The `table` input parameter is not used anywhere inside the
+* `getCleanTimeSlots()` function.
+* 
+* @returns { object } The output of the function `getCleanTimeSlots` is an array of
+* datetime strings extracted from the cells of the first row of a HTML table.
+*/
 function getCleanTimeSlots(table) {
     const thead = table.querySelector("thead");
     const dateRow = thead.rows[0];
