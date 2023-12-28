@@ -90,6 +90,20 @@ def create_app(object_name):
 
         @app.errorhandler(500)
         def internal_server_error(error):
+            """
+            This function handles an internal server error and returns a 500 status
+            code with the error message and additional details about the Sentry
+            event id and public DSN.
+
+            Args:
+                error (): The `error` input parameter is not used within the
+                    function body of `internal_server_error`.
+
+            Returns:
+                int: The output returned by the `internal_server_error` function
+                is a 500 Internal Server Error page with the template `errors/500.html`.
+
+            """
             return render_template('errors/500.html',
                                    event_id=g.sentry_event_id,
                                    public_dsn=sentry.client.get_public_dsn(
@@ -98,18 +112,52 @@ def create_app(object_name):
 
     @app.errorhandler(404)
     def not_found_error(error):
+        """
+        This function handles HTTP 404 errors for API requests by rendering a
+        custom 404 template and returning the appropriate status code (404).
+
+        Args:
+            error (): The `error` input parameter is passed as an argument to the
+                function and contains information about the error that occurred.
+
+        Returns:
+            str: The output returned by the function `not_found_error` is a HTTP
+            404 status code and the rendered template 'errors/404.html'.
+
+        """
         if request.path.startswith("/api"):
             return handle_api_error(error)
         return render_template('errors/404.html'), 404
 
     @app.errorhandler(401)
     def permission_denied_error(error):
+        """
+        This function checks if the current request path starts with "/api" and
+        if it does it returns a custom response for API errors handled by the
+        handle_api_error() function.
+
+        Args:
+            error (): The `error` input parameter is passed to the function and
+                its value is not used or mentioned anywhere inside the function's
+                code.
+
+        Returns:
+            str: The function returns `render_template('tabler/401.html')`, which
+            is a 401 page.
+
+        """
         if request.path.startswith("/api"):
             return handle_api_error(error)
         return render_template('tabler/401.html'), 401
 
     @app.before_request
     def check_for_confirmation(*args, **kwargs):
+        """
+        This function checks if the user has confirmed their email address and
+        returns if they have or prompts them to resend the confirmation link if
+        they haven't.
+
+        """
         pass
         # TODO: Check later.
         # if REQUIRE_EMAIL_CONFIRMATION:
