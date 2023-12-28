@@ -10,6 +10,14 @@ blueprint = Blueprint('club', __name__)
 @blueprint.before_request
 def check_for_membership(*args, **kwargs):
     # Ensure that anyone that attempts to pull up the dashboard is currently an active member
+    """
+    This function checks if the current user is authenticated and has an active membership.
+
+    Returns:
+        None: The output returned by this function is a Flash message with the
+        text "You currently do not have access to app" and a warning icon.
+
+    """
     if not current_user.is_authenticated or current_user.primary_membership_id is None:
         flash('You currently do not have accesss to app', 'warning')
         return redirect(url_for("main.home"))
@@ -17,6 +25,18 @@ def check_for_membership(*args, **kwargs):
 @blueprint.route('/', methods=["GET", "POST"])
 @login_required
 def index():
+    """
+    This function renders a form to edit the details of the current user's club.
+    It fetches the current user's club details and pre populates the form with
+    those values. If the form is submitted validly (i.e all mandatory fields are
+    filled), it updates the club details based on the form data and redirects back
+    to the index page.
+
+    Returns:
+        : The output returned by this function is a rendered HTML template
+        'club/club.html' with the contents specified inside the function.
+
+    """
     if current_user.club:
         setup_form = ClubSetup()
         if setup_form.validate_on_submit():
@@ -72,6 +92,19 @@ def index():
 @blueprint.route('/<hashid:club_id>/add-facility', methods=['POST'])
 @login_required
 def add_facility(club_id):
+    """
+    This function adds a new facility to a club. It validates the input form data
+    and then adds the facility to the club using the `add_facility()` method.
+
+    Args:
+        club_id (int): The `club_id` input parameter is used to specify which Club
+            object to update with the new facility information.
+
+    Returns:
+        : The output returned by this function is a HTTP redirect to the index
+        page (specifically `url_for(.index)`.
+
+    """
     club = Club.query.get(club_id)
 
     form = FacilitySetup()  # Assuming the form's class name is FacilityForm
@@ -86,6 +119,22 @@ def add_facility(club_id):
 @blueprint.route('/<hashid:facility_id>/delete-facility', methods=['POST'])
 @login_required
 def delete_facility(facility_id):
+    """
+    This function deletes a facility with the given `facility_id` from the database
+    and redirects the user to the index page.
+
+    Args:
+        facility_id (int): The `facility_id` input parameter is used to identify
+            the facility that should be deleted. It is passed as an argument to
+            the `get()` method of the `Facility` query object to retrieve the
+            facility with the corresponding ID from the database.
+
+    Returns:
+        : Based on the code provided:
+        
+        The output of `delete_facility()` function is a `redirect` to `.index()`.
+
+    """
     f = Facility.query.get(facility_id)
     if f:
         db.session.delete(f)
