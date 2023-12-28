@@ -1,4 +1,19 @@
 class Diff {
+/**
+* @description This function is a constructor that takes three arguments - `event`,
+* `ids`, and `values` - and assigns them to the corresponding properties of an object.
+* 
+* @param {  } event - The `event` input parameter is not used within the function
+* and is therefore ignored.
+* 
+* @param { array } ids - The `ids` input parameter is an array of identifiers that
+* corresponds to the indexes of the items being added or updated.
+* 
+* @param { array } values - The `values` input parameter is an array of values
+* associated with the IDs passed through the `ids` parameter.
+* 
+* @returns { object } The output of this function is undefined.
+*/
     constructor(event, ids, values) {
         this.event = event;
         this.ids = ids;
@@ -8,6 +23,17 @@ class Diff {
 
 const delta = [];
 
+/**
+* @description This function updates a `delta` array with new differences between
+* two arrays of data.
+* 
+* @param { object } data - The `data` input parameter is passed as an object with
+* properties 'event', 'ids' and 'values' representing the updated information.
+* 
+* @returns { object } The `updateDelta` function updates an existing diff or adds a
+* new one to an array called `delta`, depending on if an existing diff with the same
+* event and IDs already exists.
+*/
 function updateDelta(data) {
     // Check if a diff with the same event and IDs already exists in the delta array
     const existingDiffIndex = delta.findIndex((diff) =>
@@ -29,6 +55,25 @@ function updateDelta(data) {
     }
 }
 
+/**
+* @description This function logs a diff object to the console. It takes an object
+* diff as its argument and outputs a string to the console with the following format:
+* 
+* Event=<event>, IDs=<IDs_as_string>, Values=<values_as_string>
+* 
+* where:
+* 
+* 	- Event is the diff event type (e.g.
+* 
+* @param { object } diff - The `diff` input parameter is an object containing
+* information about the difference between two states of a system or process.
+* 
+* @returns { any } The output of this function is a string representation of the
+* differences between two objects. The string includes three parts: `Event`, `IDs`,
+* and `Values`. The `Event` part is a fixed string that is always the same. The `IDs`
+* and `Values` parts are arrays of key-value pairs representing the differences
+* between the two objects.
+*/
 function logDiff(diff) {
     let idsString = JSON.stringify(diff.ids);
     let valuesString = JSON.stringify(diff.values);
@@ -46,6 +91,17 @@ function logDiff(diff) {
     console.log(`Event=${diff.event}, IDs=${idsString}, Values=${valuesString}`);
 }
 
+/**
+* @description This function formats a JavaScript `Date` object as a string following
+* the ISO 8601 format: `YYYY-MM-DDTHH:mm:ss.SSS`.
+* 
+* @param { object } dateTime - The `dateTime` input parameter is a JavaScript Date
+* object that is being passed into the `formatLocalDateTime` function to be formatted
+* into a string representation of the current date and time.
+* 
+* @returns { string } The output returned by the `formatLocalDateTime` function is
+* a string representation of a date and time value passed as an argument to the function.
+*/
 function formatLocalDateTime(dateTime) {
     const year = dateTime.getFullYear();
     const month = String(dateTime.getMonth() + 1).padStart(2, '0'); // Month is 0-based
@@ -65,6 +121,23 @@ document.addEventListener("DOMContentLoaded", function () {
             defaultDate: new Date(date.getAttribute("startTime")),
             enableTime: true,
             dateFormat: "m/d H:i",
+/**
+* @description This function updates the values of a `<time>` element's `innerHTML`
+* property and a `ts` attribute with the selected date using `Date()` constructor
+* and `formatLocalDateTime()` method.
+* 
+* @param { array } selectedDates - The `selectedDates` input parameter is an array
+* of dates selected by the user through a dropdown or other interface element.
+* 
+* @param { string } dateStr - Based on the code provided:
+* 
+* The `dateStr` input parameter is a string representing the date displayed on the
+* webpage via the `innerHTML` assignment.
+* 
+* @returns { object } The function takes two arguments `selectedDates` and `dateStr`.
+* It updates the `innerHTML` of an element with the value of `dateStr`, and then
+* creates a new `Date` object from the selected dates.
+*/
             onChange: function (selectedDates, dateStr) {
                 date.innerHTML = dateStr;
                 const newDate = new Date(selectedDates);
