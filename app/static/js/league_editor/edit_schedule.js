@@ -289,7 +289,9 @@ function moveDownCallback(event) {
 */
 function removeCallback(event) {
     const row = event.target.closest("tr");
-    console.log(row);
+    const playerID = parseInt(row.getAttribute("playerID"));
+    updateDelta(new Diff("remove_player_from_league", {'player': playerID}, 0));
+    row.remove();
 }
 
 /**
