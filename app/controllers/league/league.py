@@ -53,6 +53,22 @@ def edit_league(id):
 @blueprint.route('/schedule/<int:id>', methods=["GET", "POST"])
 @login_required
 def schedule_league(id):
+    """
+    This function checks if the user is authenticated and if they have a primary
+    membership ID. If they don't meet these conditions it redirects them to the
+    home page with a warning message.
+
+    Args:
+        id (int): The `id` input parameter is used to identify the specific league
+            for which the user wants to view the schedule.
+
+    Returns:
+        : Based on the code provided:
+        
+        The output returned by the function `schedule_league(id)` is a rendered
+        template `schedule.html`.
+
+    """
     if not current_user.is_authenticated or current_user.primary_membership_id is None:
         flash('You currently do not have accesss to app', 'warning')
         return redirect(url_for("main.home"))
