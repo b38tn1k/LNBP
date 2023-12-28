@@ -17,9 +17,8 @@
             {% include 'league/edit_info.html' %}
             {% include 'league/edit_facilities.html' %}
         </div>
-        <div class="row row-cards">
-            {% include 'league/edit_schedule.html' %}
-        </div>
+        {% include 'league/edit_schedule.html' %}
     </div>
 </div>
+<script src="{{ url_for('static', filename='js/league_editor/edit_schedule.js') }}"></script>
 {% endblock %}

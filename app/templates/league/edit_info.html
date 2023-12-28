@@ -9,29 +9,8 @@
         leagueName="{{ league.name }}"
         leagueGameDuration="{{league.get_game_duration()}}"
         leagueType="{{league.type}}"
+        flightCount="{{ league.flights|length }}"
     ></div>
-    <script>
-        $(document).ready(function () {
-            const info = document.getElementById("infoElement");
-
-            const title = document.getElementById("league-name-input");
-            title.value = info.getAttribute("leagueName");
-
-            const gameDuration = info.getAttribute("leagueGameDuration");
-            const durationSlider = document.getElementById("game-duration-slider");
-            const displaySpan = document.getElementById("duration-display");
-            displaySpan.textContent = gameDuration;
-            durationSlider.value = parseInt(gameDuration);
-
-            const leagueTypeSelector = document.getElementById("league-type-input");
-            leagueTypeSelector.value = info.getAttribute("leagueType");
-            // setTimeout(() => {
-
-            // }, 0);
-
-            // leagueType
-        });
-    </script>
 </div>
 
 {% endblock %}
