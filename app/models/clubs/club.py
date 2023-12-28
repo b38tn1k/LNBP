@@ -149,6 +149,28 @@ class Club(Model):
         return player
     
     def new_player(self, first_name, last_name, add=True, commit=False):
+        """
+        This function creates a new instance of the `Player` model and optionally
+        adds it to the database.
+
+        Args:
+            first_name (str): The `first_name` input parameter sets the value of
+                the `first_name` attribute of the new player object.
+            last_name (str): The `last_name` input parameter creates a new instance
+                of the `Player` class with the given first name and last name for
+                the Player object being created.
+            add (bool): The `add` input parameter to the `new_player` function
+                determines whether or not to add the newly created `Player` object
+                to the database immediately.
+            commit (bool): The `commit` input parameter determines whether to
+                commit the changes made to the database after creating a new
+                `Player` object.
+
+        Returns:
+            : The output returned by this function is a `ModelProxy` object of
+            type `clubs.Player`.
+
+        """
         player = ModelProxy.clubs.Player(
                 first_name=first_name,
                 last_name=last_name,
