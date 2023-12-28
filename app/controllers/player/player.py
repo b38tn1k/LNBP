@@ -7,6 +7,24 @@ blueprint = Blueprint('player', __name__)
 @blueprint.route('/<hashid:player_id>', methods=["GET", "POST"])
 @login_required
 def index(player_id):
+    """
+    The function `index(player_id)`:
+    1/ Checks if the current user is authenticated and has a primary membership;
+    if not it redirects to the home page.
+    2/ Retrieves the club related to the current user's membership.
+    3/ Fetches the player with the specified `player_id` from the current user's
+    club.
+    4/ Renders the `player.html` template with the `club` and `player` objects.
+
+    Args:
+        player_id (int): The `player_id` input parameter specifies the ID of the
+            player to be retrieved and rendered on the HTML page.
+
+    Returns:
+        : The output returned by the function is a renderered template
+        ('player/player.html') with the data club and player.
+
+    """
     if not current_user.is_authenticated or current_user.primary_membership_id is None:
         flash('You currently do not have accesss to app', 'warning')
         return redirect(url_for("main.home"))
@@ -18,6 +36,23 @@ def index(player_id):
 @blueprint.route('/delete/<int:player_id>', methods=["POST"])
 @login_required
 def delete_player(player_id):
+    """
+    This function takes a player ID as input and checks if the player belongs to
+    the current user's club. If the player exists and is owned by the current
+    user's club., it deletes the player from the database and returns a success
+    response with a message indicating that the player has been deleted.
+
+    Args:
+        player_id (int): The `player_id` input parameter identifies the player to
+            be deleted from the current user's club.
+
+    Returns:
+        dict: Based on the code provided:
+        
+        Output: JSON response with status "success" and message "Player deleted"
+        (200 HTTP status code).
+
+    """
     if not current_user.is_authenticated or current_user.primary_membership_id is None:
         return jsonify({'status': 'error', 'message': 'Not authenticated'}), 401
 
