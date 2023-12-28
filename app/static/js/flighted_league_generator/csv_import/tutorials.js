@@ -799,13 +799,13 @@ function createFlightPlayerRow(p, flightNumber, maxFlightNumber) {
         availability.classList.add("availability");
         switch (a) {
             case 1:
-                availability.classList.add("bg-success");
+                availability.classList.add("bg-free");
                 break;
             case 2:
-                availability.classList.add("bg-warning");
+                availability.classList.add("bg-busy");
                 break;
             case 3:
-                availability.classList.add("bg-danger");
+                availability.classList.add("bg-unavailable");
                 break;
         }
         availability.title = p.names;
@@ -1091,18 +1091,18 @@ function handleFlightTableClick(event) {
         target.setAttribute("availability", availability);
 
         // Remove all bg- classes
-        target.classList.remove("bg-success", "bg-warning", "bg-danger");
+        target.classList.remove("bg-free", "bg-busy", "bg-unavailable");
 
         // Add the new bg- class based on the updated availability
         switch (availability) {
             case 1:
-                target.classList.add("bg-success");
+                target.classList.add("bg-free");
                 break;
             case 2:
-                target.classList.add("bg-warning");
+                target.classList.add("bg-busy");
                 break;
             case 3:
-                target.classList.add("bg-danger");
+                target.classList.add("bg-unavailable");
                 break;
         }
     }

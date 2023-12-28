@@ -26,7 +26,7 @@
                                     <td> {{ facility.name }} </td>
                                     <td class="text-center"> {{ facility.asset_type }} </td>
                                     <td class="text-center">
-                                        <form role="form" action="{{ url_for('club_home.delete_facility', facility_id=facility.id) }}" method="post">
+                                        <form role="form" action="{{ url_for('club.delete_facility', facility_id=facility.id) }}" method="post">
                                             {{ simple_form.hidden_tag() }}
 
                                             <button type="submit" class="btn btn-secondary btn-sm">Remove</button>
@@ -34,7 +34,7 @@
                                     </td>
                                 </tr>
                                 {% endfor %}
-                                <form role="form" action="{{ url_for('club_home.add_facility', club_id=club.id) }}" method="post">
+                                <form role="form" action="{{ url_for('club.add_facility', club_id=club.id) }}" method="post">
                                     <tr>
                                         {{ facility_form.hidden_tag() }}
                                         <th>{{ render_field(facility_form.name) }}</th>
@@ -52,7 +52,7 @@
                     <div class="card-header">
                         <h3 class="card-title">Club Setup</h3>
                     </div>
-                    <form role="form" action="{{ url_for('club_home.index') }}" method="post">
+                    <form role="form" action="{{ url_for('club.index') }}" method="post">
                         <div class="card-body">
                             {{ setup_form.hidden_tag() }} {{ render_field(setup_form.name) }}
                             <br />

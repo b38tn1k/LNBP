@@ -23,7 +23,6 @@ class Player(Model):
 
     GDPR_EXPORT_COLUMNS = {
         "id": "ID of the player",
-        "hashid": "ID of Player",
         "email": "Player Email",
         "contact_number": "Player Contact Number",
         "communication_preference_mobile": "Player Mobile Communication Preference",
@@ -35,7 +34,6 @@ class Player(Model):
         "club_ranking": "The player club ranking",
         "email_confirmed": "Whether the email was confirmation"
     }
-
 
     @property
     def full_name(self):

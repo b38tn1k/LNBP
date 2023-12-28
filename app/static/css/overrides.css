@@ -2,3 +2,17 @@ hr.thin {
     margin-top: 1rem !important;
     margin-bottom: 1rem !important;
 }
+
+.bg-free {
+    background-color: #4F97D7 !important;
+}
+
+
+.bg-busy {
+    background-color: #9A52B9 !important;
+}
+
+.bg-unavailable {
+    background-color: #F57373 !important;
+}
+

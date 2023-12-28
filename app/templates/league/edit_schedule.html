@@ -14,7 +14,7 @@
                 />
             </div>
 
-            <table class="table table-striped">
+            <table class="schedule-table csv-table flight-sub-table table table-light table-bordered table-hover table-sm">
                 <thead>
                     <tr>
                         <th>Player</th>
@@ -28,9 +28,16 @@
                     p.in_flight(flight) %}
 
                     <tr>
-                        <td>{{ p.full_name }}</td>
+                        <td style="width: 100px; overflow-x: scroll; white-space: nowrap;">{{ p.first_name[0] }} {{ p.last_name }}</td>
                         {% for ts in league.timeslots %}
-                        <td title="{{ p.full_name }}">{{ league.get_player_availability(p, ts) }}</td>
+                        {% set player_availability = league.get_player_availability(p, ts) %}
+                        {% if player_availability == 1 %}
+                        <td class="availability bg-free", title="{{ p.full_name }}" availability="{{ player_availability }}"></td>
+                        {% elif player_availability == 2 %}
+                        <td class="availability bg-busy", title="{{ p.full_name }}" availability="{{ player_availability }}"></td>
+                        {% else %}
+                        <td class="availability bg-unavailable", title="{{ p.full_name }}" availability="{{ player_availability }}"></td>
+                        {% endif %}
                         {% endfor %}
                         <!-- Additional player details here -->
                     </tr>
@@ -50,19 +57,5 @@
     </div>
 </div>
 
-<script>
-    const dates = document.querySelectorAll(".fp_dates");
-    for (let date of dates) {
-        dateString = date.getAttribute("startTime");
-        flatpickr(date, {
-            defaultDate: new Date(date.getAttribute("startTime")),
-            enableTime: true,
-            dateFormat: "m/d H:i",
-            onChange: function (selectedDates, dateStr) {
-                // Update the th content with the selected date and time
-                date.innerHTML = dateStr;
-            },
-        });
-    }
-</script>
+<script src="{{ url_for('static', filename='js/league_editor/edit_schedule.js') }}"></script>
 {% endblock %}

@@ -18,8 +18,8 @@
                         </a>
                     </li>
                     {% if current_user.club %}
-                    <li class="nav-item {{ 'active' if request.blueprint == 'club_home' }}">
-                        <a href="{{ url_for('club_home.index') }}" class="nav-link  {{ 'active' if request.endpoint == 'club_home.settings' }}">
+                    <li class="nav-item {{ 'active' if request.blueprint == 'club' }}">
+                        <a href="{{ url_for('club.index') }}" class="nav-link  {{ 'active' if request.endpoint == 'club.settings' }}">
                             <i class="fe fe-box"></i> Club</a>
                     </li>
 

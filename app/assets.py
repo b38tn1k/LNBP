@@ -53,9 +53,12 @@ landing_css = Bundle(
 
 tabler_css = Bundle(
     'https://rawcdn.githack.com/Sumukh/Ignite/70bf953851a356e785528b56ca105042074a3d5a/appname/static/tabler/css/dashboard.css',
+    # 'https://raw.githubusercontent.com/tabler/tabler/dev/demo/dist/css/tabler.css',
     # 'https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.css',
     # 'https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta17/dist/css/tabler.min.css',
     # 'https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css',
+    # 'css/rawcdn_github_backup.css',
+    # 'css/custom_tabler_dark.css',
     'css/overrides.css',
     filters='cssmin',
     output='public/css/tabler.css'

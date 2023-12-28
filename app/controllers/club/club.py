@@ -5,7 +5,7 @@ from app.forms.club_forms import ClubSetup, FacilitySetup
 from app.models import db
 from app.models.clubs import Club, Facility
 
-blueprint = Blueprint('club_home', __name__)
+blueprint = Blueprint('club', __name__)
 
 @blueprint.before_request
 def check_for_membership(*args, **kwargs):

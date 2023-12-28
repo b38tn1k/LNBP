@@ -32,6 +32,8 @@
             </table>
             {% else %}
             <p>No facilities available.</p>
+            <p>Head over to Club Settings to add some Facilities.</p>
+            <a href="{{ url_for('club.index') }}" class="btn btn-primary">Go to Club Settings</a>
             {% endif %}
         </div>
     </div>

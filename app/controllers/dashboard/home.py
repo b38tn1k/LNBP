@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, abort, redirect, url_for, flash
 from flask_login import login_required, current_user
 from app.services.club_services import get_club_facility_summary, get_leagues_by_status
+from app.forms import SimpleForm
 
 from app.models.teams import Team
 
@@ -58,10 +59,9 @@ def home(team_id):
     if not team or not team.has_member(current_user):
         abort(404)
 
-    
     facility_summary = get_club_facility_summary(current_user.club.id)
     leagues_summary = get_leagues_by_status(current_user.club.id)
     print(leagues_summary)
 
-    return render_template('dashboard/home.html', facility_summary=facility_summary, leagues=leagues_summary, team=team, club=current_user.club)
+    return render_template('dashboard/home.html', facility_summary=facility_summary, leagues=leagues_summary, team=team, club=current_user.club, simple_form=SimpleForm())
     # return render_template('dashboard/home_backup.html', club=current_user.club, team=team)
