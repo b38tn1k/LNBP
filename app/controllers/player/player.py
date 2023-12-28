@@ -80,6 +80,20 @@ def delete_player(player_id):
 @blueprint.route('/new', methods=["GET", "POST"])
 @login_required
 def new_player():
+    """
+    This function creates a new player for a club based on user input. It first
+    checks if the user is authenticated and has a primary membership id before
+    redirecting to the home page if they don't. If the user is authenticated and
+    has a primary membership id it then creates a new PlayerForm with default
+    values populated from the current user's club and then renders the 'player/new.html'
+    template with that form prepopulated with values.
+
+    Returns:
+        : The output returned by this function is a HTML page with the rendering
+        of template 'player/new.html' and an alert message "Player information
+        updated successfully." if the form is validated.
+
+    """
     if not current_user.is_authenticated or current_user.primary_membership_id is None:
         flash('You currently do not have accesss to app', 'warning')
         return redirect(url_for("main.home"))
