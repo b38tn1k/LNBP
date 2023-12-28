@@ -80,6 +80,15 @@ class League(Model):
     @property
     def not_players(self):
         # Get the set of players in the current object
+        """
+        This function returns a list of players that are members of the club but
+        not part of the current object's player list.
+
+        Returns:
+            list: The output returned by this function is a list of players who
+            are members of the club but not part of the current object's players.
+
+        """
         current_players = set(self.players)
 
         # Get the set of players in the club
