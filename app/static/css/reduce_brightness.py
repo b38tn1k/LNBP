@@ -22,11 +22,44 @@ def adjust_color_brightness(rgb_color, target_brightness):
     return tuple(int(x*255) for x in adjusted_rgb)
 
 def process_css_colors(css_content, max_brightness=0.7):
+    """
+    This function takes a CSS string as input and adjusts the colors present In
+    the CSS to have a maximum brightness of 0.7. It extracts all colors found In
+    the CSS using regular expressions and calculates their brightness levels based
+    on their RGB values.
+
+    Args:
+        css_content (str): The `css_content` input parameter is the CSS content
+            that contains the colors to be processed.
+        max_brightness (float): The `max_brightness` parameter sets the maximum
+            brightness level for adjusting the colors. It scales all brightness
+            levels relative to the specified value. If `max_brightness` is 0.7 and
+            a color's brightness level is 1.5 before adjustment (i.e., too bright),
+            it will be adjusted down to 1.1 (1.5 x 0.7).
+
+    Returns:
+        str: The output returned by this function is a modified CSS content with
+        adjusted color brightness levels.
+
+    """
     color_map = {}
     hex_color_pattern = r'#[0-9a-fA-F]{3,6}'
 
     # Extract colors and calculate brightness
     def extract_color(match):
+        """
+        This function takes a match object as input and extracts the color hex
+        code from it. It then converts the hex code to an RGB value and calculates
+        the brightness of the color.
+
+        Args:
+            match (): The `match` input parameter is a regular expression match
+                object and is used to extract the color hex code from the input string.
+
+        Returns:
+            str: The output returned by this function is the color hex string.
+
+        """
         color_hex = match.group(0)
         rgb = hex_to_rgb(color_hex)
         brightness = get_brightness(rgb)
@@ -47,6 +80,20 @@ def process_css_colors(css_content, max_brightness=0.7):
 
     # Replace old colors with new colors in CSS
     def replace_color(match):
+        """
+        This function takes a substring that represents a color (e.g.
+
+        Args:
+            match (): In the function `replace_color`, the `match` parameter is a
+                tuple containing the matching text and its position info from the
+                last pattern match done by the `re` module.
+
+        Returns:
+            str: The output returned by the function `replace_color` is the input
+            string with all occurrences of the old color replaced with the
+            corresponding new color from the `color_map`.
+
+        """
         old_color = match.group(0)
         return color_map.get(old_color, old_color)
 
