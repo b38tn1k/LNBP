@@ -8,11 +8,33 @@ from .player import *
 
 @log_timer
 def init_histories(players):
+    """
+    The `init_histories` function initializes the `other_player_history` dictionary
+    for each player with the ID of every other player as a key and a value of 0.
+
+    Args:
+        players (list): The `players` input parameter is a list of Player objects
+            that the function iterates over to initialize each Player's
+            other_player_history dictionary with zero values for all other players.
+
+    """
     for player in players:
         for p in players:
                 player.other_player_history[p.id] = 0
 @log_timer
 def get_histories(potential_game):
+    """
+    The `get_histories` function calculates the total sum of the other players'
+    history for a given player's history.
+
+    Args:
+        potential_game (list): The `potential_game` input parameter is a dictionary
+            of players and their respective other players' history values.
+
+    Returns:
+        int: The output returned by this function is 0.
+
+    """
     sum_history = 0
     for player in potential_game:
         for p in potential_game:
@@ -21,18 +43,94 @@ def get_histories(potential_game):
 
 @log_timer
 def check_potential_game_length(potential_game, rules):
+    """
+    This function checks whether a potential game meets the rules specified by
+    checking the length of the game and comparing it to the length of the rules.
+
+    Args:
+        potential_game (list): The `potential_game` input parameter is a list of
+            game tiles that represents the current state of the game.
+        rules (int): The `rules` input parameter is a boolean indicator that
+            specifies the minimum length of a valid game.
+
+    Returns:
+        bool: The function `check_potential_game_length` takes two arguments:
+        `potential_game`, which is a list of cards representing the current state
+        of the game board (i.e. the positions where cards have been played), and
+        `rules`, which is a dictionary defining the game rules.
+        
+        The function simply checks if the length of the `potential_game` list does
+        not match the value specified by the key "length" of the `rules` dictionary.
+        
+        So the output of the function would be `True` for any game state where the
+        number of cards played differs from the specified length.
+
+    """
     return (len(potential_game) != rules)
 
 @log_timer
 def contains_high_game_count_player(potential_game, average_game_count):
+    """
+    The function `contains_high_game_count_player` takes two arguments: `potential_game`
+    and `average_game_count`.
+
+    Args:
+        potential_game (dict): The `potential_game` parameter is the game being
+            analyzed for high game count players.
+        average_game_count (int): The `average_game_count` parameter is used as a
+            threshold to check if a player's game count is significantly higher
+            than the average game count.
+
+    Returns:
+        bool: The output returned by this function is `False`.
+
+    """
     return any(player.game_count > average_game_count for player in potential_game)
 
 @log_timer
 def contains_players_already_scheduled(players_scheduled, potential_game):
+    """
+    This function takes two arguments: `players_scheduled` and `potential_game`,
+    and it returns `True` if there are any players already scheduled to play that
+    are also present within the `potential_game`.
+
+    Args:
+        players_scheduled (list): The `players_scheduled` input parameter is a
+            list of players that have already been scheduled for games.
+        potential_game (list): The `potential_game` input parameter is a list of
+            players that may be scheduled for a game.
+
+    Returns:
+        bool: The output returned by the function `contains_players_already_scheduled`
+        is `True` if any of the players In `potential_game` are already scheduled
+        and `False` otherwise.
+
+    """
     return any(player in players_scheduled for player in potential_game)
 
 @log_timer
 def player_fails_day_week_count(potential_game, day, week):
+    """
+    This function checks whether a player has reached the maximum number of games
+    allowed for a specific day or week within a list of potential games.
+
+    Args:
+        potential_game (list): The `potential_game` input parameter is a list of
+            games that are being checked to see if they fit the rules defined by
+            the `player.rules` dictionary.
+        day (int): The `day` input parameter is a fixed date that the function
+            checks to see if the player has already played a game on that day.
+        week (int): The `week` input parameter specifies the number of weeks that
+            a player can play games during a single day.
+
+    Returns:
+        bool: The output returned by this function is `False`. The function checks
+        each player's `days` and `weeks` attributes and compares the number of
+        games played on a given day or week with the maximum allowed value specified
+        In the player's `rules` dictionary. If any player has played more than the
+        maximum allowed games on a day or week the function returns `True`.
+
+    """
     for player in potential_game:
         day_count = player.days.count(day)
         week_count = player.weeks.count(week)
@@ -42,6 +140,19 @@ def player_fails_day_week_count(potential_game, day, week):
 
 @log_timer
 def all_players_satisfied(potential_game):
+    """
+    This function checks whether all players have their desired number of games
+    satisfied or not.
+
+    Args:
+        potential_game (list): The `potential_game` input parameter is a list of
+            players and their associated game counts before any games are removed
+            to satisfy the minimum/maximum game constraints.
+
+    Returns:
+        bool: The output returned by this function is `all_satisfied`.
+
+    """
     all_satisfied = True
     over_scheduled = False
     for player in potential_game:
@@ -53,6 +164,26 @@ def all_players_satisfied(potential_game):
 
 @log_timer
 def get_play_count(potential_game):
+    """
+    The given function `get_play_count` takes a list of players as input and returns
+    the total number of games played by all the players.
+
+    Args:
+        potential_game (list): The `potential_game` parameter is an iterable object
+            (such as a list or tuple) of players. The function loops through each
+            player and calculates the game count for that player by summing up the
+            game counts of all the other players.
+
+    Returns:
+        int: The output returned by the `get_play_count` function is `sum_history`,
+        which is equal to the sum of the `game_count` attributes of all players
+        of all games played by them. Since there is no specific game or player
+        input passed to the function and none are mentioned explicitly inside it
+        either so undefined cannot return anything . There wont be any output
+        because sum history will always be zero as none of the player or games
+        have any count.
+
+    """
     sum_history = 0
     for player in potential_game:
         for p in potential_game:
@@ -60,6 +191,15 @@ def get_play_count(potential_game):
     return sum_history
 
 def create_failure_scenarios():
+    """
+    This function creates a dictionary of failure scenarios for a game schedule
+    optimization problem.
+
+    Returns:
+        dict: The output returned by the function `create_failure_scenarios` is
+        an empty dictionary `{}`.
+
+    """
     failing_scenarios = {}
     failing_scenarios['available slots'] = 0
     failing_scenarios['game length'] = 0
@@ -71,6 +211,22 @@ def create_failure_scenarios():
 class SingleSchedule:
     @log_timer
     def __init__(self, flight, template, gameslots):
+        """
+        This function initiates an instance of a class called `Flight` by passing
+        it a `flight`, `template`, and `gameslots` objects.
+
+        Args:
+            flight (): The `flight` input parameter passed to the `__init__()`
+                method is used to define the `Flight` object that contains information
+                about the flight for which the Gameslot object is being created.
+            template (dict): The `template` input parameter is used to pass a
+                pre-defined set of rules for the flight to the constructor of the
+                class.
+            gameslots (list): The `gameslots` input parameter is a list of Gameslot
+                objects that defines the available courts for the players to choose
+                from.
+
+        """
         self.flight_obj = flight
         self.flight_id = flight.id
         self.rules = tempRules
@@ -88,6 +244,22 @@ class SingleSchedule:
         )
 
     def check_escape_conditions(self, log=False):
+        """
+        This function checks if a set of players satisfy certain escape conditions
+        based on their game count and schedule. It returns True if all players
+        meet the conditions and False otherwise.
+
+        Args:
+            log (bool): The `log` input parameter is an optional boolean value
+                that controls whether logs are printed to the console when certain
+                conditions are met.
+
+        Returns:
+            bool: The output returned by this function is "True" if all the escape
+            conditions are satisfied (i.e., all players have enough days and weeks
+            to play), and "False" otherwise.
+
+        """
         for player in self.players:
             # players have min games
             if player.satisfied == False:
@@ -135,6 +307,16 @@ class SingleSchedule:
         return True
 
     def check_all_conditions(self):
+        """
+        This function checks if a given list of players satisfies all the conditions
+        defined by the game rules. It returns True if all conditions are satisfied
+        and False otherwise.
+
+        Returns:
+            bool: The output returned by this function is `True` if all conditions
+            are satisfied and `False` otherwise.
+
+        """
         for player in self.players:
             if player.satisfied == False:
                 return False
@@ -169,6 +351,31 @@ class SingleSchedule:
         return True
     
     def generate_timeslot_player_pool(self):
+        """
+        This function generates a timeslot player pool for a set of gameslots by
+        collecting available players and filtering them based on the specified rules.
+
+        Returns:
+            dict: The output of the `generate_timeslot_player_pool` function is a
+            dictionary `tpp` with the following structure:
+            
+            	- `tpp` is a dictionary with timeslots as keys and containing the
+            following values:
+            	+ `all`: list of all players available for that timeslot.
+            	+ `filtered`: list of available players (i.e., those who have
+            availability == AVAILABLE or UNK and the rules["assumeBusy"] is False)
+            for that timeslot.
+            	+ `times`: list of games that are scheduled during that timeslot.
+            	+ `day`: day number of the timeslot.
+            	+ `week`: week number of the timeslot.
+            	+ `available_slots`: minimum number of concurrent games allowed for
+            that timeslot.
+            	+ `sgames`: list of schedule games (i.e., games that are already
+            scheduled) for that timeslot.
+            	+ `pgames`: list of potential games (i.e., games that could be
+            scheduled) for that timeslot.
+
+        """
         ts = set([g.timeslot_id for g in self.gameslots])
         tpp = {} # timeslot player pool
         for t in ts:
@@ -189,6 +396,27 @@ class SingleSchedule:
 
     @log_timer
     def runCA(self):
+        """
+        This function calculates potential games for each player (or group of
+        players) based on their preferred courts and schedules; It also matches
+        players with suitable games to create a schedule. The following steps
+        summarize its operation:
+        	- Initialize a dictionary containing court data for timeslots.
+        	- Loop through timeslots:
+        	- Create lists of scheduled games for each timeslot
+        	- Add new games that are not blocked by existing ones or preferences.
+        	- When there is a match (e.g., when two players prefer the same court but
+        at different times), mark the game as added and continue looping to ensure
+        all matches find potential games. If no match can be made during the current
+        iteration of timeslots. It updates all relevant player schedules based on
+        added matches.
+        	- Repeat until all possible games for a particular timeslot have been
+        processed and all players have at least one game; break out of loops when
+        there are no more matching players or games. Finally—calculate new preferred
+        courts based on player history data to recreate a full schedule for your
+        tennis league.
+
+        """
         tpp, ts = self.generate_timeslot_player_pool()
         ts_list = list(ts)
         shuffle(ts_list)
@@ -398,6 +626,28 @@ class SingleSchedule:
         # print(len([g for g in self.gameslots if g.full is True]))
 
     def summarise_tests(self):
+        """
+        This function `summarize_tests` takes no arguments and returns a dictionary
+        with four key-value pairs:
+        	- `all_players_satisfied`: The value of the method `all_players_satisfied()`
+        	- `player_days_satisfied`: The value of the method `player_days_satisfied()`
+        	- `player_weeks_satisfied`: The value of the method `player_weeks_satisfied()`
+        	- `no_players_overscheduled`: The value of the method `no_players_overscheduled()`
+
+        Returns:
+            dict: The output returned by the function `summarise_tests` is a
+            dictionary with four keys:
+            
+            	- `all_players_satisfied`: a boolean value indicating if all players
+            are satisfied
+            	- `player_days_satisfied`: a list of booleans indicating if each
+            player's days are satisfied
+            	- `player_weeks_satisfied`: a list of booleans indicating if each
+            player's weeks are satisfied
+            	- `no_players_overscheduled`: a boolean value indicating if no players
+            are overscheduled.
+
+        """
         result = {}
         result['all_players_satisfied'] = self.all_players_satisfied()
         result['player_days_satisfied'] = self.player_days_satisfied()
@@ -406,12 +656,31 @@ class SingleSchedule:
         return result
 
     def backup_gameslots(self):
+        """
+        This function creates a copy of all the gameslots associated with the
+        current instance (self) and returns a list of those copies.
+
+        Returns:
+            list: The output returned by the `backup_gameslots` function is a list
+            of copies of the gameslots.
+
+        """
         b = []
         for g in self.gameslots:
             b.append(g.copy_with_events())
         return b
 
     def quick_log_game_count(self):
+        """
+        This function quick_log_game_count takes an object of type player list and
+        returns a string representation of the game count for each player separated
+        by a space.
+
+        Returns:
+            str: The output returned by the function `quick_log_game_count` is the
+            string `" 123 "`.
+
+        """
         myString = ""
         for p in self.players:
             myString += str(p.game_count) + " "
@@ -419,12 +688,26 @@ class SingleSchedule:
         return myString.strip()
 
     def clear_everything(self):
+        """
+        This function clears all game events and sets the full status to false for
+        all game slots (g) and also recreates the player calculations.
+
+        """
         for g in self.gameslots:
             g.game_event = []
             g.full = False
         self.recalculate_players()
 
     def print_problems(self, res):
+        """
+        This function prints out the problems found by the game for each player
+        during a round of the game.
+
+        Args:
+            res (dict): The `res` input parameter is a list of dictionaries
+                representing the results of each player's turn.
+
+        """
         i = 0
         for r in res:
             print("PROBLEM: ", i)
@@ -436,6 +719,11 @@ class SingleSchedule:
 
     @log_timer
     def recalculate_players(self):
+        """
+        This function recalculates the satisfaction of each player based on their
+        game event participation and updates their other player history information.
+
+        """
         satisfied = {}
         for p in self.players:
             satisfied[p.id] = 0
@@ -461,6 +749,15 @@ class SingleSchedule:
                 p.satisfied = satisfied[p.id] >= p.rules["minGamesTotal"]
 
     def get_days(self):
+        """
+        This function returns a dictionary of days where each day is a list of
+        full slots (i.e., slots that have been fully booked).
+
+        Returns:
+            dict: The output of this function is a dictionary containing lists of
+            `gameslot` objects for each day number.
+
+        """
         full_slots = [slot for slot in self.gameslots if slot.full == True]
         days = {}
         for slot in full_slots:
@@ -472,6 +769,12 @@ class SingleSchedule:
 
     @log_timer
     def sort_out_preferences(self):
+        """
+        This function sorts out the preferences of players for each day and checks
+        if a player is available for a particular game slot and decides how to
+        swap the player between games if necessary.
+
+        """
         days = self.get_days()
         for i in range(10):
             for key in days:
@@ -490,6 +793,17 @@ class SingleSchedule:
 
     @log_timer
     def create_events(self, skip=False):
+        """
+        This function creates events for each game slot and timeslot combination
+        within a flight schedule.
+
+        Args:
+            skip (bool): The `skip` input parameter of the `create_events` function
+                is a boolean parameter that allows you to skip creating events for
+                certain gameslots if they are already full or if the user has
+                chosen to skip certain gameslots.
+
+        """
         for gameslot in self.gameslots:
             if gameslot.full is True or skip is True:
                 timeslot = gameslot.timeslot_obj
@@ -501,18 +815,50 @@ class SingleSchedule:
                 timeslot.create_event(court, players, captain)
 
     def all_players_satisfied(self):
+        """
+        This function checks if all players attached to the object (i.e. instances
+        of Player) have their satisfaction value set to true (i.e. satisfied). If
+        any player's satisfaction value is false (i.e. not satisfied), the function
+        returns false. If all players are satisfied (i.e.
+
+        Returns:
+            bool: The output returned by this function is "True".
+
+        """
         for player in self.players:
             if player.satisfied == False:
                 return False
         return True
     
     def no_players_overscheduled(self):
+        """
+        This function checks whether any of the players have been overscheduled
+        by checking each player's game count against their maximum number of games
+        allowed. If any player has exceeded their limit; the function returns false.
+
+        Returns:
+            bool: The output returned by the function is `True`.
+
+        """
         for player in self.players:
             if player.game_count > player.rules['maxGamesTotal']:
                 return False
         return True
 
     def player_days_satisfied(self):
+        """
+        This function checks if a player has satisfied their daily play requirements
+        by iterating over their schedule of games and calculating the number of
+        games played on each day.
+
+        Returns:
+            bool: Based on the code provided:
+            
+            The output returned by this function is "True" if all players have
+            played within their max number of games per day; otherwise (i.e., if
+            at least one player has exceeded their limit), it returns "False".
+
+        """
         for player in self.players:
             days = {}
             for day in player.days:
@@ -528,6 +874,17 @@ class SingleSchedule:
         return True
     
     def player_weeks_satisfied(self):
+        """
+        This function checks whether a given set of players has satisfied the
+        maximum games per week limit set by their rules for all weeks. If any
+        player has exceeded the limit for any week (based on the number of games
+        played that week), the function returns False.
+
+        Returns:
+            bool: The output returned by the function `player_weeks_satisfied` is
+            `True`.
+
+        """
         for player in self.players:
             weeks = {}
             for w in player.weeks:
@@ -543,6 +900,20 @@ class SingleSchedule:
         return True
     
     def get_player_days_unsatisfied(self):
+        """
+        This function 'get_player_days_unsatisfied' returns a list of players who
+        have not played the maximum number of games allowed on a day as specified
+        by their rules.
+
+        Returns:
+            dict: The function `get_player_days_unsatisfied` returns two things:
+            
+            1/ A list of players (`us`) who have more games on a day than their
+            maximum allowed games for that day.
+            2/ A dictionary (`bg`) where the keys are the player IDs and the values
+            are the lists of game IDs for each player on that day.
+
+        """
         us = []
         bg = {}
         for player in self.players:
@@ -562,6 +933,22 @@ class SingleSchedule:
     
     
     def find_games_on_day_with_player(self, player, day):
+        """
+        This function finds all games on a given day ( día ) that include a specific
+        player ( jugador ).
+
+        Args:
+            player (): The `player` input parameter is used to filter the list of
+                games returned by the function.
+            day (int): The `day` input parameter specifies the day for which games
+                are to be found.
+
+        Returns:
+            list: The output returned by the function `find_games_on_day_with_player`
+            is a list of `Game` objects that have the specified `player` and are
+            scheduled on the specified `day`.
+
+        """
         res = []
         for g in [g for g in self.gameslots if g.day_number == day]:
             if player in g.game_event:
@@ -569,6 +956,11 @@ class SingleSchedule:
         return res
     
     def log_player_days_unsatisfied(self):
+        """
+        This function prints the player names and their corresponding start times
+        for each day that the player was unsatisfied.
+
+        """
         p, d = self.get_player_days_unsatisfied()
         for i in p:
             print(i.player_name)
@@ -577,11 +969,38 @@ class SingleSchedule:
             print()
 
     def get_gameslots_by_day(self, day_number):
+        """
+        The function `get_gameslots_by_day` takes a `day_number` and returns a
+        list of `gameslots` from a collection where the `day_number` attribute
+        matches the input.
+
+        Args:
+            day_number (int): The `day_number` input parameter specifies which
+                day's worth of gameslots the function should return.
+
+        Returns:
+            list: The function returns a list of gameslots where the "day_number"
+            matches the day_number passed as an argument.
+
+        """
         return [
             gameslot for gameslot in self.gameslots if gameslot.day_number == day_number
         ]
 
     def get_gameslots_by_week(self, week_number):
+        """
+        This function takes a `week_number` input and returns a list of `Gameslot`
+        objects that have a `week_number` equal to the input.
+
+        Args:
+            week_number (int): The `week_number` input parameter specifies which
+                week of gameslots to retrieve.
+
+        Returns:
+            list: The function "get_gameslots_by_week" returns a list of gameslots
+            where the "week_number" matches the given week number.
+
+        """
         return [
             gameslot
             for gameslot in self.gameslots
@@ -589,21 +1008,80 @@ class SingleSchedule:
         ]
 
     def log(self, dofilter=False):
+        """
+        This function calls the `log` method on all the players and gameslots
+        objects stored within the `self` object.
+
+        Args:
+            dofilter (bool): The `dofilter` parameter is an optional argument that
+                defaults to `False`. It is passed through to each item of the two
+                lists (players and gameslots) as their log method's second argument.
+
+        """
         for p in self.players:
             p.log(dofilter)
         for gs in self.gameslots:
             gs.log(dofilter)
 
     def get_average_game_count(self):
+        """
+        This function calculates the average game count for all players within a
+        collection of objects (players).
+
+        Returns:
+            float: The output returned by this function is 3.
+
+        """
         return sum([p.game_count for p in self.players]) / len(self.players)
     
     def get_average_failure_count(self):
+        """
+        This function calculates the average number of games a player has failed
+        to meet the minimum game count requirement.
+
+        Returns:
+            float: The output returned by this function would be: `undefined`. The
+            `sum` function cannot sum up the values of a list of abs(p.rules['minGamesTotal']
+            - p.game_count) as there is no 'minGamesTotal' attribute or variable
+            present.
+
+        """
         return sum([abs(p.rules['minGamesTotal'] - p.game_count) for p in self.players]) / len(self.players)
     
     def average_player_satisfaction(self):
+        """
+        This function calculates the average player satisfaction by dividing the
+        number of unsatisfied players (those with `satisfied is False`) by the
+        total number of players.
+
+        Returns:
+            float: The output returned by the function `average_player_satisfaction`
+            would be 0.
+
+        """
         return len([p for p in self.players if p.satisfied is False]) / len(self.players)
 
     def get_average_and_max_player_luck(self):
+        """
+        This function calculates the average and maximum common player luck of a
+        list of players and returns an object with the following properties:
+        	- `average`: the average luck of all players
+        	- `max`: the highest common player luck among all players
+        	- `variance`: the variance of the luck values among all players
+
+        Returns:
+            dict: The output returned by the function is a dictionary with three
+            key-value pairs:
+            
+            {"average": x / y; "max": z; "variance": w}
+            
+            where x is the total sum of all values from self.players[],
+            y is the number of unique values observed among self.players[],
+            z is the maximum value from res[key] among all players
+            and
+            w is the variance calculated based on x-average squared for each key.
+
+        """
         total = 0
         max_common = 0
         acc = 0
@@ -626,6 +1104,21 @@ class SingleSchedule:
         return {"average": average, "max": max_common, "variance": variance}
 
     def compare_basics(self, other):
+        """
+        This function compares the satisfaction of players and captaincy minimums
+        of two objects and returns a dictionary with the new score and old score.
+
+        Args:
+            other (): The `other` input parameter is passed as an instance of the
+                same class as the one containing the method.
+
+        Returns:
+            dict: The output returned by the function is a dictionary with two
+            keys: "new" and "old". The value of "new" is the score of the current
+            object being compared (which is undefined), and the value of "old" is
+            the score of the other object being compared (which is also undefined).
+
+        """
         other_score = 0
         self_score = 0
 
@@ -637,6 +1130,11 @@ class SingleSchedule:
         return {"new": self_score, "old": other_score}
     
     def log_unsatisfied_players(self):
+        """
+        The given function "log_unsatisfied_players" prints out the names of players
+        who have not satisfied their game count.
+
+        """
         for p in self.players:
             if p.satisfied == False:
                 print(p.player_name, p.game_count)
