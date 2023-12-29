@@ -24,6 +24,21 @@ from app.CSVtools import *
 @bp.route("/club/<clubname>/admin_gate")
 @login_required
 def admin_gate(clubname):
+    """
+    This function filters the `Club` database table using the provided `clubname`,
+    and then renders an HTML template called "no_auth.html" with the club object
+    as its context.
+
+    Args:
+        clubname (str): The `clubname` input parameter is used to retrieve a
+            specific Club object from the database using its name.
+
+    Returns:
+        dict: The output returned by this function is a rendering of the "no_auth.html"
+        template with the `club` and `title` variables set to the filtered club
+        object and the club name respectively.
+
+    """
     club = Club.query.filter_by(name=clubname).first_or_404()
     return render_template("no_auth.html", club=club, title=club.name)
 
@@ -31,6 +46,24 @@ def admin_gate(clubname):
 @login_required
 def club(clubname):
     # club = Club.query.filter_by(name=clubname).first_or_404()
+    """
+    This function handles theclub administration pages for the web application.
+    It renders a template called "page-club.html" and provides several form objects
+    (e.g., AddCourtForm(), EditCourtForm()) that can be used to modify club information.
+
+    Args:
+        clubname (str): The `clubname` input parameter is passed as a string and
+            is used as the name of the current club that the user is viewing. This
+            name is then used to filter the clubs using the `query.filter_by()`
+            method to retrieve the first club with the matching name.
+
+    Returns:
+        : The output returned by this function is a rendered HTML page with the
+        title and club details specified for the given `clubname`, along with
+        various forms for adding/editing courts and flights as well as managing
+        club administration and players.
+
+    """
     club = current_user.club
     acf = AddCourtForm()
     ecf = EditCourtForm()
@@ -71,6 +104,21 @@ def club(clubname):
 @bp.route("/users/<int:user_id>/toggle_auth", methods=["POST"])
 @login_required
 def toggle_user_auth(user_id):
+    """
+    This function toggle_user_auth takes a user ID as an input and updates the
+    user's authentication status. If the user is authenticated it will de-authenticate
+    them otherwise it will authenticate them.
+
+    Args:
+        user_id (int): The `user_id` input parameter is used to identify the user
+            record to be updated or retrieved from the database.
+
+    Returns:
+        : Based on the code provided:
+        
+        The output returned by this function is `redirect(url_for("club.club", clubname=club.name))`
+
+    """
     user = User.query.get(user_id)
     club = user.club
     user.toggle_auth()
