@@ -22,6 +22,18 @@ class Player(Model):
     availability_data = db.Column(JSON)
         
     def get_availability_obj_for_flight(self, flight_id):
+        """
+        This function gets an availability object for a flight by retrieving it
+        from a dictionary of flight availability data stored as a JSON string.
+
+        Args:
+            flight_id (str): The `flight_id` input parameter is used to identify
+                the specific flight for which the availability information is requested.
+
+        Returns:
+            dict: The output returned by this function is `None`.
+
+        """
         if self.availability_data:
             # Parse the JSON string into a dictionary
             try:
@@ -37,6 +49,20 @@ class Player(Model):
         return None
         
     def remove_availability_for_flight(self, flight_id):
+        """
+        This function removes availability information for a specific flight by
+        removing the given flight ID from the internal availability data dictionary
+        if it exists.
+
+        Args:
+            flight_id (str): The `flight_id` input parameter is used to identify
+                the specific flight for which availability should be removed from
+                the availability data.
+
+        Returns:
+            bool: The output returned by this function is `False`.
+
+        """
         if self.availability_data and str(flight_id) in self.availability_data:
             # self.availability_data[str(flight_id)] = '' # this should be better
             return True
@@ -44,4 +70,12 @@ class Player(Model):
             return False
 
     def __repr__(self):
+        """
+        This function defines the representation (or repr) of an object of class
+        Player.
+
+        Returns:
+            str: The output returned by this function is '<Player undefined>'.
+
+        """
         return '<Player {}>'.format(self.player_name)
