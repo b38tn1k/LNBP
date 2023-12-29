@@ -460,6 +460,20 @@ def build_league_from_json(my_club, data):
     
 def facility_to_league(league, d):
     # {'event': 'facility_in_league', 'ids': 1, 'values': False}
+    """
+    This function takes a league and a dictionary `d` as inputs. It adds or removes
+    a facility from the league based on the value of `d['values']`. If `d['values']`
+    is True (i.e., the value is "true"), it adds the facility with the given ID
+    to the league.
+
+    Args:
+        league (dict): The `league` input parameter is a reference to the League
+            object that contains the facilities to be updated based on the provided
+            `d` dictionary.
+        d (dict): The `d` input parameter is a dictionary containing information
+            about the facility to be added or removed from the league.
+
+    """
     if d['values'] is True:
         f = league.club.get_facility_by_id(d['ids'])
         league.add_facility(f)
@@ -467,6 +481,17 @@ def facility_to_league(league, d):
         league.remove_facility_by_id(d['ids'])
 
 def update_game_duration(league, d):
+    """
+    This function updates the end time of each timeslot for a league by adding a
+    fixed number of minutes to its start time.
+
+    Args:
+        league (dict): The `league` input parameter is a reference to an object
+            that contains Timeslots for the game schedule.
+        d (dict): The `d` input parameter is a dictionary containing the values
+            for the game duration minutes.
+
+    """
     new_duration_minutes = d['values']
     for ts in league.timeslots:
         new_end_time = ts.start_time + timedelta(minutes=new_duration_minutes)
@@ -474,6 +499,21 @@ def update_game_duration(league, d):
 
 def update_timeslot(league, d):
     # {'event': 'timeslot', 'ids': 1, 'values': '2023-10-03T18:30:00.000'}
+    """
+    This function takes a dictionary `d` with the fields `'ids'` and `'values'`,
+    where `'ids'` is an integer ID and `'values'` is a datetime string.
+
+    Args:
+        league (dict): The `league` input parameter is used to retrieve a timeslot
+            object from the league's database based on the given ID.
+        d (dict): In this function `d` is a dictionary containing information about
+            the timeslot to be updated. It has one key-value pair:
+            
+            	- `ids`: the ID of the timeslot to be updated (int)
+            	- `values`: the start time of the game as a string format
+            'YYYY-MM-DDTHH:MM:SS.FFF' (e.g.
+
+    """
     ts = league.get_timeslot_by_id(d['ids'])
     new_start_time = datetime.strptime(d['values'], '%Y-%m-%dT%H:%M:%S.%f')
     game_duration = league.get_game_duration()
@@ -482,10 +522,33 @@ def update_timeslot(league, d):
     ts.end_time = new_end_time
 
 def update_flight_name(league, d):
+    """
+    This function updates the name of a flight with the specified ID (retrieved
+    from the league) to the given name provided as input.
+
+    Args:
+        league (): The `league` input parameter is a reference to the parent League
+            object that contains the flight to be updated.
+        d (dict): The `d` input parameter is a dictionary that contains the values
+            for the flight name to be updated.
+
+    """
     f = league.get_flight_by_id(d['ids'])
     f.name = d['values']
 
 def add_player_to_league(league, d):
+    """
+    This function adds a player to a league. It first retrieves the player and
+    flight objects based on the IDs provided and then adds the player to the flight
+    and the league.
+
+    Args:
+        league (): The `league` input parameter is used to pass the `League` object
+            as a parameter to the function.
+        d (dict): The `d` parameter is a dictionary containing information about
+            the player to be added to the league.
+
+    """
     flight = league.get_flight_by_id(d['ids']['flight'])
     player = league.club.get_player_by_id(d['ids']['player'])
     print(player, type(player))
@@ -498,6 +561,17 @@ def add_player_to_league(league, d):
                 league.add_player_availability(player, ts, player_availability, add=True, commit=False, force=True)
 
 def update_league_rules(league, d):
+    """
+    This function updates a league's rules based on the contents of a dictionary
+    'd', which contains key-value pairs representing different rule settings.
+
+    Args:
+        league (): The `league` input parameter is used to modify the rules of a
+            league.
+        d (dict): The `d` input parameter is a dictionary that contains the new
+            league rules as keys and values.
+
+    """
     rules = d['values']
     league.rules.min_games_total = rules["min_games_total"]
     league.rules.max_games_total = rules["max_games_total"]
@@ -513,10 +587,32 @@ def update_league_rules(league, d):
     league.rules.assume_busy = rules["assume_busy"] == 'assume_busy'
 
 def remove_player(league, d):
+    """
+    The function "remove_player" removes a player from the club's roster based on
+    their ID.
+
+    Args:
+        league (dict): The `league` input parameter is used to specify the league
+            object where the player should be removed.
+        d (dict): The `d` parameter is a dictionary containing an ID for the player
+            to be removed.
+
+    """
     player = league.club.get_player_by_id(d['ids']['player'])
     league.remove_player(player)
 
 def change_flight(league, d):
+    """
+    This function changes the flight of a player from their current flight to the
+    new flight specified by "d['values']['new_flight']".
+
+    Args:
+        league (dict): The `league` input parameter is used to pass the league
+            object that the function should operate on.
+        d (dict): The `d` input parameter is a dictionary that contains the new
+            flight information and the player ID to be added to the new flight.
+
+    """
     player = league.club.get_player_by_id(d['ids']['player'])
     flight = league.get_flight_by_id(d['values']['new_flight'])
     for f in league.flights:
@@ -525,6 +621,17 @@ def change_flight(league, d):
 
 def apply_edits(league, updates):
     # priority
+    """
+    This function "apply_edits" takes a league and a list of updates as input and
+    applies the appropriate changes to the league based on the type of update.
+
+    Args:
+        league (dict): The `league` input parameter is the object that contains
+            all the information about the esports league and its teams/players/games.
+        updates (dict): The `updates` input parameter is a list of dictionary
+            objects representing various updates to the league's information.
+
+    """
     for d in updates:
         match d['event']:
             case 'add_player_to_league':
