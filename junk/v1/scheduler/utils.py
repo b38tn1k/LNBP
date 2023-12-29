@@ -44,13 +44,39 @@ tempRules["except"] = exceptions
 function_metrics = {}
 
 def minGamesTotal_exception(player):
+    """
+    This function sets the "minGamesTotal" rule for the given player to 0.
+
+    Args:
+        player (dict): The `player` input parameter is used to access the `rules`
+            dictionary of the player object and modify its value for the "minGamesTotal"
+            key.
+
+    """
     player.rules["minGamesTotal"] = 0
 
 def maxDoubleHeadersDay_exception(player):
+    """
+    This function sets the "maxGamesDay" and "maxGamesWeek" rules for the provided
+    player to 2.
+
+    Args:
+        player (dict): The `player` input parameter is not used anywhere inside
+            the function `maxDoubleHeadersDay_exception`.
+
+    """
     player.rules["maxGamesDay"] = 2
     player.rules["maxGamesWeek"] = 2
 
 def maxDoubleHeadersWeek_exception(player):
+    """
+    This function sets the `maxGamesWeek` rule for the given `player` to 2.
+
+    Args:
+        player (dict): The `player` input parameter is not used anywhere inside
+            the `maxDoubleHeadersWeek_exception` function.
+
+    """
     player.rules["maxGamesWeek"] = 2
 
 exception_fixers = {}
@@ -68,6 +94,32 @@ exception_fixers["maxDoubleHeadersDay"] = maxDoubleHeadersDay_exception
 exception_fixers["maxDoubleHeadersWeek"] = maxDoubleHeadersWeek_exception
 
 def update_availability_template(availability_template, availability, assume_busy):
+    """
+    This function takes an availability template and updates it with new availability
+    information.
+
+    Args:
+        availability_template (dict): The `availability_template` input parameter
+            is used as a copy of the initial availability template and is modified
+            within the function to reflect the updated availability state based
+            on the provided `availability` information.
+        availability (dict): The `availability` input parameter is used to specify
+            a list of dictionaries representing available time slots with their
+            corresponding availability statuses.
+        assume_busy (bool): The `assume_busy` input parameter tells the function
+            to mark as unavailable any time slots that are not explicitly marked
+            as available or unavailable.
+
+    Returns:
+        dict: The function returns two things:
+        
+        1/ A score (an integer) that represents the number of available time slots
+        out of the total number of time slots.
+        2/ An updated availability template (a dictionary), where the values for
+        each time slot have been updated based on the provided availability and
+        assuming busy or not.
+
+    """
     availability_template = availability_template.copy()  # Make a copy
     if availability:
         for item in availability:
@@ -90,10 +142,47 @@ def update_availability_template(availability_template, availability, assume_bus
     return score, availability_template
 
 def random_string(length):
+    """
+    The function `random_string` generates a string of a specified length using a
+    combination of random ASCII letters and digits.
+
+    Args:
+        length (int): The `length` input parameter specifies the number of characters
+            that the random string should have.
+
+    Returns:
+        str: The output returned by this function is a random string of length
+        `length`, consisting of letters and digits chosen at random from the
+        standard 7-bit ASCII character set.
+
+    """
     return ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(length))
 
 def log_timer(func):
+    """
+    This function logs the execution time of a function and collects statistics
+    on its performance.
+
+    Args:
+        func (): The `func` input parameter is a decorated function that is being
+            wrapped by the `log_timer()` function.
+
+    Returns:
+        : The output returned by this function is the result of the wrapped function
+        (`*args`, **kwargs) plus some timing information for that function call.
+
+    """
     def wrapper(*args, **kwargs):
+        """
+        This function is a decorator that wraps another function `func` and measures
+        its execution time.
+
+        Returns:
+            : The output returned by this function is the result of the function
+            `func` with arguments `args` and `kwargs`, along with additional
+            information about the execution time of the function.
+
+        """
         start_time = time.perf_counter()
         result = func(*args, **kwargs)
         elapsed_time = time.perf_counter() - start_time
@@ -117,6 +206,11 @@ def log_timer(func):
 
 
 def timer_report():
+    """
+    This function sorts a list of metrics by the total time spent on each function
+    and reports the average and maximum time for each function.
+
+    """
     sorted_metrics = sorted(
         function_metrics.items(),
         key=lambda x: x[1]["total_time"],
@@ -130,6 +224,19 @@ def timer_report():
         print()
 
 def copy_gameslots(gameslots):
+    """
+    This function creates a copy of a list of game slots (gs) by duplicating each
+    element of the input list (gameslots).
+
+    Args:
+        gameslots (list): The `gameslots` input parameter is a list of game slots
+            that will be duplicated and returned as a new list by the function.
+
+    Returns:
+        list: The output of the function `copy_gameslots` is a list of duplicates
+        of the original `gameslots` list.
+
+    """
     gs = []
     for g in gameslots:
         gs.append(g.duplicate())
