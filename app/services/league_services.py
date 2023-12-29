@@ -621,6 +621,17 @@ def change_flight(league, d):
 
 def update_availability(league, d):
     # {'event': 'availability', 'ids': {'timeslot': 1, 'player': 10}, 'values': 2}
+    """
+    The function `update_availability` takes a league object and a dictionary `d`
+    with id values for a timeslot and a player.
+
+    Args:
+        league (): The `league` input parameter is used to retrieve information
+            from the league database.
+        d (dict): The `d` input parameter contains the data being updated for
+            availability tracking purposes.
+
+    """
     ts = league.get_timeslot_by_id(d['ids']['timeslot'])
     player = league.club.get_player_by_id(d['ids']['player'])
     a = d['values']
@@ -629,6 +640,21 @@ def update_availability(league, d):
 
 def push_time_slot(league, d):
     # {'event': 'push_time_slot', 'ids': -1, 'values': '2023-11-08 20:15:00'}
+    """
+    This function creates a time slot for a game or event taking into account the
+    duration of the game and other schedule events that have been played by setting
+    specific time limits that last between starts and end times which accommodate
+    the scheduling duration for all previous league events as taken from get_game_duration().
+
+    Args:
+        league (dict): The `league` input parameter is used to specify the league
+            object that the timeslot will be created for. It allows the function
+            to access the league's properties and methods (e.g.
+        d (dict): The `d` input parameter is an event dict containing the time
+            slot information {'event': 'push_time_slot', 'ids': -1,'values':
+            '2023-11-08 20:15:00'}
+
+    """
     start_time = datetime.strptime(d['values'], '%Y-%m-%d %H:%M:%S')
     game_duration = league.get_game_duration()
     end_time = start_time + timedelta(minutes=game_duration)
