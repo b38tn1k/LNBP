@@ -8702,7 +8702,7 @@ textarea.form-control-lg {
 }
 
 .overflow-scroll {
-  overflow: scroll !important;
+  overflow: auto !important;
 }
 
 .overflow-x-auto {

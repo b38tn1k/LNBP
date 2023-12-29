@@ -37,6 +37,8 @@ function generateTableFromCellGroup(cellGroup, id) {
     const table = document.createElement("table");
     const tbody = document.createElement("tbody");
     tbody.classList.add("w-100");
+    table.style.marginRight = "10px";
+    table.style.marginLeft = "10px";
 
     table.classList.add(
         "csv-table",
@@ -585,23 +587,23 @@ function parseCellGroups() {
 }
 
 /**
-* @description This function creates an HTML input field with a specific class and
-* attribute and adds an event listener to it to log its current value upon pressing
-* the Enter key.
-* 
-* @param { number } flightNumber - The `flightNumber` input parameter passes a dynamic
-* value to the created input element's attribute "flight-number".
-* 
-* @returns { array } The function `createFlightHeader` takes a single argument
-* `flightNumber` and returns an array with two elements:
-* 
-* 1/ The `flightNumber` parameter passed to the function.
-* 2/ A created HTML input element with a value set to "Flight <flightNumber>".
-* 
-* The input element has three classes (`form-control`, `mb-3`, and `flight-title`)
-* and an event listener that listens for the `'keypress'` event and logs the current
-* value of the input element to the console when the Enter key is pressed.
-*/
+ * @description This function creates an HTML input field with a specific class and
+ * attribute and adds an event listener to it to log its current value upon pressing
+ * the Enter key.
+ *
+ * @param { number } flightNumber - The `flightNumber` input parameter passes a dynamic
+ * value to the created input element's attribute "flight-number".
+ *
+ * @returns { array } The function `createFlightHeader` takes a single argument
+ * `flightNumber` and returns an array with two elements:
+ *
+ * 1/ The `flightNumber` parameter passed to the function.
+ * 2/ A created HTML input element with a value set to "Flight <flightNumber>".
+ *
+ * The input element has three classes (`form-control`, `mb-3`, and `flight-title`)
+ * and an event listener that listens for the `'keypress'` event and logs the current
+ * value of the input element to the console when the Enter key is pressed.
+ */
 function createFlightHeader(flightNumber) {
     const flightInput = document.createElement("input");
     flightInput.setAttribute("type", "text");
@@ -621,15 +623,16 @@ function createFlightHeader(flightNumber) {
 }
 
 /**
-* @description This function creates a new HTML table element with various styling
-* classes and styles applied to it.
-* 
-* @returns { object } Based on the code provided:
-* The function `createFlightTable()` returns a new `<table>` element with various
-* CSS classes and styles applied to it.
-*/
+ * @description This function creates a new HTML table element with various styling
+ * classes and styles applied to it.
+ *
+ * @returns { object } Based on the code provided:
+ * The function `createFlightTable()` returns a new `<table>` element with various
+ * CSS classes and styles applied to it.
+ */
 function createFlightTable() {
     const table = document.createElement("table");
+    const table_container = document.createElement("div");
     table.classList.add(
         "csv-table",
         "flight-sub-table",
@@ -639,24 +642,29 @@ function createFlightTable() {
         "table-hover",
         "table-sm"
     );
-    table.style.maxWidth = "100%";
     table.style.width = "auto";
-    return table;
+    table.style.padding = "5px";
+    table_container.style.margin = "0px";
+    table_container.style.marginBottom = "16px";
+    table_container.appendChild(table);
+    table_container.style.overflow = "auto";
+    table_container.width = "100%";
+    return [table, table_container];
 }
 
 /**
-* @description The provided JavaScript function `createFlightDateTimeRows` creates
-* two rows of HTML table cells for displaying flight departure and arrival times for
-* each player.
-* 
-* @param { object } league - The `league` input parameter is an array of objects
-* containing timeslot information for each player.
-* 
-* @returns { array } The function `createFlightDateTimeRows` creates two tables rows:
-* a `dateRow` and a `timeRow`. The `dateRow` contains one cell with a label for the
-* player name that spans two columns and two rows. The `timeRow` contains two cells
-* for the date and time input fields.
-*/
+ * @description The provided JavaScript function `createFlightDateTimeRows` creates
+ * two rows of HTML table cells for displaying flight departure and arrival times for
+ * each player.
+ *
+ * @param { object } league - The `league` input parameter is an array of objects
+ * containing timeslot information for each player.
+ *
+ * @returns { array } The function `createFlightDateTimeRows` creates two tables rows:
+ * a `dateRow` and a `timeRow`. The `dateRow` contains one cell with a label for the
+ * player name that spans two columns and two rows. The `timeRow` contains two cells
+ * for the date and time input fields.
+ */
 function createFlightDateTimeRows(league) {
     const dateRow = document.createElement("tr");
     const timeRow = document.createElement("tr");
@@ -697,55 +705,55 @@ function createFlightDateTimeRows(league) {
 }
 
 /**
-* @description This function takes a `dateTime` object and returns a string representing
-* the local date and time formatted according to the ISO 8601 standard.
-* 
-* @param { object } dateTime - The `dateTime` input parameter is a JavaScript Date
-* object that is passed to the function and is used to extract various parts (years
-* ,months ,days etc) from the date object and convert it into the desired format
-* using methods like `getFullYear`, `getMonth()`, `getDate()`, `getHours()`,
-* `getMinutes()`, `getSeconds()` and `padStart()`.
-* 
-* @returns { string } This function takes a `dateTime` parameter and returns a string
-* representation of the local date and time using the ISO 8601 format. The output
-* is a string consisting of:
-* 
-* 	- Year (4 digits)
-* 	- Month (2 digits padded with leading zeros)
-* 	- Day (2 digits padded with leading zeros)
-* 	- Hours (2 digits padded with leading zeros)
-* 	- Minutes (2 digits padded with leading zeros)
-* 	- Seconds (3 digits padded with leading zeros)
-* 	- Milliseconds (3 digits padded with leading zeros)
-* 
-* The output is a concatenation of these components separated by literal `'-'` and
-* `-` characters.
-*/
+ * @description This function takes a `dateTime` object and returns a string representing
+ * the local date and time formatted according to the ISO 8601 standard.
+ *
+ * @param { object } dateTime - The `dateTime` input parameter is a JavaScript Date
+ * object that is passed to the function and is used to extract various parts (years
+ * ,months ,days etc) from the date object and convert it into the desired format
+ * using methods like `getFullYear`, `getMonth()`, `getDate()`, `getHours()`,
+ * `getMinutes()`, `getSeconds()` and `padStart()`.
+ *
+ * @returns { string } This function takes a `dateTime` parameter and returns a string
+ * representation of the local date and time using the ISO 8601 format. The output
+ * is a string consisting of:
+ *
+ * 	- Year (4 digits)
+ * 	- Month (2 digits padded with leading zeros)
+ * 	- Day (2 digits padded with leading zeros)
+ * 	- Hours (2 digits padded with leading zeros)
+ * 	- Minutes (2 digits padded with leading zeros)
+ * 	- Seconds (3 digits padded with leading zeros)
+ * 	- Milliseconds (3 digits padded with leading zeros)
+ *
+ * The output is a concatenation of these components separated by literal `'-'` and
+ * `-` characters.
+ */
 function formatLocalDateTime(dateTime) {
     const year = dateTime.getFullYear();
-    const month = String(dateTime.getMonth() + 1).padStart(2, '0'); // Month is 0-based
-    const day = String(dateTime.getDate()).padStart(2, '0');
-    const hours = String(dateTime.getHours()).padStart(2, '0');
-    const minutes = String(dateTime.getMinutes()).padStart(2, '0');
-    const seconds = '00'
-    const milliseconds = '000'
+    const month = String(dateTime.getMonth() + 1).padStart(2, "0"); // Month is 0-based
+    const day = String(dateTime.getDate()).padStart(2, "0");
+    const hours = String(dateTime.getHours()).padStart(2, "0");
+    const minutes = String(dateTime.getMinutes()).padStart(2, "0");
+    const seconds = "00";
+    const milliseconds = "000";
     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}`;
 }
 
 /**
-* @description This function creates an HTML table row with flight date and time
-* selectors for each time slot.
-* 
-* @param { object } league - The `league` input parameter is used to pass an object
-* of type FlatpickrTimeSlot[], which contains all available time slots for the league.
-* 
-* @returns {  } The output of this function is a HTML table row element with two
-* columns. The first column contains a header cell with the text "Player", and the
-* second column contains two cells for each time slot provided. Each cell represents
-* a date and time picker widget and displays the selected date and time as "m/d H:i"
-* format. Additionally a 'datetime' attribute is added to each cell with the value
-* of the current date and time picked by the user.
-*/
+ * @description This function creates an HTML table row with flight date and time
+ * selectors for each time slot.
+ *
+ * @param { object } league - The `league` input parameter is used to pass an object
+ * of type FlatpickrTimeSlot[], which contains all available time slots for the league.
+ *
+ * @returns {  } The output of this function is a HTML table row element with two
+ * columns. The first column contains a header cell with the text "Player", and the
+ * second column contains two cells for each time slot provided. Each cell represents
+ * a date and time picker widget and displays the selected date and time as "m/d H:i"
+ * format. Additionally a 'datetime' attribute is added to each cell with the value
+ * of the current date and time picked by the user.
+ */
 function createFlightDateTimeComboRow(league) {
     const row = document.createElement("tr");
     const playerLabel = document.createElement("th");
@@ -762,8 +770,7 @@ function createFlightDateTimeComboRow(league) {
         cell.classList.add("fw-bold");
         const dateTime = new Date(ts);
         dateTime.setHours(dateTime.getHours() + 12);
-        
-        
+
         // Format the date and time as "m/d H:i" in the browser's local timezone
         const formattedDate = dateTime.toLocaleDateString("en-US", {
             month: "2-digit",
@@ -778,44 +785,44 @@ function createFlightDateTimeComboRow(league) {
 
         // Set the formatted date and time as the cell content
         cell.innerText = `${formattedDate} ${formattedTime}`;
-        
-        cell.setAttribute('datetime', formatLocalDateTime(dateTime))
+
+        cell.setAttribute("datetime", formatLocalDateTime(dateTime));
 
         // Initialize flatpickr
         flatpickr(cell, {
             enableTime: true,
             dateFormat: "m/d H:i",
             defaultDate: dateTime,
-/**
-* @description This function updates the content and datetime attribute of an HTML
-* cell when a date or time is selected. It takes two parameters: `selectedDates`
-* which is an array of dates chosen by the user and `dateStr` which is the user's
-* input format.
-* 
-* @param { array } selectedDates - The `selectedDates` input parameter is an array
-* of dates selected by the user.
-* 
-* @param { string } dateStr - The `dateStr` input parameter is passed as the value
-* of the `date` field that was selected by the user.
-* 
-* @returns { any } The function `onChange` takes two parameters `selectedDates` and
-* `dateStr`, and it updates the content of a cell and its `datetime` attribute when
-* a date or time is selected. The output returned by this function is two `console.log()`
-* statements that print the value of the `datetime` attribute of the cell.
-* 
-* The first log statement prints the current value of the `datetime` attribute which
-* is still represented as Zulu time.
-* 
-* The second log statement prints the updated value of the `datetime` attribute after
-* formatting the new date using `formatLocalDateTime()`.
-*/
+            /**
+             * @description This function updates the content and datetime attribute of an HTML
+             * cell when a date or time is selected. It takes two parameters: `selectedDates`
+             * which is an array of dates chosen by the user and `dateStr` which is the user's
+             * input format.
+             *
+             * @param { array } selectedDates - The `selectedDates` input parameter is an array
+             * of dates selected by the user.
+             *
+             * @param { string } dateStr - The `dateStr` input parameter is passed as the value
+             * of the `date` field that was selected by the user.
+             *
+             * @returns { any } The function `onChange` takes two parameters `selectedDates` and
+             * `dateStr`, and it updates the content of a cell and its `datetime` attribute when
+             * a date or time is selected. The output returned by this function is two `console.log()`
+             * statements that print the value of the `datetime` attribute of the cell.
+             *
+             * The first log statement prints the current value of the `datetime` attribute which
+             * is still represented as Zulu time.
+             *
+             * The second log statement prints the updated value of the `datetime` attribute after
+             * formatting the new date using `formatLocalDateTime()`.
+             */
             onChange: function (selectedDates, dateStr) {
                 // Update the cell's content and datetime attribute when a date or time is selected
-                console.log(cell.getAttribute('datetime')) //still appears in zulu time
+                console.log(cell.getAttribute("datetime")); //still appears in zulu time
                 cell.innerText = dateStr;
                 const newDate = new Date(selectedDates);
-                cell.setAttribute('datetime', formatLocalDateTime(newDate));
-                console.log(cell.getAttribute('datetime')) //still appears in zulu time
+                cell.setAttribute("datetime", formatLocalDateTime(newDate));
+                console.log(cell.getAttribute("datetime")); //still appears in zulu time
             },
         });
 
@@ -825,34 +832,31 @@ function createFlightDateTimeComboRow(league) {
     return row;
 }
 
-
-
-
 /**
-* @description This function adds a set of buttons to a table row representing a
-* player's flights: "delete", "move up", and "move down".
-* 
-* @param {  } playerRow - The `playerRow` input parameter passed to the function is
-* a HTML table row that contains the data for one player's flights.
-* 
-* @param { number } flightNumber - The `flightNumber` input parameter determines
-* which button(s) to show and which to hide.
-* 
-* @param { number } maxFlightNumber - The `maxFlightNumber` input parameter specifies
-* the maximum flight number that can be displayed for a given player row.
-* 
-* @param { object } p - The `p` input parameter passed to the `addPlayerMacros()`
-* function is not used anywhere inside the function and hence can be safely ignored.
-* 
-* @returns {  } The output returned by this function is an HTML table row with three
-* buttons: a delete button and two arrow buttons (up and down) that can be used to
-* move the player's flight within the list.
-*/
+ * @description This function adds a set of buttons to a table row representing a
+ * player's flights: "delete", "move up", and "move down".
+ *
+ * @param {  } playerRow - The `playerRow` input parameter passed to the function is
+ * a HTML table row that contains the data for one player's flights.
+ *
+ * @param { number } flightNumber - The `flightNumber` input parameter determines
+ * which button(s) to show and which to hide.
+ *
+ * @param { number } maxFlightNumber - The `maxFlightNumber` input parameter specifies
+ * the maximum flight number that can be displayed for a given player row.
+ *
+ * @param { object } p - The `p` input parameter passed to the `addPlayerMacros()`
+ * function is not used anywhere inside the function and hence can be safely ignored.
+ *
+ * @returns {  } The output returned by this function is an HTML table row with three
+ * buttons: a delete button and two arrow buttons (up and down) that can be used to
+ * move the player's flight within the list.
+ */
 function addPlayerMacros(playerRow, flightNumber, maxFlightNumber, p) {
     // Create and append the delete button
     const deleteButton = document.createElement("button");
     let icon0 = document.createElement("i");
-    icon0.classList.add('fe', 'fe-trash')
+    icon0.classList.add("fe", "fe-trash");
     deleteButton.appendChild(icon0);
     // deleteButton.innerHTML = "&times;";
     deleteButton.classList.add("btn", "btn-danger", "btn-sm");
@@ -866,11 +870,11 @@ function addPlayerMacros(playerRow, flightNumber, maxFlightNumber, p) {
     });
 
     const functionCell = document.createElement("td");
-    functionCell.classList.add("d-flex","justify-content-between","align-items-center")
+    functionCell.classList.add("d-flex", "justify-content-between", "align-items-center");
 
     const moveUpButton = document.createElement("button");
     let icon = document.createElement("i");
-    icon.classList.add('fe', 'fe-arrow-up')
+    icon.classList.add("fe", "fe-arrow-up");
     moveUpButton.appendChild(icon);
     // moveUpButton.innerHTML = "&uarr;";
     moveUpButton.classList.add("btn", "btn-primary", "btn-sm", "move-up-button");
@@ -879,7 +883,7 @@ function addPlayerMacros(playerRow, flightNumber, maxFlightNumber, p) {
 
     const moveDownButton = document.createElement("button");
     let icon2 = document.createElement("i");
-    icon2.classList.add('fe', 'fe-arrow-down')
+    icon2.classList.add("fe", "fe-arrow-down");
     moveDownButton.appendChild(icon2);
     moveDownButton.classList.add("btn", "btn-primary", "btn-sm", "move-down-button");
     moveDownButton.addEventListener("click", switchPlayerFlightDown);
@@ -900,21 +904,21 @@ function addPlayerMacros(playerRow, flightNumber, maxFlightNumber, p) {
 }
 
 /**
-* @description This function creates a table row for a flight player and adds macros
-* for their availability.
-* 
-* @param { object } p - The `p` input parameter is the player object that contains
-* information about a specific player.
-* 
-* @param { string } flightNumber - The `flightNumber` input parameter specifies the
-* unique identifier for a flight that is being displayed.
-* 
-* @param { number } maxFlightNumber - The `maxFlightNumber` input parameter specifies
-* the maximum flight number to be displayed on the player row.
-* 
-* @returns {  } Based on the code provided , the `createFlightPlayerRow` function
-* creates a `tr` element representing a row for a flight and its players.
-*/
+ * @description This function creates a table row for a flight player and adds macros
+ * for their availability.
+ *
+ * @param { object } p - The `p` input parameter is the player object that contains
+ * information about a specific player.
+ *
+ * @param { string } flightNumber - The `flightNumber` input parameter specifies the
+ * unique identifier for a flight that is being displayed.
+ *
+ * @param { number } maxFlightNumber - The `maxFlightNumber` input parameter specifies
+ * the maximum flight number to be displayed on the player row.
+ *
+ * @returns {  } Based on the code provided , the `createFlightPlayerRow` function
+ * creates a `tr` element representing a row for a flight and its players.
+ */
 function createFlightPlayerRow(p, flightNumber, maxFlightNumber) {
     const playerRow = document.createElement("tr");
     playerRow.classList.add("player-row");
@@ -947,26 +951,24 @@ function createFlightPlayerRow(p, flightNumber, maxFlightNumber) {
     return playerRow;
 }
 
-
-
 /**
-* @description This function updates a dropdown menu based on a user input and some
-* suggested values. It clears existing suggestions before adding new ones from the
-* given `suggestions` array.
-* 
-* @param { string } playerNameInput - The `playerNameInput` parameter is used to get
-* the value of an input field that triggers the updating of the suggestions dropdown.
-* 
-* @param { array } suggestions - The `suggestions` input parameter is an array of
-* strings that contains the suggestions to displayin the dropdown menu.
-* 
-* @returns { any } This function takes two arguments: `playerNameInput` and
-* `suggestions`. It updates a dropdown element with the `suggestions` based on the
-* `playerNameInput` value.
-* 
-* The output of this function is an updated dropdown element with the suggestions
-* listed inside.
-*/
+ * @description This function updates a dropdown menu based on a user input and some
+ * suggested values. It clears existing suggestions before adding new ones from the
+ * given `suggestions` array.
+ *
+ * @param { string } playerNameInput - The `playerNameInput` parameter is used to get
+ * the value of an input field that triggers the updating of the suggestions dropdown.
+ *
+ * @param { array } suggestions - The `suggestions` input parameter is an array of
+ * strings that contains the suggestions to displayin the dropdown menu.
+ *
+ * @returns { any } This function takes two arguments: `playerNameInput` and
+ * `suggestions`. It updates a dropdown element with the `suggestions` based on the
+ * `playerNameInput` value.
+ *
+ * The output of this function is an updated dropdown element with the suggestions
+ * listed inside.
+ */
 function updateDropdown(playerNameInput, suggestions) {
     const dropdown = document.getElementById("suggestions-dropdown" + playerNameInput.getAttribute("flightNumber"));
 
@@ -976,7 +978,7 @@ function updateDropdown(playerNameInput, suggestions) {
     }
 
     // Create and append new suggestion items
-    suggestions.forEach(suggestion => {
+    suggestions.forEach((suggestion) => {
         const suggestionItem = document.createElement("div");
         suggestionItem.classList.add("suggestion-item");
         suggestionItem.textContent = suggestion;
@@ -998,23 +1000,22 @@ function updateDropdown(playerNameInput, suggestions) {
     }
 }
 
-
 /**
-* @description This function creates an HTML table row with two cells: one for a "+"
-* button to add a player and one for a text input to enter the player's name.
-* 
-* @param { string } flightNumber - The `flightNumber` input parameter sets the value
-* of the `flight-number` attribute on the newly created `add-player-row` element.
-* 
-* @returns {  } The output returned by the `createAddPlayerRowFlight` function is a
-* new `tr` element representing a row for adding a player to a flight. This row
-* contains two cells: one for a "+" button to add a player and one for an input field
-* to enter the player's name.
-*/
+ * @description This function creates an HTML table row with two cells: one for a "+"
+ * button to add a player and one for a text input to enter the player's name.
+ *
+ * @param { string } flightNumber - The `flightNumber` input parameter sets the value
+ * of the `flight-number` attribute on the newly created `add-player-row` element.
+ *
+ * @returns {  } The output returned by the `createAddPlayerRowFlight` function is a
+ * new `tr` element representing a row for adding a player to a flight. This row
+ * contains two cells: one for a "+" button to add a player and one for an input field
+ * to enter the player's name.
+ */
 function createAddPlayerRowFlight(flightNumber) {
     const addPlayerButton = document.createElement("button");
     let icon = document.createElement("i");
-    icon.classList.add('fe', 'fe-user-plus')
+    icon.classList.add("fe", "fe-user-plus");
     addPlayerButton.appendChild(icon);
     // addPlayerButton.innerHTML = '<i class="fe >';
     addPlayerButton.classList.add("btn", "btn-primary", "btn-sm");
@@ -1023,19 +1024,19 @@ function createAddPlayerRowFlight(flightNumber) {
     const addPlayerButtonCell = document.createElement("td");
     addPlayerButtonCell.appendChild(addPlayerButton);
     const suggestions = document.createElement("div");
-    suggestions.id = "suggestions-dropdown" + String(flightNumber)
-    suggestions.classList.add("suggestions-dropdown")
+    suggestions.id = "suggestions-dropdown" + String(flightNumber);
+    suggestions.classList.add("suggestions-dropdown");
 
     const newPlayerNameCell = document.createElement("td");
     const playerNameInput = document.createElement("input");
     playerNameInput.classList.add("form-control", "new-player-name");
-    playerNameInput.setAttribute("flightNumber", flightNumber)
-    playerNameInput.placeholder = "New Player"
+    playerNameInput.setAttribute("flightNumber", flightNumber);
+    playerNameInput.placeholder = "New Player";
 
     playerNameInput.addEventListener("input", function () {
         const inputText = playerNameInput.value.toLowerCase();
-        const suggestions = playerNames.filter(player => player.toLowerCase().includes(inputText));
-        
+        const suggestions = playerNames.filter((player) => player.toLowerCase().includes(inputText));
+
         // Call a function to update the dropdown with suggestions
         updateDropdown(this, suggestions);
 
@@ -1047,7 +1048,6 @@ function createAddPlayerRowFlight(flightNumber) {
     newPlayerNameCell.appendChild(playerNameInput);
     newPlayerNameCell.appendChild(suggestions);
 
-
     const addPlayerRow = document.createElement("tr");
     addPlayerRow.classList.add("add-player-row");
     addPlayerRow.appendChild(addPlayerButtonCell);
@@ -1058,15 +1058,15 @@ function createAddPlayerRowFlight(flightNumber) {
 }
 
 /**
-* @description This function counts the number of columns (td elements)in a table's
-* tbody by first checking if the tbody has any rows and then counting the cells(td
-* elements)in the first row.
-* 
-* @param {  } table - The `table` input parameter is the table element to be counted.
-* 
-* @returns { integer } The output of this function is the number of cells (td
-* elements)in the first row of the tbody.
-*/
+ * @description This function counts the number of columns (td elements)in a table's
+ * tbody by first checking if the tbody has any rows and then counting the cells(td
+ * elements)in the first row.
+ *
+ * @param {  } table - The `table` input parameter is the table element to be counted.
+ *
+ * @returns { integer } The output of this function is the number of cells (td
+ * elements)in the first row of the tbody.
+ */
 function countColumns(table) {
     // Check if the tbody has any rows
     if (table.rows.length > 0) {
@@ -1079,22 +1079,22 @@ function countColumns(table) {
 }
 
 /**
-* @description This function gets a target table and its associated tbody element
-* based on a given target flight. It first identifies the target table using an ID
-* preceded by `flight-`, and then retrieves the tbody element within that table.
-* 
-* @param { string } targetFlight - The `targetFlight` input parameter specifies the
-* identifier of the table to be searched for.
-* 
-* @returns { array } The function takes a `targetFlight` parameter and returns an
-* array with two elements:
-* 
-* 1/ The `targetTable` element of the HTML document that has an id corresponding to
-* the `targetFlight` parameter.
-* 2/ The `tbody` element of the target table.
-* 
-* The output is an array with these two elements (the target table and the tbody element).
-*/
+ * @description This function gets a target table and its associated tbody element
+ * based on a given target flight. It first identifies the target table using an ID
+ * preceded by `flight-`, and then retrieves the tbody element within that table.
+ *
+ * @param { string } targetFlight - The `targetFlight` input parameter specifies the
+ * identifier of the table to be searched for.
+ *
+ * @returns { array } The function takes a `targetFlight` parameter and returns an
+ * array with two elements:
+ *
+ * 1/ The `targetTable` element of the HTML document that has an id corresponding to
+ * the `targetFlight` parameter.
+ * 2/ The `tbody` element of the target table.
+ *
+ * The output is an array with these two elements (the target table and the tbody element).
+ */
 function getTargetTableAndTbody(targetFlight) {
     console.log(targetFlight);
     const targetTable = document.getElementById(`flight-${targetFlight}`);
@@ -1114,37 +1114,37 @@ function getTargetTableAndTbody(targetFlight) {
 }
 
 /**
-* @description This function adds a new player to a flight schedule table. It gets
-* the information from the form input field and creates a new row with the player
-* name and availability status.
-* 
-* @param {  } event - The `event` input parameter is not used anywhere inside the
-* function `addPlayerWithName()`.
-* 
-* @returns {  } Based on the provided code snippet:
-* 
-* The output returned by the `addPlayerWithName` function is not explicitly stated
-* or returned. However;
-* 
-* Concerning what the function does and the operations carried out inside the body
-* of the function: It takes a event target that refers to a row with information
-* about a new player; obtains the flight number from that row; reads the name provided
-* for that new player from an input field within that row; updates or resets the
-* state of the input field to null (if not null). The newly provided name becomes
-* p.name. Further steps are performed using properties created based on newPlayerName
-* input; these include defining some object properties and appending newPlayer
-* elements using a method createFlightPlayerRow and inserting that method's output
-* within the <tBody> element having specified classes for each flight (targetTbody).
-* MaxFlightNumber property is computed from that specific table with the appropriate
-* classes. Lastly; return void and has no express or explicited function return statements
-* 
-* I will describe concisely what is returned based on those explanations: nothing
-* is directly/explicitly stated or returned as "return" values are void functions.
-* It only modifies and inserts information into the HTML table by manipulating object
-* properties for an existing array and append child elements at specified indices
-* or positions with row-based operations before resetting state and providing feedback
-* on successful creation through text content changes.
-*/
+ * @description This function adds a new player to a flight schedule table. It gets
+ * the information from the form input field and creates a new row with the player
+ * name and availability status.
+ *
+ * @param {  } event - The `event` input parameter is not used anywhere inside the
+ * function `addPlayerWithName()`.
+ *
+ * @returns {  } Based on the provided code snippet:
+ *
+ * The output returned by the `addPlayerWithName` function is not explicitly stated
+ * or returned. However;
+ *
+ * Concerning what the function does and the operations carried out inside the body
+ * of the function: It takes a event target that refers to a row with information
+ * about a new player; obtains the flight number from that row; reads the name provided
+ * for that new player from an input field within that row; updates or resets the
+ * state of the input field to null (if not null). The newly provided name becomes
+ * p.name. Further steps are performed using properties created based on newPlayerName
+ * input; these include defining some object properties and appending newPlayer
+ * elements using a method createFlightPlayerRow and inserting that method's output
+ * within the <tBody> element having specified classes for each flight (targetTbody).
+ * MaxFlightNumber property is computed from that specific table with the appropriate
+ * classes. Lastly; return void and has no express or explicited function return statements
+ *
+ * I will describe concisely what is returned based on those explanations: nothing
+ * is directly/explicitly stated or returned as "return" values are void functions.
+ * It only modifies and inserts information into the HTML table by manipulating object
+ * properties for an existing array and append child elements at specified indices
+ * or positions with row-based operations before resetting state and providing feedback
+ * on successful creation through text content changes.
+ */
 function addPlayerWithName(event) {
     const newPlayerInfoRow = event.target.closest("tr");
     let targetFlight = parseInt(newPlayerInfoRow.getAttribute("flight-number"));
@@ -1172,64 +1172,64 @@ function addPlayerWithName(event) {
 }
 
 /**
-* @description This function decreases the player's flight altitude by 1 unit.
-* 
-* @param {  } event - The `event` input parameter is not used within the body of the
-* `switchPlayerFlightUp()` function.
-* 
-* @returns { any } The output returned by the `switchPlayerFlightUp` function is
-* `undefined`. This is because the function does not return any value explicitly.
-*/
+ * @description This function decreases the player's flight altitude by 1 unit.
+ *
+ * @param {  } event - The `event` input parameter is not used within the body of the
+ * `switchPlayerFlightUp()` function.
+ *
+ * @returns { any } The output returned by the `switchPlayerFlightUp` function is
+ * `undefined`. This is because the function does not return any value explicitly.
+ */
 function switchPlayerFlightUp(event) {
     switchPlayerFlight(event, -1);
 }
 
 /**
-* @description This function Switches the player's flight direction down (1)
-* 
-* @param { object } event - The `event` input parameter is not used within the
-* function body of `switchPlayerFlightDown`.
-* 
-* @returns { any } The function `switchPlayerFlightDown(event)` does not return any
-* value as it is a void function.
-*/
+ * @description This function Switches the player's flight direction down (1)
+ *
+ * @param { object } event - The `event` input parameter is not used within the
+ * function body of `switchPlayerFlightDown`.
+ *
+ * @returns { any } The function `switchPlayerFlightDown(event)` does not return any
+ * value as it is a void function.
+ */
 function switchPlayerFlightDown(event) {
     switchPlayerFlight(event, 1);
 }
 
 /**
-* @description This function switches the flight number of a table row with the
-* specified flight number by a given delta (positive or negative), and adjusts the
-* order of the rows accordingly.
-* 
-* @param { object } event - The `event` input parameter is not used at all within
-* the functionality of this JavaScript function `switchPlayerFlight()`. As such
-* nothing is done with it and it may be omitted entirely.
-* 
-* @param { number } delta - The `delta` input parameter indicates whether the flight
-* number should be increased (delta = 1) or decreased (delta = -1).
-* 
-* @returns { any } The output returned by the `switchPlayerFlight` function is not
-* specified explicitly since it does not return any value explicitly. However. based
-* on the function's functionality here is a concise description of the output:
-* 
-* The function switches the row of a player from one position to another within a
-* table. Specifically; if the player is currently at flight number `x` and the delta
-* parameter indicates a change of `y` flights up or down (where `y>0` for moving up
-* and `y<0` for moving down):
-* 
-* The function adjusts the value of `currentFlight` accordingly (to either `x+y` or
-* `x-y`), Finds the target row corresponding to the desired flight position; inserts
-* the current player row into the appropriate position relative to the target row
-* insertBefore()` or appendChild())
-* and updates button visibility for moving up or down within the respective flight
-* ranges based on the top and bottom classes for each table ( `top-flight`, and 'bottom-flight').
-* Finally: it updates the attributed "flight-number' attribute to reflect the new
-* flight number associated with target Row.
-* In essence; this function reorganizes a player row within a particular table section
-* for an airline management game or other suitable scenario requiring seat shuffling
-* by users., based on some rule.
-*/
+ * @description This function switches the flight number of a table row with the
+ * specified flight number by a given delta (positive or negative), and adjusts the
+ * order of the rows accordingly.
+ *
+ * @param { object } event - The `event` input parameter is not used at all within
+ * the functionality of this JavaScript function `switchPlayerFlight()`. As such
+ * nothing is done with it and it may be omitted entirely.
+ *
+ * @param { number } delta - The `delta` input parameter indicates whether the flight
+ * number should be increased (delta = 1) or decreased (delta = -1).
+ *
+ * @returns { any } The output returned by the `switchPlayerFlight` function is not
+ * specified explicitly since it does not return any value explicitly. However. based
+ * on the function's functionality here is a concise description of the output:
+ *
+ * The function switches the row of a player from one position to another within a
+ * table. Specifically; if the player is currently at flight number `x` and the delta
+ * parameter indicates a change of `y` flights up or down (where `y>0` for moving up
+ * and `y<0` for moving down):
+ *
+ * The function adjusts the value of `currentFlight` accordingly (to either `x+y` or
+ * `x-y`), Finds the target row corresponding to the desired flight position; inserts
+ * the current player row into the appropriate position relative to the target row
+ * insertBefore()` or appendChild())
+ * and updates button visibility for moving up or down within the respective flight
+ * ranges based on the top and bottom classes for each table ( `top-flight`, and 'bottom-flight').
+ * Finally: it updates the attributed "flight-number' attribute to reflect the new
+ * flight number associated with target Row.
+ * In essence; this function reorganizes a player row within a particular table section
+ * for an airline management game or other suitable scenario requiring seat shuffling
+ * by users., based on some rule.
+ */
 function switchPlayerFlight(event, delta) {
     const targetRow = event.target.closest("tr");
     if (!targetRow) {
@@ -1269,19 +1269,19 @@ function switchPlayerFlight(event, delta) {
 }
 
 /**
-* @description This function handles clicks on TD elements with a class of 'availability',
-* updates the value of the 'availability' attribute based on the previous value and
-* the number of times the cell has been clicked (incrementing from 1 to 3), and
-* applies a corresponding CSS background class based on the updated availability.
-* 
-* @param { object } event - The `event` input parameter provides information about
-* the click event that triggered the function. It contains properties such as `target`,
-* `stopPropagation`, and `preventDefault` that can be used to interact with the
-* elements involved with the event.
-* 
-* @returns { integer } This function takes an event object as input and updates the
-* "availability" attribute of the target element (a `<td>` with a certain class).
-*/
+ * @description This function handles clicks on TD elements with a class of 'availability',
+ * updates the value of the 'availability' attribute based on the previous value and
+ * the number of times the cell has been clicked (incrementing from 1 to 3), and
+ * applies a corresponding CSS background class based on the updated availability.
+ *
+ * @param { object } event - The `event` input parameter provides information about
+ * the click event that triggered the function. It contains properties such as `target`,
+ * `stopPropagation`, and `preventDefault` that can be used to interact with the
+ * elements involved with the event.
+ *
+ * @returns { integer } This function takes an event object as input and updates the
+ * "availability" attribute of the target element (a `<td>` with a certain class).
+ */
 function handleFlightTableClick(event) {
     let target = event.target;
     // Check if the clicked element is a td with class 'availability'
@@ -1338,7 +1338,7 @@ function step4DataFromServer(data) {
         child.appendChild(flightInput);
 
         // Create table
-        const table = createFlightTable();
+        const [table, table_container] = createFlightTable();
         table.id = "flight-" + String(flightNumber);
         table.classList.add("cleaned-flight");
         if (flightNumber == 1) {
@@ -1364,7 +1364,7 @@ function step4DataFromServer(data) {
         table.appendChild(thead);
         table.appendChild(tbody);
 
-        child.appendChild(table);
+        child.appendChild(table_container);
 
         table.addEventListener("click", handleFlightTableClick);
         flightNumber += 1;
@@ -1372,22 +1372,22 @@ function step4DataFromServer(data) {
 }
 
 /**
-* @description This function steps forward to step number 4 ( indicated by `stepIndex`
-* variable being assigned value `4`) and then calls `step4DataFromServer()` with
-* data passed as an argument( `data.data`).
-* 
-* @param { object } data - The `data` input parameter is passed from the previous
-* step (i.e., `step3ClientSend`) and contains the data sent by the client to the server.
-* 
-* @returns { object } This function takes a single argument `data` and does the following:
-* 
-* 1/ It sets `stepIndex` to 4.
-* 2/ It shows the current step (step 4).
-* 3/ It calls `step4DataFromServer` with the data received from the server (which
-* is contained within the `data` object).
-* 
-* The output returned by this function is not specified directly.
-*/
+ * @description This function steps forward to step number 4 ( indicated by `stepIndex`
+ * variable being assigned value `4`) and then calls `step4DataFromServer()` with
+ * data passed as an argument( `data.data`).
+ *
+ * @param { object } data - The `data` input parameter is passed from the previous
+ * step (i.e., `step3ClientSend`) and contains the data sent by the client to the server.
+ *
+ * @returns { object } This function takes a single argument `data` and does the following:
+ *
+ * 1/ It sets `stepIndex` to 4.
+ * 2/ It shows the current step (step 4).
+ * 3/ It calls `step4DataFromServer` with the data received from the server (which
+ * is contained within the `data` object).
+ *
+ * The output returned by this function is not specified directly.
+ */
 function step4ServerResp(data) {
     stepIndex = 4;
     showStep(stepIndex);
@@ -1414,41 +1414,41 @@ function stepIndex4Prep() {
 }
 
 /**
-* @description The function `getCleanTimeSlots` takes a HTML table as input and
-* returns an array of DateTime objects obtained from the datetime attributes of the
-* cells inside the first row (thead) of the table.
-* 
-* @param {  } table - The `table` input parameter is not used anywhere inside the
-* `getCleanTimeSlots()` function.
-* 
-* @returns { object } The output of the function `getCleanTimeSlots` is an array of
-* datetime strings extracted from the cells of the first row of a HTML table.
-*/
+ * @description The function `getCleanTimeSlots` takes a HTML table as input and
+ * returns an array of DateTime objects obtained from the datetime attributes of the
+ * cells inside the first row (thead) of the table.
+ *
+ * @param {  } table - The `table` input parameter is not used anywhere inside the
+ * `getCleanTimeSlots()` function.
+ *
+ * @returns { object } The output of the function `getCleanTimeSlots` is an array of
+ * datetime strings extracted from the cells of the first row of a HTML table.
+ */
 function getCleanTimeSlots(table) {
     const thead = table.querySelector("thead");
     const dateRow = thead.rows[0];
     const combinedDateTime = [];
 
     for (let i = 0; i < dateRow.cells.length; i++) {
-        let dateInput = dateRow.cells[i]
+        let dateInput = dateRow.cells[i];
 
-        if (dateInput.hasAttribute('datetime')) {
-            combinedDateTime.push(dateInput.getAttribute('datetime'));
+        if (dateInput.hasAttribute("datetime")) {
+            combinedDateTime.push(dateInput.getAttribute("datetime"));
         }
     }
     return combinedDateTime;
 }
 
 /**
-* @description The provided function takes an array of HTML elements `titles` as
-* input and returns an array of objects representing flight data.
-* 
-* @param { array } titles - The `titles` input parameter is an array of elements
-* (presumably <title> tags) that the function processes to extract flight data.
-* 
-* @returns { object } The output returned by the `extractFlightData` function is an
-* array of objects with properties such as `title`, `number`, and `playersAndAvailabilities`.
-*/
+ * @description The provided function takes an array of HTML elements `titles` as
+ * input and returns an array of objects representing flight data.
+ *
+ * @param { array } titles - The `titles` input parameter is an array of elements
+ * (presumably <title> tags) that the function processes to extract flight data.
+ *
+ * @returns { object } The output returned by the `extractFlightData` function is an
+ * array of objects with properties such as `title`, `number`, and `playersAndAvailabilities`.
+ */
 function extractFlightData(titles) {
     return Array.from(titles).map((t) => ({
         name: t.value,
@@ -1458,22 +1458,22 @@ function extractFlightData(titles) {
 }
 
 /**
-* @description This function takes a HTML table and a flight number as input and
-* extracts the player data from the table based on the given flight number.
-* 
-* @param { any } table - The `table` input parameter is passed a reference to the
-* HTML table element that contains the player data.
-* 
-* @param { string } flightNumber - The `flightNumber` input parameter filters the
-* rows to only include those with a matching flight number.
-* 
-* @returns { object } The `extractPlayerData` function takes a table and a flight
-* number as input and returns an array of objects containing information about the
-* players on that flight. Each object contains two properties: `name` (the player's
-* name) and `availability` (the player's availability for that flight). The function
-* filters the table rows to only include rows with a class of "player-row", then
-* maps over those rows to extract the name and availability information.
-*/
+ * @description This function takes a HTML table and a flight number as input and
+ * extracts the player data from the table based on the given flight number.
+ *
+ * @param { any } table - The `table` input parameter is passed a reference to the
+ * HTML table element that contains the player data.
+ *
+ * @param { string } flightNumber - The `flightNumber` input parameter filters the
+ * rows to only include those with a matching flight number.
+ *
+ * @returns { object } The `extractPlayerData` function takes a table and a flight
+ * number as input and returns an array of objects containing information about the
+ * players on that flight. Each object contains two properties: `name` (the player's
+ * name) and `availability` (the player's availability for that flight). The function
+ * filters the table rows to only include rows with a class of "player-row", then
+ * maps over those rows to extract the name and availability information.
+ */
 function extractPlayerData(table, flightNumber) {
     return Array.from(table.rows)
         .filter((row) => row.classList.contains("player-row"))
@@ -1485,23 +1485,22 @@ function extractPlayerData(table, flightNumber) {
         }));
 }
 
-
 /**
-* @description This function takes a 'data' object and checks if the 'status' is
-* 'success' with a redirect URL. If so it redirects the user to that URL.
-* 
-* @param { object } data - The `data` input parameter receives the flight booking
-* data from the server-side API call.
-* 
-* @returns { object } This function takes data as an argument and logs it to the
-* console before checking if the status is 'success' and there's a redirect URL. If
-* both conditions are true), it redirects the user to the provided URL using `window.location.href`.
-*/
+ * @description This function takes a 'data' object and checks if the 'status' is
+ * 'success' with a redirect URL. If so it redirects the user to that URL.
+ *
+ * @param { object } data - The `data` input parameter receives the flight booking
+ * data from the server-side API call.
+ *
+ * @returns { object } This function takes data as an argument and logs it to the
+ * console before checking if the status is 'success' and there's a redirect URL. If
+ * both conditions are true), it redirects the user to the provided URL using `window.location.href`.
+ */
 function sentCleanFlightNext(data) {
     console.log(data);
 
     // Check if the status is 'success' and there's a redirect URL
-    if (data.status === 'success' && data.redirect_url) {
+    if (data.status === "success" && data.redirect_url) {
         // Redirect to the URL provided by the server
         window.location.href = data.redirect_url;
     } else {
@@ -1510,28 +1509,27 @@ function sentCleanFlightNext(data) {
     }
 }
 
-
 /**
-* @description This function takes a list of HTML tables with flight information and
-* cleans the data by extracting the time slots and player availabilities.
-* 
-* @returns { object } Based on the code provided:
-* 
-* The output of this function is an object named "league" that has several properties:
-* 
-* 	- "timeslots": An array of cleaned time slots extracted from the first table element
-* 	- "flights": An array of flight data objects
-* 	- "players_and_availabilities": An array of player and availability objects for
-* each flight
-* 	- "cleaned": A string indicating whether the data has been cleaned (true) or not
-* (false)
-* 	- "name": A string with the name of the league
-* 	- "type": A string with the type of the league
-* 	- "game_duration": A float with the duration of the game (1.5 hours)
-* 
-* Note that the function also sends the cleaned data to a server using the "sendToServer"
-* function and the "sentCleanFlightNext" callback.
-*/
+ * @description This function takes a list of HTML tables with flight information and
+ * cleans the data by extracting the time slots and player availabilities.
+ *
+ * @returns { object } Based on the code provided:
+ *
+ * The output of this function is an object named "league" that has several properties:
+ *
+ * 	- "timeslots": An array of cleaned time slots extracted from the first table element
+ * 	- "flights": An array of flight data objects
+ * 	- "players_and_availabilities": An array of player and availability objects for
+ * each flight
+ * 	- "cleaned": A string indicating whether the data has been cleaned (true) or not
+ * (false)
+ * 	- "name": A string with the name of the league
+ * 	- "type": A string with the type of the league
+ * 	- "game_duration": A float with the duration of the game (1.5 hours)
+ *
+ * Note that the function also sends the cleaned data to a server using the "sendToServer"
+ * function and the "sentCleanFlightNext" callback.
+ */
 function convertCleanFlightsToJSONAndSend() {
     const tables = document.querySelectorAll(".cleaned-flight");
     const titles = document.querySelectorAll(".flight-title");
@@ -1553,10 +1551,10 @@ function convertCleanFlightsToJSONAndSend() {
     league.cleaned = "true";
     league.name = document.getElementById("league-name-input").value;
     if (league.name.length == 0) {
-        league.name = "New League"
+        league.name = "New League";
     }
     league.type = document.getElementById("league-type-input").value;
-    league.game_duration = parseFloat(document.getElementById("game-duration-slider").value)/60.0;
+    league.game_duration = parseFloat(document.getElementById("game-duration-slider").value) / 60.0;
     sendToServer(league, sentCleanFlightNext);
 }
 

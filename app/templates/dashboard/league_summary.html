@@ -7,7 +7,7 @@
             </a>
         </div>
 
-        <div class="card-body">
+        <div class="card-body" style="max-height: 500px !important; overflow: auto;">
             {% if leagues %}
                 {% for league_type, league_list in leagues.items() %}
                     {% if league_list %}

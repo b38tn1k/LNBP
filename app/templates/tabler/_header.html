@@ -2,16 +2,19 @@
     <div class="container">
         <div class="d-flex">
         <a class="header-brand" href="{{ url_for('main.home') }}">
-            <img src="{{ url_for('static', filename='public/leagueninja/leagueninja-logo@2x.png') }}" class="header-brand-img" alt="tabler logo">
+            <img src="{{ url_for('static', filename='public/leagueninja/leagueninja-logo@2x.png') }}" class="header-brand-img" alt="League Ninja Logo">
         </a>
         <div class="d-flex order-lg-2 ml-auto">
-            <div class="nav-item d-none d-md-flex">
+
+            <!-- <div class="nav-item d-none d-md-flex">
                 <a href="mailto://{{ constants.SUPPORT_EMAIL }}" class="btn btn-sm btn-outline-primary" target="_blank">Get help</a>
-            </div>
+            </div> -->
+
             {% if current_user.is_authenticated %}
                 <div class="dropdown">
                     <a href="#" class="nav-link pr-0 leading-none" data-toggle="dropdown">
                         <span class="avatar avatar-placeholder"></span>
+                        <!-- leagueninja-icon.png -->
                         <span class="ml-2 d-none d-lg-block">
                         {% if current_user.full_name %}
                             <span class="text-default">{{ current_user.full_name }}</span>
