@@ -15,6 +15,18 @@ UPLOAD_FOLDER = 'app/uploads/'
 
 def read_csv(filename):
     # Read the CSV content
+    """
+    The function `read_csv(filename)` reads the contents of a CSV file specified
+    by `filename` and returns a list of rows (cells) as a single-dimensional list.
+
+    Args:
+        filename (str): The `filename` input parameter is the name of the file to
+            be read.
+
+    Returns:
+        list: The output returned by this function is a list of lists named "csv_content".
+
+    """
     with open(filename, 'r') as file:
         reader = csv.reader(file)
         csv_content = list(reader)
@@ -23,6 +35,21 @@ def read_csv(filename):
 
 def get_schedule_blocks(csv_content):
     # Indices where rows are fully empty
+    """
+    This function finds blocks of consecutive empty rows (rows with no cells)
+    within a CSV content and returns a list of tuples representing the start and
+    end indices of each block.
+
+    Args:
+        csv_content (list): The `csv_content` parameter is the 2D list of rows and
+            columns representing the CSV data to be processed by the function.
+
+    Returns:
+        list: The output returned by this function is a list of pairs of indices
+        (starting index and ending index) for each block of non-empty rows found
+        within the given CSV content.
+
+    """
     empty_row_indices = [i for i, row in enumerate(csv_content) if not any(row)]
     # Add start and end indices for csv_content
     empty_row_indices.insert(0, -1)
@@ -35,6 +62,27 @@ def get_schedule_blocks(csv_content):
 
 def process_schedule_block(csv_content, start, end):
     # Extract headers
+    """
+    This function processes a CSV file containing information about basketball
+    players and their availability for games on specific days and times. It extracts
+    headers from the first few rows of the file (date and time headers), parses
+    the date and time strings into actual dates and times using the `datetime`
+    module's `parse()` method. The function then iterates over the remaining rows
+    of the CSV file and creates a list of players with their availability for each
+    game and their names.
+
+    Args:
+        csv_content (str): The `csv_content` input parameter is a list of
+            comma-separated values representing a schedule block data set and is
+            used to extract the flight name date and time information and process
+            each player's availability for a specific date and time range.
+        start (int): The `start` input parameter specifies the index of the first
+            row to process within the CSV content.
+        end (int): The `end` input parameter specifies the index of the last row
+            to be processedin the CSV file. It is used to skip the header row and
+            any additional rows that may exist at the end of the file.
+
+    """
     if (start + 1 >= len(csv_content)):
         return
     date_headers = csv_content[start]
@@ -116,6 +164,19 @@ def process_schedule_block(csv_content, start, end):
 
 
 def get_number_of_columns(csv_file_path):
+    """
+    This function gets the number of columns present inside a given CSV file by
+    reading the first row and then returning the length of that row.
+
+    Args:
+        csv_file_path (str): The `csv_file_path` input parameter specifies the
+            file path to the CSV file that should be read by the function.
+
+    Returns:
+        int: The output returned by this function is the number of columns present
+        inthe first row of the CSV file specified by the `csv_file_path` argument.
+
+    """
     with open(csv_file_path, 'r') as file:
         csv_reader = csv.reader(file)
         first_row = next(csv_reader)
@@ -123,6 +184,21 @@ def get_number_of_columns(csv_file_path):
     
 
 def get_court_name(name, courts):
+    """
+    This function takes a string `name` and an list of dictionaries `courts`, where
+    each dictionary represents a court with a `court_name`.
+
+    Args:
+        name (str): The `name` input parameter is a string that represents the
+            full name of the court to be searched.
+        courts (list): The `courts` input parameter is a list of courts and the
+            function iterates over it to find the court with the matching name.
+
+    Returns:
+        str: The output returned by this function is `name`, which is the original
+        input string minus the first character (a space).
+
+    """
     for c in courts:
         if c.court_name == name[1:]:
             name = name[1:]
@@ -131,6 +207,17 @@ def get_court_name(name, courts):
     
 
 def unpack_long_csv(club, filepath):
+    """
+    This function unpacks a long CSV file containing data for a single flight of
+    matches and creates the flights and players' availability records.
+
+    Args:
+        club (): The `club` input parameter is used to retrieve or add courts and
+            players to the club based on the data from the CSV file.
+        filepath (str): The `filepath` parameter is a string that contains the
+            path to a CSV file containing the scheduling data.
+
+    """
     csv_content = read_csv(filepath)
     league_name = filepath.split('.')[0].split('/')[-1]
     league = club.add_league(league_name)
@@ -200,6 +287,24 @@ def createFileForm(club):
     # club.empty()
     # db.session.commit()
     # test
+    """
+    This function creates a form for uploading CSV files to a Django app and
+    performs the following operations on the uploaded file:
+    1/ Validates the file upload and saves it to a specific folder based on the
+    club ID.
+    2/ Extracts the number of columns from the file and unpacks long CSV files
+    (more than 4 columns).
+    3/ Loads players from the CSV file into the club.
+
+    Args:
+        club (): The `club` input parameter is used to specify the Club object
+            that the uploaded CSV file will be associated with. The function creates
+            a file form for uploading CSV files and validates the form inputs.
+
+    Returns:
+        : The output returned by this function is a CSVUploadForm instance.
+
+    """
     fileform = CSVUploadForm()
     if fileform.validate_on_submit():
         f = fileform.file.data
