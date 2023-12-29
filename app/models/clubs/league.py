@@ -26,6 +26,12 @@ class League(Model):
     GDPR_EXPORT_COLUMNS = {}
 
     def __init__(self, *args, **kwargs):
+        """
+        This function initiates a new object of class `ModelProxy` and sets up a
+        relationship between the new object and an existing `LeagueRules` object
+        using the `clubs` attribute.
+
+        """
         super().__init__(*args, **kwargs)
         rules = ModelProxy.clubs.LeagueRules(league=self)
         db.session.add(rules)
@@ -255,12 +261,38 @@ class League(Model):
         return new_timeslot
 
     def get_timeslot_by_id(self, id):
+        """
+        This function takes an ID as input and searches through a list of `Timeslot`
+        objects (named `self.timeslots`) to find the one with the matching ID.
+
+        Args:
+            id (int): The `id` input parameter specifies the unique identifier of
+                the desired `Timeslot` object that should be retrieved from the
+                list of `self.timeslots`.
+
+        Returns:
+            None: The function "get_timeslot_by_id" returns None if no timeslot
+            with the given ID is found.
+
+        """
         for timeslot in self.timeslots:
             if timeslot.id == id:
                 return timeslot
         return None
 
     def get_flight_by_id(self, id):
+        """
+        The function `get_flight_by_id` takes an ID as input and returns the flight
+        with that ID from a list of flights.
+
+        Args:
+            id (int): The `id` input parameter is used to retrieve a specific
+                flight by its ID.
+
+        Returns:
+            None: The output returned by the function `get_flight_by_id` is `None`.
+
+        """
         for f in self.flights:
             if f.id == id:
                 return f
@@ -337,6 +369,19 @@ class League(Model):
 
     def remove_player(self, player, commit=False):
         # Remove player association from the league
+        """
+        This function removes a player from the league and all its associated
+        flights by removing the player's association from the league and each flight.
+
+        Args:
+            player (): The `player` input parameter is used to specify the player
+                to be removed from the league and all associated flights.
+            commit (bool): The `commit` parameter is used to determine whether to
+                commit any changes made to the database during the execution of
+                the function. If `commit=True`, then any changes made will be
+                committed to the database after the function finishes executing.
+
+        """
         league_association = next(
             (association for association in self.player_associations if association.player == player),
             None
@@ -352,6 +397,17 @@ class League(Model):
             db.session.commit()
 
     def remove_player_from_flight(self, player, flight):
+        """
+        This function removes a player from a flight by searching for the player's
+        association with the flight and then removing that association if found.
+
+        Args:
+            player (): The `player` input parameter specifies the player to be
+                removed from the flight.
+            flight (): The `flight` input parameter is passed by reference and
+                it's the current flight that the player should be removed from.
+
+        """
         flight_association = next(
             (association for association in flight.player_associations if association.player == player),
             None
@@ -376,6 +432,22 @@ class League(Model):
 
     def remove_facility_by_id(self, id, add=True, commit=False):
         # Find the association with the given facility ID
+        """
+        This function removes a facility from a collection of facility associations
+        based on its ID. If the ID is not found or no facility is associated with
+        that ID it returns null.
+
+        Args:
+            id (int): The `id` input parameter specifies the ID of the facility
+                to be removed from the list of facility associations.
+            add (bool): The `add` parameter determines whether or not to add the
+                instance of the class (i.e., the self object) to the database if
+                the removal of the facility association was successful.
+            commit (bool): The `commit` parameter is an optional Boolean value
+                that determines whether to commit the changes made to the session
+                after removing the facility association.
+
+        """
         facility_to_remove = next(
             (a for a in self.facility_associations if a.facility_id == id), None
         )
@@ -387,6 +459,21 @@ class League(Model):
                 db.session.add(self)
 
     def facility_in_league(self, facility):
+        """
+        This function checks if a given `facility` is present among the facilities
+        associated with the object that the function is called on.
+
+        Args:
+            facility (): The `facility` input parameter is used to compare against
+                the `facility` field of each item included as part of a
+                `FacilityAssociation`. The purpose of the `facility` parameter is
+                to specify the Facility for which the function will search associated
+                FacilityAssociations.
+
+        Returns:
+            bool: The function takes an object `self` and a parameter `facility`.
+
+        """
         return any(
             association.facility == facility
             for association in self.facility_associations
