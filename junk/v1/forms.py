@@ -32,11 +32,32 @@ class RegistrationForm(FlaskForm):
     submit = SubmitField('Register')
 
     def validate_username(self, username):
+        """
+        This function validates whether a given `username` already exists or not
+        by querying the database using `User.query.filter_by()` and checking if
+        the result is not `None`.
+
+        Args:
+            username (str): The `username` input parameter passes the value of the
+                `username` field of the current form data to the query performed
+                on the `User` model.
+
+        """
         user = User.query.filter_by(username=username.data).first()
         if user is not None:
             raise ValidationError('Please use a different username.')
 
     def validate_email(self, email):
+        """
+        This function checks if the provided email address is already associated
+        with a user record on database and raises a ValidationError if it is found
+        to be existing.
+
+        Args:
+            email (str): The `email` input parameter passes the value of the `email`
+                field from the form to the function for validation.
+
+        """
         user = User.query.filter_by(email=email.data).first()
         if user is not None:
             raise ValidationError('Please use a different email address.')
