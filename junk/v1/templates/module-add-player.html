@@ -1,0 +1,17 @@
+<div class="form-block">
+<h2>Add Player</h2>
+<form action="" method="post" novalidate>
+    {{ add_player_form.hidden_tag() }}
+    <p>
+        {{ add_player_form.player_name.label }}<br />
+        {{ add_player_form.player_name(size=32) }}
+    </p>
+    <p>
+        {{ add_player_form.player_email.label }}<br />
+        {{ add_player_form.player_email(size=32) }}
+    </p>
+    <div id="form-block-buttons">
+        <p>{{ add_player_form.submit() }}</p>
+    </div>
+</form>
+</div>

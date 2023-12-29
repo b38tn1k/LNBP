@@ -1,0 +1,49 @@
+{% extends "base.html" %} {% block content %}
+
+<h1>{{ player.player_name }}</h1>
+
+<div class="multiform-container">
+    {% for flight in player.flights %}
+
+    <div class="form-block no-text-alignment flight-availability" id="{{flight.id}}">
+        
+        <a href="{{ url_for('flights.edit_flight', flight_id=flight.id) }}"><h2>{{flight.flight_name}}</h2></a>
+
+        <table class="basic-table no-text-alignment">
+            <thead>
+                <tr>
+                    <th>Time Slot</th>
+                    <th>Availability</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for time in flight.get_sort_timeslots() %}
+                <tr id="{{ time.id }}">
+                    <td>{{time.get_human_readable_date() | safe}}</td>
+                    <td>
+                        <div class="three-way-switch">
+                            <label>
+                                <input type="radio" name="switch_{{ time.id }}" value=1 checked class="auto-updated-switch" />
+                                <span>Yes</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="switch_{{ time.id }}" value=2 class="auto-updated-switch" />
+                                <span>Maybe</span>
+                            </label>
+                            <label>
+                                <input type="radio" name="switch_{{ time.id }}" value=3 class="auto-updated-switch" />
+                                <span>No</span>
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% endfor %}
+</div>
+<script src="{{ url_for('static', filename='js/page-player-availability.js') }}" data-player-id="{{ player.id }}"></script>
+
+{% endblock %}

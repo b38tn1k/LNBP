@@ -3,7 +3,7 @@
     <div class="col-12">
         <div class="card" flight-number="{{ loop.index }}">
             {% set flightCounter = loop.index %}
-            <div class="card-body" style="overflow: auto">
+            <div class="card-body" style="overflow-x: auto; overflow-y: hidden; margin-right:16px;">
                 <table id="flight-{{ flightCounter }}" flight="{{ flight.id }}" flight-number="{{ flightCounter }}" class="schedule-table csv-table flight-sub-table table table-bordered table-hover table-sm">
                     <thead>
                         <tr>

@@ -1,0 +1,8 @@
+<div class="form-block">
+<h2>Add CSV Data</h2>
+<form method="POST" enctype="multipart/form-data">
+    {{ fileform.hidden_tag() }}
+    {{ fileform.file() }}
+    <input type="submit">
+</form>
+</div>

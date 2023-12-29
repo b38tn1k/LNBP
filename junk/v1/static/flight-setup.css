@@ -1,0 +1,71 @@
+#hour-spinner,
+#minute-spinner,
+#time-input {
+    height: 32px; /* Adjust this value to your needs */
+    padding: 5px;
+}
+
+.timeslot-mgmt {
+    border: 1px solid #ccc;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px;
+}
+
+/* Adjust margin for the last element in each div */
+.timeslot-mgmt:last-child {
+    margin-left: 0;
+}
+
+.time-picker {
+    padding: 10px;
+    display: flex;
+    align-items: flex-end;
+    text-align: center;
+}
+
+.color_container {
+    width: 200px;
+    height: 100%;
+    display: flex;
+    flex-direction: column; /* change this to column for vertical stacking */
+    justify-content: space-between; /* this will distribute the items evenly vertically */
+    margin-bottom: 20px;
+}
+
+#color-picker-container {
+    width: 100%;
+    /* height: 30%; */
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 10px;
+}
+
+#color-preview {
+    padding: 10px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#fgcolor-picker,
+#bgcolor-picker,
+#add-timeslot-button {
+    border: 1px solid black;
+    width: 32px;
+    height: 32px;
+}
+
+#random-button {
+    border: 1px solid black;
+    background: #ffffff;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

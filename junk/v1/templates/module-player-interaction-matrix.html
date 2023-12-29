@@ -1,0 +1,25 @@
+<div class="form-block ">
+    <h2>Player Interaction Matrix</h2>
+    <table id="player-matrix" class="grid-table">
+        <thead>
+            <tr>
+                <th id="always-empty"></th>
+                {% for player_col in flight.players %}
+                    <th data-player-anchor="{{ player_col.id }}">{{ player_col.player_name[:5] }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for player_row in flight.players %}
+            <tr>
+                <td data-player-anchor="{{ player_row.id }}">{{ player_row.player_name[:5] }}</td>
+                {% for player_col in flight.players %}
+                    <td data-player-row="{{ player_row.id }}" data-player-column="{{ player_col.id }}" 
+                        title="{{ player_row.player_name }} vs. {{ player_col.player_name }}">
+                    </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

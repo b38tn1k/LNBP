@@ -1,0 +1,9 @@
+<div class="form-block">
+    <h2>Flight Manager</h2>
+    <button class="fat-button" id="master-court-button">Update All Courts</button>
+    {% set color_target = '/flights/' ~ flight.id ~ '/colors' %} 
+    {% set color_endpoint = '/flights/' ~ flight.id ~ '/colors' %} 
+    {% set fg_color = flight.fg_color %} {% set bg_color = flight.bg_color %} 
+    {% set color_title = 'Flight Colors' %} 
+    {% include "module-color-picker.html" %}
+</div>

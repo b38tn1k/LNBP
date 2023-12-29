@@ -1,0 +1,288 @@
+{% extends "base.html" %} {% block content %}
+<div class="multiform-container">
+    <div class="form-block">
+        <h2>{{league.league_name}}: Flights</h2>
+        <div>
+            <button id="generateAllBtn" onclick="generateAllFlights({{ league.id }})">Generate All</button>
+            <button id="generateAssetsBtn" onclick="getAssets({{ league.id }}, '{{ league.league_name }}')">Get CSVs</button>
+            <div id="responseContainer"></div>
+        </div>
+        <table class="basic-table" id="flight-mgmt-table">
+            <thead>
+                <tr>
+                    <th>Flight Name</th>
+                    <th>Edit</th>
+                    <th>Schedule</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for flight in league.flights %}
+                <tr>
+                    <td>{{ flight.flight_name }}</td>
+                    <td>
+                        <button onclick="location.href='{{ url_for('flights.edit_flight', flight_id=flight.id) }}';">
+                            Edit
+                        </button>
+                    </td>
+                    <td>
+                        <button onclick="location.href='{{ url_for('scheduler.social_schedule', flight_id=flight.id) }}';">
+                            Schedule
+                        </button>
+                    </td>
+                    <td>
+                        <button class="delete-flight-button" data-flight-id="{{flight.id}}">Delete</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <hr />
+
+        <form action="" method="post" novalidate>
+            <div id="form-block-buttons">
+                <input
+                    type="text"
+                    id="flight-name-input"
+                    placeholder="Enter flight name"
+                    onkeydown="checkForEnter(event)"
+                    data-league-id = "{{league.id}}"
+                />
+                <button type="button" onclick="newFlight()">Create Flight</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="multiform-container"></div>
+<script>
+    // Get all buttons with the class 'delete-flight-button'
+    var deleteButtons = document.querySelectorAll(".delete-flight-button");
+
+    // Attach an event listener to each button
+    deleteButtons.forEach(function (button) {
+        button.addEventListener("click", function () {
+            send_delete(button);
+        });
+    });
+
+    function send_delete(button) {
+        // Get the league_id from the button's data-flight-id attribute
+    let id = button.getAttribute("data-flight-id");
+        baseURL = "{{ url_for('flights.delete_flight', flight_id='202020') }}";
+        var deleteURL = baseURL.replace("202020", id);
+
+        fetch(deleteURL, {
+            method: "POST",
+            credentials: "same-origin",
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                // Handle the response here. For now, I'm just logging it.
+                if (data.status === "success") {
+                    let parentRow = button.closest("tr");
+                    if (parentRow) {
+                        parentRow.style.display = "none";
+                    }
+                }
+            })
+            .catch((error) => {
+                console.error("There was an error:", error);
+            });
+    }
+
+    function checkForEnter(event) {
+        if (event.key === "Enter") {
+            // Call your desired function or actions here.
+            newFlight();
+            // For instance: newFlight()(); if you want to call that function.
+        }
+    }
+
+    function generateAllFlights(league_id) {
+        // Set responseContainer to 'working'
+        document.getElementById("responseContainer").textContent = "working";
+
+        // Assuming you have the league_id available (e.g., 1), you can replace this dynamically
+        // var league_id = 1;
+        var baseURL = "{{ url_for('leagues.generate_all', league_id='2020202020') }}";
+        var generateAllURL = baseURL.replace("2020202020", league_id);
+
+        fetch(generateAllURL, {
+            method: "POST",
+            credentials: "same-origin"
+        })
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.status === "success") {
+                result_strings = []
+                data.results.forEach(dict => {
+                    result_string = ""
+                    console.log(dict)
+                    result_string += "Flight: " + dict.name + " "
+                    obj = dict.selected_stats
+                    let trueCount = 0;
+                    let falseCount = 0;
+                    for (let key in obj) {
+                        if (obj[key] === true) {
+                            trueCount++;
+                        } else if (obj[key] === false) {
+                            falseCount++;
+                        }
+                    }
+                    console.log(dict['captained']);
+                    if (falseCount == 0 && dict['captained']) {
+                        result_string += "Sucess"
+                    } else {
+                        result_string += "Requires Attention"
+                    }
+                    result_strings.push(result_string);
+                });
+
+                document.getElementById("responseContainer").innerHTML = result_strings.join('<br>');
+
+            }
+        })
+        .catch((error) => {
+            console.error("There was an error:", error);
+            document.getElementById("responseContainer").textContent = "error";  // Optional: In case you want to handle errors
+        });
+    }
+
+    function getAssets(league_id, league_name) {
+        // Set responseContainer to 'working'
+        document.getElementById("responseContainer").textContent = "working";
+
+        // Assuming you have the league_id available (e.g., 1), you can replace this dynamically
+        // var league_id = 1;
+        var baseURL = "{{ url_for('leagues.get_assets', league_id='2020202020') }}";
+        var generateAllURL = baseURL.replace("2020202020", league_id);
+
+        fetch(generateAllURL, {
+            method: "POST",
+            credentials: "same-origin"
+        })
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.status === "success") {
+                result_strings = [data.scorecard, data.schedule];
+                console.log(data.scorecard)
+                generateCSV(data.schedule, "scheduleCSV", league_name + "-schedule.csv", "Download Schedule")
+                generateCSV(data.scorecard, "scorecardCSV", league_name + "-scorecard.csv", "Download Score Card")
+                // if there is any div with id == scheduleCSV, delete it
+                // create a div with class form-block and id scheduleCSV inside the first multiform-container
+                // data.schedule is the text of a csv file. I would like to represent it as a table inside the scheduleCSV div
+                // I would like to add a button to the table that allows downloading
+            }
+        })
+        .catch((error) => {
+            console.error("There was an error:", error);
+            document.getElementById("responseContainer").textContent = "error";  // Optional: In case you want to handle errors
+        });
+    }
+
+    function generateCSV(schedule, divID, download_name, button_label) {
+        // Remove existing div with divID if it exists
+        let existingDiv = document.getElementById(divID);
+        if (existingDiv) {
+            existingDiv.remove();
+        }
+
+        // Create a new div
+        let newDiv = document.createElement("div");
+        newDiv.className = "form-block form-block-big";
+        newDiv.id = divID;
+
+        let containers = document.querySelectorAll(".multiform-container");
+        let container = containers[containers.length - 1];
+
+        // let container = document.querySelector(".multiform-container");
+        if (container) {
+            container.appendChild(newDiv);
+        }
+
+        // Convert CSV data to HTML table and append to newDiv
+        let rows = schedule.split('\n').map(row => row.split(','));
+        let table = document.createElement('table');
+        
+        rows.forEach(row => {
+            let tr = document.createElement('tr');
+            row.forEach(cell => {
+                let td = document.createElement('td');
+                td.textContent = cell;
+                tr.appendChild(td);
+            });
+            table.appendChild(tr);
+        });
+        table.className = "league-generated-tables"
+        
+        
+
+        // Add download button
+        let downloadButton = document.createElement('button');
+        downloadButton.textContent = button_label;
+        downloadButton.onclick = function() {
+            let blob = new Blob([schedule], {type: 'text/csv'});
+            let link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = download_name;
+            link.click();
+        };
+        
+        newDiv.appendChild(downloadButton);
+        newDiv.appendChild(table);
+    }
+
+    
+
+    function newFlight() {
+        var input = document.getElementById("flight-name-input");
+        var flightName = input.value;
+        var leagueId = input.getAttribute("data-league-id")
+        baseURL = "{{ url_for('leagues.create_flight', league_id='202020', flight_name='testflight') }}";
+        var createURL = baseURL.replace("202020", leagueId);
+        createURL = createURL.replace("testflight", flightName);
+        if (flightName.length != 0) {
+            fetch(createURL, {
+                method: "POST",
+                credentials: "same-origin",
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    console.log(data);
+
+                    if (data.status === "success") {
+                        // Get the table's tbody
+                        var tbody = document.getElementById("flight-mgmt-table").querySelector("tbody");
+
+                        // Create a new row and cells
+                        var newRow = document.createElement("tr");
+                        var nameCell = document.createElement("td");
+                        var editCell = document.createElement("td");
+                        var deleteCell = document.createElement("td");
+
+                        // Populate the cells
+                        nameCell.textContent = flightName;
+                        var baseURL = "{{ url_for('flights.edit_flight', flight_id='202020') }}";
+                        var editURL = baseURL.replace("202020", data.flight_id);
+                        editCell.innerHTML = `<button onclick="location.href='` + editURL + `';">Edit</button>`;
+
+                        deleteCell.innerHTML = `<button class="delete-flight-button" data-flight-id="` + data.flight_id + `" onclick="send_delete(this)">Delete</button>`;
+                        
+                        // Append cells to the row
+                        newRow.appendChild(nameCell);
+                        newRow.appendChild(editCell);
+                        newRow.appendChild(deleteCell);
+
+                        // Append the new row to the tbody
+                        tbody.appendChild(newRow);
+                    }
+                })
+                .catch((error) => {
+                    console.error("There was an error:", error);
+                });
+        }
+    }
+</script>
+</div>
+{% endblock %}

@@ -20,7 +20,7 @@
                     {% if current_user.club %}
                     <li class="nav-item {{ 'active' if request.blueprint == 'club' }}">
                         <a href="{{ url_for('club.index') }}" class="nav-link  {{ 'active' if request.endpoint == 'club.settings' }}">
-                            <i class="fe fe-box"></i> Club</a>
+                            <i class="fe fe-users"></i> Club</a>
                     </li>
 
                     {% endif %}

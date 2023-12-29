@@ -1,0 +1,21 @@
+{% extends "base.html" %} {% block content %}
+
+<h1>{{ title }}</h1>
+<br>
+
+<div class="form-with-calendar">
+    <div class="multiform-container">
+        <!-- <div class="form-block form-block-align-top">
+            <h2>Court Manager</h2>
+            <br />
+            
+        </div> -->
+        <!-- {% include "module-court-selector.html" %}  -->
+    </div>
+    {% include "module-calendar.html" %}
+    
+</div>
+
+<script src="{{ url_for('static', filename='js/page-court-calendar.js') }}" calendar-data="helllllo"></script>
+
+{% endblock %}

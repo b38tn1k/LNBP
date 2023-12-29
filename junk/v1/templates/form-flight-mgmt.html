@@ -1,0 +1,46 @@
+<div class="form-block">
+    <h2>Flights</h2>
+    <table class="basic-table">
+        <thead>
+            <tr>
+                <th>Flight Name</th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for flight in club.flights %}
+            <tr>
+                <td>{{ flight.flight_name }}</td>
+                <td>
+                    <form action="{{ url_for('flights.edit_flight', flight_id=flight.id) }}" method="post" novalidate>
+                        {{ edit_flight_form.hidden_tag() }} {{ edit_flight_form.flight_id(value=flight.id) }} {{
+                        edit_flight_form.edit()}}
+                    </form>
+                </td>
+                <td>
+                    <form action="{{ url_for('flights.delete_flight', flight_id=flight.id) }}" method="post" novalidate>
+                        {{ edit_flight_form.hidden_tag() }} {{ edit_flight_form.flight_id(value=flight.id) }} {{
+                        edit_flight_form.delete()}}
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <hr>
+
+    <form action="" method="post" novalidate>
+        {{ add_flight_form.hidden_tag() }}
+        <p>
+            {{ add_flight_form.flight_name.label }}<br />
+            {{ add_flight_form.flight_name(size=32) }}
+            <!-- {% for error in add_flight_form.flight_name.errors %}
+            <br /><span style="color: red">[{{ error }}]</span>
+            {% endfor %} -->
+        </p>
+        <div id="form-block-buttons">
+            <p>{{ add_flight_form.submit() }}</p>
+        </div>
+    </form>
+</div>

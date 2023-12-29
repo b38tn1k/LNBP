@@ -1,0 +1,15 @@
+<div class="form-block no-text-alignment">
+    <h3>Timeslots</h3>
+    <table class="basic-table">
+        <tbody>
+            {% for time in flight.get_sort_timeslots() %}
+            <tr>
+                <td>{{time.get_human_readable_date() | safe}}</td>
+                {% for court in time.courts %}
+                <td>{{court.court_name}}</td>
+                {% endfor%}
+            </tr>
+            {% endfor%}
+        </tbody>
+    </table>
+</div>

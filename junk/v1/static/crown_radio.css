@@ -1,0 +1,23 @@
+.custom-radio {
+    position: relative;
+    display: inline-block;
+}
+
+.custom-radio input[type="radio"] {
+    display: none;
+}
+
+.custom-radio .radio-svg {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-right: 5px;
+    margin-top: 3px;
+    background: url("../static/images/captain_unchecked.svg") no-repeat center center;
+    background-size: cover;
+}
+
+.custom-radio input[type="radio"]:checked + .radio-svg {
+    background: url("../static/images/captain_checked.svg") no-repeat center center;
+    background-size: cover;
+}

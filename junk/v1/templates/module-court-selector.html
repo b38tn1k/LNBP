@@ -1,0 +1,30 @@
+<div class="form-block" id="court-selector-toggle">
+    <h2>Court Selector</h2>
+    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" id="my-toast">
+        <div class="toast-header">
+            <strong class="me-auto">Notice</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">No courts are active. Please select at least one court before adding an event.</div>
+    </div>
+
+    <table class="basic-table">
+        <thead>
+            <tr>
+                <th>Court</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for court in courts %}
+            <tr id="{{ court.id }}">
+                <td>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="court-switch-{{ court.id }}" checked />
+                        <label class="form-check-label" for="court-switch-{{ court.id }}">{{ court.court_name }}</label>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,14 @@
+{% extends "base.html" %} {% block content %}
+<h1>{{ club.name }}</h1>
+
+<div class="multiform-container">
+    {% include "form-club-admin-mgmt.html" %}
+    {% include "form-player.html" %}
+    {% include "module-add-player.html" %}
+    {% include "form-court-mgmt.html" %}
+    {% include "module-league-mgmt.html" %}
+    {% include "module-add-csv-data.html" %}
+    
+</div>
+
+{% endblock %}

@@ -1,13 +1,26 @@
-from flask import Blueprint, render_template, abort, redirect, url_for, flash, request, jsonify
+from flask import (
+    Blueprint,
+    render_template,
+    abort,
+    redirect,
+    url_for,
+    flash,
+    request,
+    jsonify,
+)
 from flask_login import login_required, current_user
 from app.forms import SimpleForm
 from app.forms.club_forms import ClubSetup, FacilitySetup
 from app.models import db
 from app.models.clubs import Club, Facility
-from app.services.league_services import league_wizard_csv_to_dicts, build_league_from_json
+from app.services.league_services import (
+    league_wizard_csv_to_dicts,
+    build_league_from_json,
+)
 import json
 
-blueprint = Blueprint('league', __name__)
+blueprint = Blueprint("league", __name__)
+
 
 @blueprint.before_request
 def check_for_membership(*args, **kwargs):
@@ -22,10 +35,11 @@ def check_for_membership(*args, **kwargs):
 
     """
     if not current_user.is_authenticated or current_user.primary_membership_id is None:
-        flash('You currently do not have accesss to app', 'warning')
+        flash("You currently do not have accesss to app", "warning")
         return redirect(url_for("main.home"))
 
-@blueprint.route('/edit/<int:id>', methods=["GET", "POST"])
+
+@blueprint.route("/edit/<int:id>", methods=["GET", "POST"])
 @login_required
 def edit_league(id):
     """
@@ -43,14 +57,29 @@ def edit_league(id):
 
     """
     if not current_user.is_authenticated or current_user.primary_membership_id is None:
-        flash('You currently do not have accesss to app', 'warning')
+        flash("You currently do not have accesss to app", "warning")
         return redirect(url_for("main.home"))
     league = current_user.club.get_league_by_id(id)
     if league is None:
         return redirect(url_for("main.home"))
-    return render_template('league/edit.html', league=league, club=current_user.club)
+    if request.method == "POST":
+        try:
+            data = request.json
+            print(data)
+            flash('League updated successfully.', 'success')
+            return jsonify({"status": "success"})
+        except Exception as e:
+            return jsonify({"status": "failure", "error": str(e)})
 
-@blueprint.route('/schedule/<int:id>', methods=["GET", "POST"])
+    return render_template(
+        "league/edit.html",
+        simple_form=SimpleForm(),
+        league=league,
+        club=current_user.club,
+    )
+
+
+@blueprint.route("/schedule/<int:id>", methods=["GET", "POST"])
 @login_required
 def schedule_league(id):
     """
@@ -64,20 +93,23 @@ def schedule_league(id):
 
     Returns:
         : Based on the code provided:
-        
+
         The output returned by the function `schedule_league(id)` is a rendered
         template `schedule.html`.
 
     """
     if not current_user.is_authenticated or current_user.primary_membership_id is None:
-        flash('You currently do not have accesss to app', 'warning')
+        flash("You currently do not have accesss to app", "warning")
         return redirect(url_for("main.home"))
     league = current_user.club.get_league_by_id(id)
     if league is None:
         return redirect(url_for("main.home"))
-    return render_template('league/schedule.html', league=league, club=current_user.club)
+    return render_template(
+        "league/schedule.html", league=league, club=current_user.club
+    )
 
-@blueprint.route('/delete/<int:id>', methods=["GET", "POST"])
+
+@blueprint.route("/delete/<int:id>", methods=["GET", "POST"])
 @login_required
 def delete_league(id):
     """
@@ -93,12 +125,12 @@ def delete_league(id):
         and current_user.primary_membership_id is not None (i.e., the user is
         authenticated and has a primary membership), the output returned by this
         function is:
-        
+
         A 302 redirect to the home page.
 
     """
     if not current_user.is_authenticated or current_user.primary_membership_id is None:
-        flash('You currently do not have accesss to app', 'warning')
+        flash("You currently do not have accesss to app", "warning")
         return redirect(url_for("main.home"))
     league = current_user.club.get_league_by_id(id)
     if league is not None:
@@ -107,7 +139,7 @@ def delete_league(id):
     return redirect(url_for("main.home"))
 
 
-@blueprint.route('/new', methods=["GET", "POST"])
+@blueprint.route("/new", methods=["GET", "POST"])
 @login_required
 def create_league():
     """
@@ -122,7 +154,7 @@ def create_league():
 
     Returns:
         dict: Based on the code provided:
-        
+
         The output returned by this function is `jsonify({"status": "success"}`)
         if the input data is valid and `jsonify({"status": "failure", "error":
         str(e)})` if there is an exception.
@@ -132,19 +164,29 @@ def create_league():
     player_names = [player.full_name for player in my_club.players]
     players_json = json.dumps(player_names)
 
-    if request.method == 'POST':
+    if request.method == "POST":
         try:
             data = request.json
-            if 'cleaned' in data:
+            if "cleaned" in data:
                 print("Data contains the field 'cleaned'.")
-                
+
                 league = build_league_from_json(my_club, data)
                 db.session.commit()
-                return jsonify({"status": "success", "redirect_url": url_for('league.edit_league', id=league.id)})
+                return jsonify(
+                    {
+                        "status": "success",
+                        "redirect_url": url_for("league.edit_league", id=league.id),
+                    }
+                )
             else:
                 print("Data does not contain the field 'cleaned'.")
                 league_dict = league_wizard_csv_to_dicts(data)
                 return jsonify({"status": "success", "data": league_dict})
         except Exception as e:
             return jsonify({"status": "failure", "error": str(e)})
-    return render_template('league/create.html', club=my_club, players_json=players_json, simple_form=SimpleForm())
+    return render_template(
+        "league/create.html",
+        club=my_club,
+        players_json=players_json,
+        simple_form=SimpleForm(),
+    )

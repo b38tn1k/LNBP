@@ -1,0 +1,65 @@
+.three-way-switch {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 150px;
+    background: linear-gradient(#f0f0f0, #d1d1d1); /* Background gradient for the button */
+    border-radius: 15px;
+    padding: 2px;
+    border: 1px solid #ccc;
+}
+
+.three-way-switch label {
+    position: relative;
+    flex: 1;
+    text-align: center;
+    cursor: pointer;
+    padding: 5px;
+}
+
+/* Add vertical lines between the options */
+.three-way-switch label::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    border-left: 1px solid #ccc;
+}
+
+/* Remove vertical line for the last label */
+.three-way-switch label:last-child::before {
+    border-left: none;
+}
+
+.three-way-switch input[type="radio"] {
+    /* Keep the radio input visible but visually hide it */
+    position: absolute;
+    opacity: 0;
+    z-index: -1;
+}
+
+/* Styling for checked states */
+.three-way-switch input[type="radio"]:checked + span {
+    /* background-color: #007bff; */
+    color: black;
+    font-weight: bold; /* Bold the selected text */
+}
+
+/* Styling for unchecked states */
+.three-way-switch input[type="radio"]:not(:checked) + span {
+    color: #999; /* Grey color for the unselected text */
+}
+
+/* Add additional styles for each switch value */
+.three-way-switch input[value="yes"] + span {
+    border-radius: 13px 0 0 13px;
+}
+
+.three-way-switch input[value="maybe"] + span {
+    border-radius: 0;
+}
+
+.three-way-switch input[value="no"] + span {
+    border-radius: 0 13px 13px 0;
+}

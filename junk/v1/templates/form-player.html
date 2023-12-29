@@ -1,0 +1,39 @@
+<div class="form-block">
+    <h2>Players</h2>
+    <input type="text" id="player-search-input" placeholder="Search players..." />
+    <div class="form-block-long-content">
+        <table class="basic-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>ID</th>
+                    <th>Email</th>
+                    <th>Edit</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody id="player-table-body">
+                {% for player in club.players %}
+                <tr id="{{ player.player_name }}">
+                    <td>{{ player.player_name[:10] }}</td>
+                    <td>{{ player.id }}</td>
+                    <td>{{ player.player_email[:10] }}</td>
+                    <td>
+                        <form action="{{ url_for('players.edit_player', player_id=player.id) }}" method="post" novalidate>
+                            {{ edit_player_form.hidden_tag() }} {{ edit_player_form.player_id(value=player.id) }} {{
+                            edit_player_form.edit()}}
+                        </form>
+                    </td>
+                    <td>
+                        <form action="{{ url_for('players.delete_player', player_id=player.id) }}" method="post" novalidate>
+                            {{ edit_player_form.hidden_tag() }} {{ edit_player_form.player_id(value=player.id) }} {{
+                            edit_player_form.delete()}}
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <script src="{{ url_for('static', filename='js/module-search-players.js') }}"></script>
+</div>

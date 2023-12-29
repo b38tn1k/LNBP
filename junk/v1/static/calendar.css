@@ -1,0 +1,47 @@
+#calendar-widget-div {
+    background-color: #f2f2f2;
+    border: 1px solid black;
+    display: flex;
+    align-items: flex-start; /* Align children along the top edge */
+    justify-content: space-between; /* Add space between the children */
+    /* height: 100vh; */
+    min-width: 800px;
+    padding: 20px; /* Add some padding around the children */
+    flex-grow: 1;
+}
+
+.form-with-calendar {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+}
+
+@media (max-width: 1500px) {
+    .form-with-calendar {
+        flex-direction: column;
+    }
+}
+
+.calendar-sidebar {
+    padding: 10px;
+    border: 1px solid #ccc;
+    flex-shrink: 0; /* Prevent this element from shrinking if space is tight */
+}
+
+.calendar-container {
+    border: 1px solid black;
+    background-color: #f2f2f2;
+    padding: 20px;
+    flex-grow: 1; /* Allow this element to grow if extra space is available */
+    margin-bottom: 15px;
+}
+
+#external-events .fc-event {
+    cursor: move;
+    margin: 3px 0;
+}
+
+#calendar {
+    margin: 20px auto;
+}
+

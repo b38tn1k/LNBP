@@ -1,0 +1,18 @@
+<!-- <div class="color_container calendar-sidebar">
+    <h3>{{ color_title }}</h3> -->
+<div id="color-preview">{{title}}</div>
+<div id="color-picker-container">
+    <input type="color" id="bgcolor-picker" value="{{bg_color}}" />
+    <input type="color" id="fgcolor-picker" value="{{fg_color}}" />
+    <button id="random-button" onclick="randomColors()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24">
+            <path
+                fill="currentColor"
+                d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2m7 7a2 2 0 0 0-2 2a2 2 0 0 0 2 2a2 2 0 0 0 2-2a2 2 0 0 0-2-2M7 5a2 2 0 0 0-2 2a2 2 0 0 0 2 2a2 2 0 0 0 2-2a2 2 0 0 0-2-2m10 10a2 2 0 0 0-2 2a2 2 0 0 0 2 2a2 2 0 0 0 2-2a2 2 0 0 0-2-2Z"
+            />
+        </svg>
+    </button>
+</div>
+<!-- </div> -->
+
+<script src="{{ url_for('static', filename='js/module-color-picker.js') }}" endpoint="{{ color_endpoint }}"></script>

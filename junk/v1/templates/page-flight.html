@@ -1,0 +1,20 @@
+{% extends "base.html" %} {% block content %}
+
+<h1>{{ title }}</h1>
+<br />
+
+<div class="form-with-calendar">
+    <div class="multiform-container">
+        {% include "module-player-selector.html" %} {% include "module-court-selector.html" %} 
+    </div>
+    <div class="multiform-container">
+        {% include "module-timeslot-mgmt.html" %} {% include "module-flight-mgmt.html" %}
+    </div>
+    {% include "module-calendar.html" %}
+    
+</div>
+
+
+<script src="{{ url_for('static', filename='js/page-flight-calendar.js') }}" data-flight-id="{{ flight.id }}"></script>
+
+{% endblock %}

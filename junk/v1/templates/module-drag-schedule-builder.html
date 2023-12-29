@@ -1,0 +1,15 @@
+<div class="form-block form-block-big" id="schedule" data-timeslots="{{ flight.get_timeslots_json() }}">
+    <div class="table-container">
+        <table class="draggableScheduleTool" id="custom-grid">
+            <thead>
+            <tr>
+                <th></th> <!-- Empty cell in the top-left corner --> 
+                {% for time in flight.get_sort_timeslots() %} <th>{{ time.get_human_readable_date_time_short() | safe }}</th> {% endfor %}
+            </tr>
+            </thead>
+            <tbody> {% for court in flight.get_all_courts() %} <tr>
+                <td style="white-space: nowrap">{{ court.court_name }}</td> {% for time in flight.get_sort_timeslots() %} <td class="draggable-target" data-court-id={{ court.id }} data-time-id={{ time.id }} data-court-available={{ court.get_available(time)}}></td> {% endfor %}
+            </tr> {% endfor %} </tbody>
+        </table>
+    </div>
+</div>

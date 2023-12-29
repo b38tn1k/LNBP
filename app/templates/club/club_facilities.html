@@ -1,0 +1,41 @@
+<div class="col-6">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Facilities</h3>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover table-outline table-vcenter text-nowrap card-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th class="text-center">Type</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for facility in club.facilities %}
+                    <tr>
+                        <td> {{ facility.name }} </td>
+                        <td class="text-center"> {{ facility.asset_type }} </td>
+                        <td class="text-center">
+                            <form role="form" action="{{ url_for('club.delete_facility', facility_id=facility.id) }}" method="post">
+                                {{ simple_form.hidden_tag() }}
+
+                                <button type="submit" class="btn btn-secondary btn-sm">Remove</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    <form role="form" action="{{ url_for('club.add_facility', club_id=club.id) }}" method="post">
+                        <tr>
+                            {{ facility_form.hidden_tag() }}
+                            <td>{{ facility_form.name(class="form-control", placeholder=facility_form.name.label.text) }}</td>
+                            <td>{{ facility_form.facility_type(class="custom-select") }}</td>
+                            <td><button type="submit" class="btn btn-secondary">Add</button></td>
+                        </tr>
+                    </form>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

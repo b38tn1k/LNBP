@@ -1,0 +1,120 @@
+{% extends "base.html" %} {% block content %} <h1>{{ flight.flight_name }}</h1>
+<div>
+  <button class='basic-button' id="generateButton">Generate</button>
+  <button class='basic-button' id="captainButton">Shuffle Captains</button>
+  <button class='basic-button' id="clearButton">Clear</button>
+</div> {% include "module-drag-schedule-builder.html" %} 
+{% include "module-drag-schedule-source.html" %} 
+<div class="multiform-container"> 
+    {% include "module-player-interaction-matrix.html" %} 
+    {% include "module-flight-table.html" %} 
+</div>
+<script type="text/javascript">
+  // Define your data as a global JavaScript variable
+  var playerAvailability = JSON.parse('{{ flight.get_player_availability() | tojson | safe }}');
+  var flightID = parseInt("{{ flight.id }}");
+  var other_court_events = JSON.parse('{{ flight.get_other_court_events() | tojson | safe }}');
+  const captain_checked_svg = "{{ url_for('static', filename='/images/captain_checked.svg') }}";
+  const captain_unchecked_svg = "{{ url_for('static', filename='/images/captain_unchecked.svg') }}";
+  const tennis_racket_svg = "{{ url_for('static', filename='/images/tennis-racket.svg') }}";
+  const tennis_racket_warning_svg = "{{ url_for('static', filename='/images/tennis-racket-warning.svg') }}";
+  const timeslot_check_svg = "{{ url_for('static', filename='/images/face-neutral.svg') }}"
+  const timeslot_check_warning_svg = "{{ url_for('static', filename='/images/face-neutral-warning.svg') }}"
+</script>
+<script src="{{ url_for('static', filename='js/page-social-schedule-drag.js') }}"></script>
+<script>
+
+  document.getElementById('generateButton').addEventListener('click', function() {
+    // Get the button reference
+    const button = document.getElementById('generateButton');
+
+    // Add the glow effect to the button before the fetch starts
+    button.classList.add('button-glow-waiting');
+
+    fetch('/flights/{{ flight.id }}/generate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+      // You can include data in the body if your endpoint needs it
+      // body: JSON.stringify({ key: 'value' })
+    }).then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    }).then(data => {
+      // Remove the glow effect after data is received and processed
+      button.classList.remove('button-glow-waiting');
+
+      console.log(data);
+      clearSchedule();
+      initialize();
+    }).catch(error => {
+      // Remove the glow effect if there's an error as well
+      button.classList.remove('button-glow-waiting');
+
+      console.error('There was a problem:', error);
+    });
+});
+
+
+  document.getElementById('captainButton').addEventListener('click', function() {
+
+    const button = document.getElementById('captainButton');
+
+    // Add the glow effect to the button before the fetch starts
+    button.classList.add('button-glow-waiting');
+
+    fetch('/flights/{{ flight.id }}/do_captains', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      // You can include data in the body if your endpoint needs it
+      // body: JSON.stringify({ key: 'value' })
+    }).then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      // You can process the response further here if necessary
+      return response.json();
+    }).then(data => {
+      button.classList.remove('button-glow-waiting');
+      // Here, you can handle the data received from the server
+      console.log(data);
+      clearSchedule();
+      initialize();
+    }).catch(error => {
+      button.classList.remove('button-glow-waiting');
+      // This block catches any errors in the fetch or processing steps
+      console.error('There was a problem:', error);
+    });
+  });
+
+  document.getElementById('clearButton').addEventListener('click', function() {
+    fetch('/flights/{{ flight.id }}/clear', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      // You can include data in the body if your endpoint needs it
+      // body: JSON.stringify({ key: 'value' })
+    }).then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      // You can process the response further here if necessary
+      return response.json();
+    }).then(data => {
+      // Here, you can handle the data received from the server
+      button.classList.remove('button-glow-waiting');
+      console.log(data);
+      clearSchedule();
+      initialize();
+    }).catch(error => {
+      // This block catches any errors in the fetch or processing steps
+      console.error('There was a problem:', error);
+    });
+  });
+</script></div> {% endblock %}

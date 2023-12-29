@@ -4,15 +4,15 @@
         <div class="card-header">Add Player</div>
         <div class="card-body">
             <div class="mb-3">
-                <select name="player_select" class="custom-select">
+                <select id="add_player_select" name="player_select" class="custom-select">
                     <option value="-1">Select Player</option>
-                    {% for player in club.players %}
+                    {% for player in league.not_players|sort(attribute='last_name') %}
                     <option value="{{ player.id }}">{{ player.full_name }}</option>
                     {% endfor %}
                 </select>
             </div>
             <div class="mb-3">
-                <select name="player_select" class="custom-select">
+                <select id="add_player_flight_select" name="flight_select" class="custom-select">
                     <option value="-1">Select Flight</option>
                     {% for flight in league.flights %}
                     <option value="{{ flight.id }}">{{ flight.name }}</option>
@@ -20,7 +20,7 @@
                 </select>
             </div>
             <div class="mb-3">
-                <button class="btn btn-primary">Add Player</button>
+                <button id="add-player-button" class="btn btn-primary">Add Player</button>
             </div>
         </div>
     </div>

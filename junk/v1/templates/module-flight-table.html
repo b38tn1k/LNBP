@@ -1,0 +1,68 @@
+<div class="form-block form-block-big">
+    <div class="heading-with-button">
+        <h2>{{flight.flight_name}} Table View</h2>
+        <button class="basic-button" onclick="downloadTableAsCSV()">
+            <img
+                src="{{ url_for('static', filename='images/save-outline.svg') }}"
+                alt="Download Icon"
+                style="height: 20px; width: auto; vertical-align: middle"
+            />
+        </button>
+    </div>
+    <div class="table-container">
+        <table id="os-schedule-table">
+            <thead>
+                <tr>
+                    <th>{{flight.flight_name}}</th>
+                    {% for ts in flight.get_sort_timeslots() %}
+                    <th>{{ ts.get_human_readable_date_day_month() }}</th>
+                    {% endfor %}
+                </tr>
+                <tr>
+                    <th></th>
+                    {% for ts in flight.get_sort_timeslots() %}
+                    <th>{{ ts.get_human_readable_time() }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for player_row in flight.players %}
+                <tr>
+                    <td data-player-anchor="{{ player_row.id }}">{{ player_row.player_name }}</td>
+                    {% for ts in flight.get_sort_timeslots() %}
+                    <td data-player-id="{{player_row.id}}" data-timeslot-id="{{ts.id}}"></td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function downloadTableAsCSV() {
+            const table = document.getElementById("os-schedule-table");
+            let csv = [];
+            const rows = table.querySelectorAll("tr");
+
+            for (let i = 0; i < rows.length; i++) {
+                const row = [],
+                    cols = rows[i].querySelectorAll("td, th");
+
+                for (let j = 0; j < cols.length; j++) {
+                    row.push(cols[j].innerText);
+                }
+
+                csv.push(row.join(","));
+            }
+
+            const csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
+            const downloadLink = document.createElement("a");
+            const url = URL.createObjectURL(csvFile);
+            downloadLink.href = url;
+            downloadLink.download = "{{flight.flight_name}}-schedule.csv";
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        }
+    </script>
+</div>

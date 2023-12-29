@@ -1,0 +1,187 @@
+{% extends "base.html" %} {% block content %}
+<h1>{{title}}</h1>
+
+<div class="multiform-container">
+    <div class="form-block form-block-skinny">
+        <h2>Configure Tests</h2>
+        <p>
+            <!-- Players Slider -->
+            <label for="players-amount">Players:</label>
+            <input type="text" id="players-amount" readonly />
+            <div id="players-slider"></div>
+        </p>
+        <p>
+            <!-- Courts Slider -->
+            <label for="courts-amount">Courts:</label>
+            <input type="text" id="courts-amount" readonly />
+            <div id="courts-slider"></div>
+        </p>
+        <p>
+            <!-- Timeslots Slider -->
+            <label for="timeslots-amount">Timeslots:</label>
+            <input type="text" id="timeslots-amount" readonly />
+            <div id="timeslots-slider"></div>
+        </p>
+        <p>
+            <!-- Days Slider -->
+            <label for="days-amount">Days:</label>
+            <input type="text" id="days-amount" readonly />
+            <div id="days-slider"></div>
+        </p>
+        <p>
+            <!-- Weeks Slider -->
+            <label for="weeks-amount">Weeks:</label>
+            <input type="text" id="weeks-amount" readonly />
+            <div id="weeks-slider"></div>
+        </p>
+
+        <p>
+            <!-- Iterations Slider -->
+            <label for="iterations-amount">Iterations:</label>
+            <input type="text" id="iterations-amount" readonly />
+            <div id="iterations-slider"></div>
+        </p>
+
+        <button class="basic-button" id="testGenerateButton">Generate</button>
+    </div>
+    <div class="form-block form-block-big">
+        <h2>Algorithm Test Results</h2>
+        <div id='generation_results' ></div>
+    </div>
+</div>
+
+<script>
+    const sliderConfigs = [
+        { id: "players", min: 4, max: 36, values: [12, 12] },
+        { id: "courts", min: 1, max: 10, values: [2, 2] },
+        { id: "timeslots", min: 1, max: 24, values: [2, 2] },
+        { id: "days", min: 1, max: 7, values: [1, 2] },
+        { id: "weeks", min: 1, max: 36, values: [12, 12] }
+    ];
+
+
+    $(function() {
+        sliderConfigs.forEach(config => {
+            const { id, min, max, values } = config;
+            
+            $(`#${id}-slider`).slider({
+                range: true,
+                min: min,
+                max: max,
+                values: values,
+                slide: function(event, ui) {
+                    $(`#${id}-amount`).val(ui.values[0] + " - " + ui.values[1]);
+                }
+            });
+            
+            $(`#${id}-amount`).val(values[0] + " - " + values[1]);
+        });
+    });
+
+    $("#iterations-slider").slider({
+        range: "min",
+        min: 1,
+        max: 100,
+        value: 1,  // initial value
+        slide: function(event, ui) {
+            $("#iterations-amount").val(ui.value);
+        }
+    });
+
+    $("#iterations-amount").val($("#iterations-slider").slider("value"));
+
+
+
+    
+    document.getElementById("testGenerateButton").addEventListener("click", function () {
+
+        // Gather the values from each slider
+        let sliderData = {};
+        sliderConfigs.forEach(config => {
+            const { id } = config;
+            sliderData[id] = $(`#${id}-slider`).slider("values");
+        });
+
+        // Add the value from the single "iterations" slider
+        sliderData["iterations"] = $("#iterations-slider").slider("value");
+
+        // Send the request to the server with the gathered data
+        fetch("/algorithm_test", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(sliderData) // Pass the gathered slider data in the request body
+        })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            // You can process the response further here if necessary
+            return response.json();
+        })
+        .then((data) => {
+            // 1. Grab the generation_results div.
+            const resultsDiv = document.getElementById('generation_results');
+                
+                // 2. Clear its contents.
+                resultsDiv.innerHTML = '';
+
+                // 3. Create a new table element.
+                const table = document.createElement('table');
+                table.classList.add('table-with-outlines');
+
+                // Add table headers
+                const headers = ['courts', 'timeslots', 'days', 'weeks', 'players', 'group stats', 'selected stats'];
+                const thead = table.createTHead();
+                const headerRow = thead.insertRow();
+                for (let header of headers) {
+                    const th = document.createElement('th');
+                    th.textContent = header;
+                    headerRow.appendChild(th);
+                }
+
+                // 4. Append table rows and cells based on the data.
+                for (let d of data) {
+                    const row = table.insertRow();
+                    row.insertCell().textContent = d.courts;
+                    row.insertCell().textContent = d.timeslots;
+                    row.insertCell().textContent = d.days;
+                    row.insertCell().textContent = d.weeks;
+                    row.insertCell().textContent = d.players;
+                    // Inserting pool_stats into a sub-table
+                    let statsCell = row.insertCell();
+                    let statsTable = document.createElement('table');
+                    statsCell.appendChild(statsTable);
+                    let statsRow1 = statsTable.insertRow();
+                    statsRow1.insertCell().textContent = `Players Satisfied: ${d.result.pool_stats.all_players_satisfied}`;
+                    statsRow1.insertCell().textContent = `No Overscheduled: ${d.result.pool_stats.no_players_overscheduled}`;
+                    let statsRow2 = statsTable.insertRow();
+                    statsRow2.insertCell().textContent = `Days Satisfied: ${d.result.pool_stats.player_days_satisfied}`;
+                    statsRow2.insertCell().textContent = `Weeks Satisfied: ${d.result.pool_stats.player_weeks_satisfied}`;
+
+                    // Inserting selected_stats into another sub-table
+                    let selectedStatsCell = row.insertCell();
+                    let selectedStatsTable = document.createElement('table');
+                    selectedStatsCell.appendChild(selectedStatsTable);
+                    let selectedStatsRow1 = selectedStatsTable.insertRow();
+                    selectedStatsRow1.insertCell().textContent = `Players Satisfied: ${d.result.selected_stats.all_players_satisfied}`;
+                    selectedStatsRow1.insertCell().textContent = `No Overscheduled: ${d.result.selected_stats.no_players_overscheduled}`;
+                    let selectedStatsRow2 = selectedStatsTable.insertRow();
+                    selectedStatsRow2.insertCell().textContent = `Days Satisfied: ${d.result.selected_stats.player_days_satisfied}`;
+                    selectedStatsRow2.insertCell().textContent = `Weeks Satisfied: ${d.result.selected_stats.player_weeks_satisfied}`;
+
+                }
+
+                // 5. Inject the table into the generation_results div.
+                resultsDiv.appendChild(table);
+
+        })
+        .catch((error) => {
+            // This block catches any errors in the fetch or processing steps
+            console.error("There was a problem:", error);
+        });
+    });
+</script>
+
+{% endblock %}

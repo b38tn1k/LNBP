@@ -1,0 +1,136 @@
+{% extends "base.html" %} {% block content %}
+<h1>{{ club.name }}: Leagues</h1>
+
+<div class="multiform-container">
+    <div class="form-block">
+        <h2>Leagues</h2>
+        <table class="basic-table" id="league-mgmt-table">
+            <thead>
+                <tr>
+                    <th>League Name</th>
+                    <th>Edit</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for league in club.leagues %}
+                <tr>
+                    <td>{{ league.league_name }}</td>
+                    <td>
+                        <button onclick="location.href='{{ url_for('leagues.edit_league', league_id=league.id) }}';">
+                            Edit
+                        </button>
+                    </td>
+                    <td>
+                        <button class="delete-league-button" data-league-id="{{league.id}}">Delete</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <hr />
+
+        <form action="" method="post" novalidate>
+            <div id="form-block-buttons">
+                <input
+                    type="text"
+                    id="league-name-input"
+                    placeholder="Enter league name"
+                    onkeydown="checkForEnter(event)"
+                />
+                <button type="button" onclick="newLeague()">Create League</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Get all buttons with the class 'delete-league-button'
+        var deleteButtons = document.querySelectorAll(".delete-league-button");
+
+        // Attach an event listener to each button
+        deleteButtons.forEach(function (button) {
+            button.addEventListener("click", function () {
+                send_delete(button);
+            });
+        });
+
+        function send_delete(button) {
+            // Get the league_id from the button's data-league-id attribute
+        let league_id = button.getAttribute("data-league-id");
+            baseURL = "{{ url_for('leagues.delete_league', league_id='202020') }}";
+            var deleteURL = baseURL.replace("202020", league_id);
+
+            fetch(deleteURL, {
+                method: "POST",
+                credentials: "same-origin",
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    // Handle the response here. For now, I'm just logging it.
+                    if (data.status === "success") {
+                        let parentRow = button.closest("tr");
+                        if (parentRow) {
+                            parentRow.style.display = "none";
+                        }
+                    }
+                })
+                .catch((error) => {
+                    console.error("There was an error:", error);
+                });
+        }
+
+        function checkForEnter(event) {
+            if (event.key === "Enter") {
+                // Call your desired function or actions here.
+                newLeague();
+                // For instance: newLeague(); if you want to call that function.
+            }
+        }
+
+        function newLeague() {
+            var leagueName = document.getElementById("league-name-input").value;
+            if (leagueName.length != 0) {
+                fetch(`/leagues/create/${leagueName}`, {
+                    method: "POST",
+                    credentials: "same-origin",
+                })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        console.log(data);
+
+                        if (data.status === "success") {
+                            // Get the table's tbody
+                            var tbody = document.getElementById("league-mgmt-table").querySelector("tbody");
+
+                            // Create a new row and cells
+                            var newRow = document.createElement("tr");
+                            var nameCell = document.createElement("td");
+                            var editCell = document.createElement("td");
+                            var deleteCell = document.createElement("td");
+
+                            // Populate the cells
+                            nameCell.textContent = leagueName;
+                            var baseURL = "{{ url_for('leagues.edit_league', league_id='202020') }}";
+                            var editURL = baseURL.replace("202020", data.league_id);
+                            editCell.innerHTML = `<button onclick="location.href='` + editURL + `';">Edit</button>`;
+
+                            deleteCell.innerHTML = `<button class="delete-league-button" data-league-id="` + data.league_id + `" onclick="send_delete(this)">Delete</button>`;
+                            
+                            // Append cells to the row
+                            newRow.appendChild(nameCell);
+                            newRow.appendChild(editCell);
+                            newRow.appendChild(deleteCell);
+
+                            // Append the new row to the tbody
+                            tbody.appendChild(newRow);
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("There was an error:", error);
+                    });
+            }
+        }
+    </script>
+</div>
+
+{% endblock %}

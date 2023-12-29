@@ -19,9 +19,13 @@
                 <tbody>
                     {% for facility in club.facilities %}
                     <tr>
-                        <td>
-                            <div class="form-check form-switch">
-                                <input type="checkbox" class="form-check-input" id="facility-{{ facility.id }}" />
+                        <td facility="{{facility.id}}">
+                            <div class="form-check mb-3 ">
+                                {% if facility in league.facilities%}
+                                <input checked type="checkbox" class="form-check-input-lg facility-checker" facility="{{facility.id}}" id="facility-{{ facility.id }}" >
+                                {% else %}
+                                <input type="checkbox" class="form-check-input-lg facility-checker" facility="{{facility.id}}" id="facility-{{ facility.id }}" >
+                                {%endif%}
                             </div>
                         </td>
                         <td>{{ facility.name }}</td>

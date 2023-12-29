@@ -1,0 +1,24 @@
+<div id="external-events" class="calendar-sidebar">
+
+    <div id="external-events-internal">
+        <!-- Timeslot events here -->
+    </div>
+
+    <!-- New timeslot form -->
+    <div id="new-timeslot-form">
+        <div class="time-picker">
+            <input id="hour-spinner" name="hours" placeholder="HH" value="01" />
+            H
+            <input id="minute-spinner" name="minutes" placeholder="MM" value="00" />
+            M
+        </div>
+        <input type="time" id="time-input" value="12:00" />
+        <!-- <input type="number" id="duration-input" value="1" min="1" /> -->
+        <button
+            id="add-timeslot-button"
+            onclick="addTimeslot('{{ flight.fg_color }}', '{{ flight.bg_color}}', '{{ flight.id}}', '{{ flight.flight_name}}')"
+        >
+            +
+        </button>
+    </div>
+</div>

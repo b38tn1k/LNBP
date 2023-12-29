@@ -1,0 +1,45 @@
+<div class="form-block">
+    <h2>Courts</h2>
+    <table class="basic-table">
+        <thead>
+            <tr>
+                <th>Court Name</th>
+                <th>Edit</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for court in club.courts %}
+            <tr>
+                <td>{{ court.court_name }}</td>
+
+                <td>
+                    <form action="{{ url_for('courts.edit_court', court_id=court.id) }}" method="post" novalidate>
+                        {{ edit_court_form.hidden_tag() }} {{ edit_court_form.court_id(value=court.id) }} {{ edit_court_form.edit()}}
+                    </form>
+                </td>
+                <td>
+                    <form action="{{ url_for('courts.delete_court', court_id=court.id) }}" method="post" novalidate>
+                        {{ edit_court_form.hidden_tag() }} {{ edit_court_form.court_id(value=court.id) }} {{
+                        edit_court_form.delete()}}
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <hr>
+    <form action="" method="post" novalidate>
+        {{ add_court_form.hidden_tag() }}
+        <p>
+            {{ add_court_form.court_name.label }}<br />
+            {{ add_court_form.court_name(size=32) }} 
+            <!-- {% for error in add_court_form.court_name.errors %}
+            <br /><span style="color: red">[{{ error }}]</span>
+            {% endfor %} -->
+        </p>
+        <div id="form-block-buttons">
+            <p>{{ add_court_form.submit() }}</p>
+        </div>
+    </form>
+</div>

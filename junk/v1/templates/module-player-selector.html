@@ -1,0 +1,38 @@
+<div class="form-block form-block-align-top" id="player-selector-toggle">
+    <h2>Player Selector</h2>
+    <br />
+    <input type="text" id="player-search-input" placeholder="Search players..." />
+    <div class="form-block-long-content">
+        <table class="basic-table">
+            <thead>
+                <tr>
+                    <th>Player</th>
+                    <th>Availability</th>
+                </tr>
+            </thead>
+            <tbody id="player-table-body">
+                {% for player in current_user.club.players %}
+                <tr id="{{ player.player_name }}">
+                    <td>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input player-switch" type="checkbox" id="player-switch-{{ player.id }}" {% if flight.player_in_flight(player) %} checked {% endif %} />
+                            <label class="form-check-label" for="player-switch-{{ player.id }}">
+                                {{ player.player_name[:10] }} {{ player.player_email[:10] }}
+                            </label>
+                        </div>
+                    </td>
+                    <td>
+                        <form action="{{ url_for('players.edit_player', player_id=player.id) }}" method="post" novalidate>
+                            {{ edit_player_form.hidden_tag() }} {{ edit_player_form.player_id(value=player.id) }} {{
+                            edit_player_form.edit()}}
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/module-search-players.js') }}"></script>
+<script src="{{ url_for('static', filename='js/module-selector-add-remove-players.js') }}" data-flight-id="{{ flight.id }}"></script>
+

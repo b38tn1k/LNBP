@@ -1,0 +1,49 @@
+<div class="form-block form-block-big draggable-source">
+    <!-- <h3>Players</h3> -->
+    <div class="draggable-pool">
+        {% for player in flight.players %}
+        <div class="draggable-origin draggable-target">
+            <div class="draggable-item" data-player-id="{{player.id}}" data-player-name="{{player.player_name}}">
+                <label class="custom-radio">
+                    <input
+                        type="radio"
+                        class="player-is-captain-input"
+                        name="player-is-captain-input"
+                        data-player-id="{{player.id}}"
+                    />
+                    <span class="radio-svg"></span>
+                </label>
+                {{player.player_name[:10]}}
+            </div>
+            <table class="tiny-table">
+                <tr>
+                    <td>
+                        <img class="racket-warning" src="{{ url_for('static', filename='/images/tennis-racket.svg') }}" alt="Games Player" />
+                    </td>
+                    <td>
+                        <img
+                            class="captain-switch"
+                            src="{{ url_for('static', filename='/images/captain_unchecked.svg') }}"
+                            alt="Games Captained"
+                        />
+                    </td>
+                    <td>
+                        <img
+                            class="low-preference-time-counter"
+                            src="{{ url_for('static', filename='/images/face-neutral.svg') }}"
+                            alt="Unpreferred Timeslots"
+                        />
+                    </td>
+                </tr>
+                <tr>
+                    <td><span class="player-game-count">0</span></td>
+                    <td><span class="player-captain-count">0</span></td>
+                    <td><span class="player-badtimeslot-count">0/0</span></td>
+                </tr>
+                <!-- Add more rows as needed -->
+            </table>
+            <!-- add this line -->
+        </div>
+        {% endfor %}
+    </div>
+</div>

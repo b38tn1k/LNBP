@@ -1,0 +1,10 @@
+
+{% extends "base.html" %} {% block content %}
+<h1>{{ club.name }}: Players</h1>
+
+<div class="multiform-container">
+    {% include "form-player.html" %}
+    {% include "module-add-player.html" %}
+</div>
+
+{% endblock %}

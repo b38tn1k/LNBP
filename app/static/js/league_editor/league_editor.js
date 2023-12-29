@@ -132,18 +132,18 @@ document.addEventListener("DOMContentLoaded", function () {
     displaySpan.textContent = gameDuration;
     durationSlider.value = parseInt(gameDuration);
 
-/**
-* @description This function updates the text content of an element with the ID
-* "displaySpan" to a given value.
-* 
-* @param { string } value - The `value` input parameter passes a string value to the
-* `displaySpan.textContent` property setter to update the text content of the element
-* with the ID "displaySpan".
-* 
-* @returns {  } The function `updateDisplay(value)` takes a single argument `value`,
-* and it sets the `textContent` of an element with an ID `displaySpan` to the provided
-* value.
-*/
+    /**
+     * @description This function updates the text content of an element with the ID
+     * "displaySpan" to a given value.
+     *
+     * @param { string } value - The `value` input parameter passes a string value to the
+     * `displaySpan.textContent` property setter to update the text content of the element
+     * with the ID "displaySpan".
+     *
+     * @returns {  } The function `updateDisplay(value)` takes a single argument `value`,
+     * and it sets the `textContent` of an element with an ID `displaySpan` to the provided
+     * value.
+     */
     function updateDisplay(value) {
         displaySpan.textContent = value;
     }
@@ -240,78 +240,192 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    const facilities = document.querySelectorAll(".facility-checker");
+    facilities.forEach((f) => {
+        f.addEventListener("change", () => {
+            updateDelta(new Diff("facility_in_league", parseInt(f.getAttribute("facility")), f.checked));
+        });
+    });
+
+    const addPlayerButton = document.getElementById("add-player-button");
+    addPlayerButton.addEventListener("click", () => {
+        const playerSelector = document.getElementById("add_player_select");
+        const playerID = parseInt(playerSelector.value);
+        const playerName = playerSelector.options[playerSelector.selectedIndex].textContent;
+        const flightID = parseInt(document.getElementById("add_player_flight_select").value);
+        console.log(playerID, playerName, flightID);
+        if (playerID != -1 && flightID != -1) {
+            updateDelta(new Diff("add_player_to_league", { player: playerID, flight: flightID }, 0));
+        }
+        addNewPlayerToFlight(playerName, playerID, flightID);
+    });
+
     document
         .querySelectorAll(".schedule-table")
         .forEach((table) => table.addEventListener("click", handleFlightTableClick));
 
+    document.getElementById("save-button").addEventListener("click", saveButtonCallback);
+
     document.querySelectorAll(".reveal-after").forEach((div) => (div.style.display = "block"));
 });
 
+function saveButtonCallback(event) {
+    const saveString = JSON.stringify(delta);
+    sendToServer(saveString);
+}
+
+function sendToServer(data) {
+    const currentUrl = window.location.href;
+    const csrf_token = document.querySelector('#hidden-form input[name="csrf_token"]').value;
+
+    fetch(currentUrl, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrf_token,
+        },
+        body: JSON.stringify(data),
+    })
+        .then((response) => {
+            if (!response.ok) {
+                return Promise.reject("Fetch failed; Server responded with " + response.status);
+            }
+            return response.json();
+        })
+        .then((data) => {
+            if (data.status === "success") {
+                console.log("Data successfully ingested by server.");
+                window.location.reload();
+            } else {
+                console.log("Failure: ", data.error);
+            }
+        })
+        .catch((error) => console.log("Fetch error: ", error));
+}
+
+function addNewPlayerToFlight(playerName, playerID, flightID) {
+    // Find flight table
+    const flightTables = document.querySelectorAll(".flight-sub-table");
+    let targetTable;
+    for (let table of flightTables) {
+        if (parseInt(table.getAttribute("flight")) == flightID) {
+            targetTable = table;
+        }
+    }
+
+    // Find the tbody in the target table
+    const tbody = targetTable.querySelector("tbody");
+
+    // Clone the first tr element in the tbody
+    const firstRow = tbody.querySelector("tr:first-child");
+    const newRow = firstRow.cloneNode(true); // true to clone child nodes
+
+    // Modify the content of the new row
+    newRow.cells[1].textContent = playerName;
+
+    // Set player ID attribute
+    newRow.setAttribute("playerID", playerID);
+
+    // Update availability cells in the new row
+    const availabilityCells = newRow.querySelectorAll(".availability");
+    availabilityCells.forEach((cell) => {
+        cell.classList.remove("bg-busy", "bg-unavailable"); // Remove previous classes
+        cell.classList.add("bg-free"); // Set default class
+        cell.title = playerName;
+        cell.setAttribute("player", playerID);
+        cell.setAttribute("availability", 1); // Set availability attribute to 1
+    });
+
+    // Update macro buttons in the new row
+    const macroButtons = newRow.querySelectorAll(".player_macro_button");
+    macroButtons.forEach((button) => {
+        button.setAttribute("flight", flightID);
+        button.setAttribute("playerID", playerID);
+        const macroType = button.getAttribute("macro-type");
+        switch (macroType) {
+            case "up":
+                button.addEventListener("click", moveUpCallback);
+                break;
+
+            case "down":
+                button.addEventListener("click", moveDownCallback);
+                break;
+
+            case "remove":
+                button.addEventListener("click", removeCallback);
+                break;
+        }
+    });
+
+    // Append the new row to the tbody
+    tbody.appendChild(newRow);
+}
+
 /**
-* @description The `moveUpCallback` function moves the player's flight direction
-* down by one step when triggered by an event.
-* 
-* @param { object } event - The `event` input parameter is not used or referenced
-* within the function body of `moveUpCallback`.
-* 
-* @returns { any } The output returned by the `moveUpCallback` function is `undefined`.
-*/
+ * @description The `moveUpCallback` function moves the player's flight direction
+ * down by one step when triggered by an event.
+ *
+ * @param { object } event - The `event` input parameter is not used or referenced
+ * within the function body of `moveUpCallback`.
+ *
+ * @returns { any } The output returned by the `moveUpCallback` function is `undefined`.
+ */
 function moveUpCallback(event) {
     switchPlayerFlight(event, -1);
 }
 
 /**
-* @description The function `moveDownCallback` is called when the user moves down
-* (via arrow key or other keyboard input) during a game or simulation.
-* 
-* @param { any } event - The `event` parameter is not used within the function
-* `moveDownCallback`. It is passed as an argument to the function but is not referred
-* to or acted upon within the code.
-* 
-* @returns { any } The function `moveDownCallback` does not return any value.
-*/
+ * @description The function `moveDownCallback` is called when the user moves down
+ * (via arrow key or other keyboard input) during a game or simulation.
+ *
+ * @param { any } event - The `event` parameter is not used within the function
+ * `moveDownCallback`. It is passed as an argument to the function but is not referred
+ * to or acted upon within the code.
+ *
+ * @returns { any } The function `moveDownCallback` does not return any value.
+ */
 function moveDownCallback(event) {
     switchPlayerFlight(event, 1);
 }
 
 /**
-* @description This function removes a callback event listener from an HTML table
-* row element ( `<tr>` ) that is closest to the event target .
-* 
-* @param { object } event - The `event` input parameter is not used within the
-* `removeCallback` function.
-* 
-* @returns { object } The function `removeCallback` does not return anything since
-* it is defined as a function with no `return` statement. Instead of returning any
-* value itself.  It logs the `row` element that is closest to the `event.target`
-* element inside the event handler of whatever `event` is passed into this function
-* call on line `<event>`.
-*/
+ * @description This function removes a callback event listener from an HTML table
+ * row element ( `<tr>` ) that is closest to the event target .
+ *
+ * @param { object } event - The `event` input parameter is not used within the
+ * `removeCallback` function.
+ *
+ * @returns { object } The function `removeCallback` does not return anything since
+ * it is defined as a function with no `return` statement. Instead of returning any
+ * value itself.  It logs the `row` element that is closest to the `event.target`
+ * element inside the event handler of whatever `event` is passed into this function
+ * call on line `<event>`.
+ */
 function removeCallback(event) {
     const row = event.target.closest("tr");
     const playerID = parseInt(row.getAttribute("playerID"));
-    updateDelta(new Diff("remove_player_from_league", {'player': playerID}, 0));
+    updateDelta(new Diff("remove_player_from_league", { player: playerID }, 0));
     row.remove();
 }
 
 /**
-* @description This function retrieves the `tbody` element of a table with an ID
-* containing a specified flight number and returns an array containing the table and
-* its tbody element.
-* 
-* @param { string } targetFlight - The `targetFlight` input parameter specifies the
-* ID of the table to be retrieved.
-* 
-* @returns { array } The output of the `getTargetTableAndTbody` function is an array
-* containing two elements:
-* 
-* 1/ The `targetTable` element (an HTML table element with an id containing the value
-* of `targetFlight`).
-* 2/ The `targetTbody` element (a tbody element within the target table).
-* 
-* The function takes a `targetFlight` parameter and returns these two elements if
-* they exist and are found within the DOM.
-*/
+ * @description This function retrieves the `tbody` element of a table with an ID
+ * containing a specified flight number and returns an array containing the table and
+ * its tbody element.
+ *
+ * @param { string } targetFlight - The `targetFlight` input parameter specifies the
+ * ID of the table to be retrieved.
+ *
+ * @returns { array } The output of the `getTargetTableAndTbody` function is an array
+ * containing two elements:
+ *
+ * 1/ The `targetTable` element (an HTML table element with an id containing the value
+ * of `targetFlight`).
+ * 2/ The `targetTbody` element (a tbody element within the target table).
+ *
+ * The function takes a `targetFlight` parameter and returns these two elements if
+ * they exist and are found within the DOM.
+ */
 function getTargetTableAndTbody(targetFlight) {
     const targetTable = document.getElementById(`flight-${targetFlight}`);
     if (!targetTable) {
@@ -330,26 +444,26 @@ function getTargetTableAndTbody(targetFlight) {
 }
 
 /**
-* @description This function allows a user to switch a player's flight by clicking
-* on their row and increasing or decreasing their flight number.
-* 
-* @param { any } event - The `event` input parameter is not used within the functionality
-* of the `switchPlayerFlight` function. It is passed to the function as an undefined
-* value and then ignored.
-* 
-* @param { integer } delta - The `delta` input parameter specifies the difference
-* between the current flight number and the new flight number that the row should
-* be moved to.
-* 
-* @returns {  } Based on the code provided:
-* 
-* The `switchPlayerFlight` function takes two parameters: `event` and `delta`. It
-* retrieves the currently selected table row using `event.target.closest("tr")` and
-* calculates the new flight number by adding or subtracting the given delta to the
-* current flight number. Then it updates the DOM elements related to the target
-* flight and modifies the button visibility based on whether the table is a top or
-* bottom flight table. Finally ,it returns undefined .
-*/
+ * @description This function allows a user to switch a player's flight by clicking
+ * on their row and increasing or decreasing their flight number.
+ *
+ * @param { any } event - The `event` input parameter is not used within the functionality
+ * of the `switchPlayerFlight` function. It is passed to the function as an undefined
+ * value and then ignored.
+ *
+ * @param { integer } delta - The `delta` input parameter specifies the difference
+ * between the current flight number and the new flight number that the row should
+ * be moved to.
+ *
+ * @returns {  } Based on the code provided:
+ *
+ * The `switchPlayerFlight` function takes two parameters: `event` and `delta`. It
+ * retrieves the currently selected table row using `event.target.closest("tr")` and
+ * calculates the new flight number by adding or subtracting the given delta to the
+ * current flight number. Then it updates the DOM elements related to the target
+ * flight and modifies the button visibility based on whether the table is a top or
+ * bottom flight table. Finally ,it returns undefined .
+ */
 function switchPlayerFlight(event, delta) {
     const targetRow = event.target.closest("tr");
     if (!targetRow) {
@@ -365,7 +479,7 @@ function switchPlayerFlight(event, delta) {
 
     const flightID = parseInt(targetTable.getAttribute("flight"));
     const playerID = parseInt(targetRow.getAttribute("playerID"));
-    updateDelta(new Diff("change_flight", {'player': playerID}, {'new_flight': flightID}));
+    updateDelta(new Diff("change_flight", { player: playerID }, { new_flight: flightID }));
 
     // Insert the targetRow into the target tbody as the 3rd row
     if (targetTbody.rows.length >= 2 && delta > 0) {

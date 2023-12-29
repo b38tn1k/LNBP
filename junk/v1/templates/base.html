@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>League Ninja - {{ title }}</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}" />
+        <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+        
+        
+        {% if '/edit' in request.url and ('/courts/' in request.url or '/flights/' in request.url) %}
+        <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+        {% endif %}
+
+        {% if '/social_schedule' in request.url %}
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.min.css">
+        {% endif %}
+        
+        <link rel="stylesheet" href="{{ url_for('static', filename='calendar.css') }}" />
+        <link rel="stylesheet" href="{{ url_for('static', filename='top-bar.css') }}" />
+        <link rel="stylesheet" href="{{ url_for('static', filename='layout.css') }}" />
+        <link rel="stylesheet" href="{{ url_for('static', filename='three-way-switch.css') }}" />
+        <link rel="stylesheet" href="{{ url_for('static', filename='flight-setup.css') }}" />
+        <link rel="stylesheet" href="{{ url_for('static', filename='crown_radio.css') }}" />
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+        <link rel="stylesheet" href="{{ url_for('static', filename='tests.css') }}" />
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" />
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+        <script src="{{ url_for('static', filename='js/vibe-bg-sketch.js') }}"></script>
+    </head>
+    <body>
+        <div class="top-bar">
+            <a href="{{ url_for('main.index') }}"
+                ><img src="{{ url_for('static', filename='images/logo_basic.png') }}" alt="Home"
+            /></a>
+            {% if current_user.is_authenticated %}
+            <div class="top-nav">
+                <a href="{{ url_for('players.players') }}">Players</a>
+
+                <div class="top-nav-dropdown">
+                    <a href="{{ url_for('leagues.leagues') }}">Leagues</a>
+                    <div class="dropdown-content">
+                        {% for league in current_user.club.leagues %}
+                        <a class="dropdown-item" href="{{ url_for('leagues.edit_league', league_id=league.id) }}">
+                            {{ league.league_name }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="top-nav-dropdown">
+                    <a href="{{ url_for('courts.courts') }}">Courts</a>
+                    <div class="dropdown-content">
+                        {% for court in current_user.club.courts %}
+                        <a class="dropdown-item" href="{{ url_for('courts.edit_court', court_id=court.id) }}">
+                            {{ court.court_name }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="top-nav top-nav-dropdown right_hand_top_nav">
+                <a href="{{ url_for('main.profile') }}">{{ current_user.username }}</a>
+                <div class="dropdown-content">
+                    <!-- <a href="{{ url_for('club.club', clubname = current_user.club.name) }}">{{ current_user.club.name }}</a> -->
+                    <a href="{{ url_for('main.logout') }}">Logout</a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="content">
+            <main>{% block content %} {% endblock %}</main>
+        </div>
+        <footer>
+            <p>&copy; 2023 League Ninja. All rights reserved.</p>
+        </footer>
+    </body>
+</html>

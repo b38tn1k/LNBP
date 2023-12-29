@@ -1,0 +1,309 @@
+.button-glow-waiting {
+  animation: glowAnimationGreen 1.0s infinite alternate;
+  -webkit-animation: glowAnimationGreen 1.0s infinite alternate;  /* Safari and older Chrome */
+  transition: box-shadow 1.0s ease-in-out;
+  -webkit-transition: box-shadow 1.0s ease-in-out;  /* Safari and older Chrome */
+}
+
+@keyframes glowAnimationGreen {
+  from {
+      box-shadow: 0 0 0px #00ff00, 0 0 0px #00ff00, 0 0 0px #33ff66, 0 0 0px #66ff99;
+  }
+  to {
+    box-shadow: 0 0 5px #00aaff, 0 0 10px #00ffff, 0 0 12px #33ffff, 0 0 20px #66ff99;
+  }
+}
+
+/* Safari and older Chrome */
+@-webkit-keyframes glowAnimationGreen {
+  from {
+    box-shadow: 0 0 0px #00ff00, 0 0 0px #00ff00, 0 0 0px #33ff66, 0 0 0px #66ff99;
+  }
+  to {
+      box-shadow: 0 0 5px #00aaff, 0 0 10px #00ffff, 0 0 12px #33ffff, 0 0 20px #66ff99;
+  }
+}
+
+
+
+.form-block {
+    background-color: #f2f2f2;
+    border: 1px solid black;
+    padding: 10px;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 20px;
+    text-align: left;
+    flex: 1 0 50%; 
+    min-width: 350px;
+    max-width: 500px;
+    margin: 15px; 
+    /* max-height: 600px;
+    overflow: auto; */
+}
+
+.table-container {
+  align-items: center;
+  overflow: scroll;
+  width: 100%;
+}
+
+.draggable-pool {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Adjust the "100px" to the minimum size you want for your items */
+  grid-gap: 50px; /* Adjust the grid gap as needed */
+  grid-row-gap: 0px;
+  justify-items: center; /* Center the items on the x-axis */
+  align-items: start; /* Align the items to the start on the y-axis */
+  width:95%;
+}
+
+.draggable-source{
+  margin-left: 0;
+  margin-right: 0;
+}
+.draggable-origin{
+  border: 1px solid #ccc;
+  margin: 10px;
+}
+
+.draggable-item {
+  min-width: 80px;
+  width: 110px;
+  height: 25px;
+  color: black;
+  border: solid 1px black;
+  border-radius: 5px;
+  margin: 5px;
+  cursor: move;
+  font-size: 12px;
+  white-space: nowrap;
+  /* Flexbox settings */
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  padding: 0 10px; /* Add some padding on left and right */
+}
+
+.heading-with-button {
+  display: flex;        /* Use flexbox for the layout */
+  justify-content: space-between; /* Distribute child elements to the far left and right */
+  align-items: center;  /* Vertically align the child elements in the center */
+  width: 100%;          /* Take up the full width of the parent container */
+}
+
+/* Ensure the button doesn't grow larger than its content */
+.heading-with-button button {
+  flex-shrink: 0;
+}
+
+
+button.basic-button {
+  margin: 10px;
+}
+
+button.fat-button {
+  width: 100%;
+  margin: 10px;
+  margin-left: 0px;
+}
+
+table.grid-table {
+  width: 100%;
+}
+
+table.grid-table td,
+table.grid-table th {
+  border: 1px solid black;
+  width: 5em;
+  height: 5em;
+  text-align: center;
+  font-size: 6px;
+  cursor: default;
+}
+
+table.grid-table th:first-child,
+table.grid-table td:first-child {
+  font-weight: bold;
+}
+
+table.tiny-table {
+  font-size: 10px; /* You can adjust this as needed */
+  border-collapse: collapse;
+  border: none;
+  text-align: center;
+  margin: 0;
+  /* margin-bottom: 5px; */
+  width: 100%;
+  /* table-layout: fixed; */
+}
+
+.tiny-table td,
+.tiny-table th{
+  min-height:1em;
+  padding: 0.5em;         /* Adjusts the padding */
+  text-align: center;   /* Adjusts the text alignment */
+  vertical-align: middle;
+}
+
+
+.player-count{
+  width:100%;
+  /* margin: 10px; */
+  /* font-size: 12px; */
+}
+
+.player-captained{
+  width:100%;
+  /* margin: 10px; */
+  /* font-size: 12px; */
+}
+
+.form-block-skinny{
+  flex: 1; 
+  max-width: 1vw;
+}
+
+.form-block-big {
+  display: flex;
+  flex-direction: column;
+  flex: 1; 
+  min-width: 700px;
+  max-width: 100vw;
+  flex: 3 0 60%;
+  margin: 15px;  
+  overflow: auto;
+  align-items: left;
+}
+
+ #os-schedule-table {
+  border: 1px solid #ccc;
+  border-collapse: collapse;
+  flex-grow: 1; 
+  width: 100%;
+}
+
+#os-schedule-table th,
+#os-schedule-table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+  overflow: scroll;
+}
+
+#os-schedule-table td:first-child {
+  font-weight: bold;
+}
+
+.league-generated-tables {
+  border: 1px solid #ccc;
+  font-size: 6px;
+  /* border-collapse: collapse; */
+  /* flex-grow: 1; 
+  width: 100%; */
+}
+
+.league-generated-tables th,
+.league-generated-tables td {
+  border: 1px solid #ccc;
+  /* padding: 8px;
+  text-align: left; */
+  /* overflow: scroll; */
+}
+
+.league-generated-tables td:first-child {
+  font-weight: bold;
+}
+
+
+table.draggableScheduleTool {
+  border: 1px solid #ccc;
+  border-collapse: collapse;
+  flex-grow: 1; 
+  max-width: 100%;
+  /* min-height: 50vh; */
+}
+
+.draggableScheduleTool th {
+  border: 1px solid #ccc;
+  word-wrap: break-word;
+  padding-left: 5px;
+}
+
+table.draggableScheduleTool td:first-child {
+  font-weight: bold;
+}
+
+.draggableScheduleTool td {
+  border: 1px solid #ccc;
+}
+
+.greyed-out {
+  background-color: #666;
+}
+
+.form-block-long-content {
+  max-height: 300px;
+  overflow: auto;
+}
+
+
+.form-block-align-top {
+  /* padding-top: 0px; */
+  margin-top: 0px; 
+}
+
+@media (max-width: 1500px) {
+  .form-block-align-top {
+    margin: 15px; 
+  }
+}
+
+.form-block-buttons {
+    display: flex;
+    justify-content: space-between;
+}
+
+table.basic-table {
+  width: 100%;
+  max-width: 100%;
+}
+
+.basic-table th {
+  /* width: 100%; */
+}
+
+.basic-table th,
+.basic-table td {
+  border-bottom: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+}
+
+.basic-table th:last-child,
+.basic-table td:last-child{
+  text-align: right;
+}
+
+.basic-table .no-text-alignment th:last-child,
+.basic-table .no-text-alignment td:last-child {
+    text-align: left; /* or any other text alignment you prefer for these tables */
+}
+
+.basic-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.multiform-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  min-width: 400px;
+}
+
+#p5JsBG {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -1;
+}

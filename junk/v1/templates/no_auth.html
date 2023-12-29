@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="multiform-container">
+    <div class="form-block">
+        <p>
+            <h1>{{ club.name }}</h1>
+            You are unable to access these settings. 
+            <br>To gain access, reach out to:
+            <ul>
+            {% for user in club.users %}
+            {% if user.club_authenticated == 1 %}
+                <li>{{ user.username }}</li>
+            {% endif %}
+            {% endfor %}
+        </ul>
+        </p>
+    </div>
+</div>
+
+{% endblock %}

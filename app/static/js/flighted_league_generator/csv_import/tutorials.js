@@ -927,8 +927,8 @@ function createFlightPlayerRow(p, flightNumber, maxFlightNumber) {
     const playerName = document.createElement("td");
     playerName.classList.add("fw-bold");
     playerName.innerHTML = p.names;
-    playerName.style.width = "200px";
-    playerName.style.minWidth = "200px";
+    // playerName.style.width = "150px";
+    // playerName.style.minWidth = "150";
     playerRow.append(playerName);
     p.availability.forEach(function (a) {
         const availability = document.createElement("td");
