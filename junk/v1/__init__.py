@@ -27,6 +27,20 @@ login = LoginManager()
 login.login_view = 'main.login'
 
 def create_app(config_class=Config):
+    """
+    This function creates a Flask application instance and registers several
+    blueprints for different routes and features of the application.
+
+    Args:
+        config_class (): The `config_class` parameter is used to specify a custom
+            config class for the Flask application. It allows the user to define
+            a different config class other than the default `FlaskConfig`.
+
+    Returns:
+        : The output returned by this function is a Flask application object named
+        `app`.
+
+    """
     app = Flask(__name__)
     app.config.from_object(Config)
     db.init_app(app)
