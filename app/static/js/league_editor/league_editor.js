@@ -286,6 +286,31 @@ document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".reveal-after").forEach((div) => (div.style.display = "block"));
 });
 
+/**
+* @description This function decrements a counter called `pushTSCounter` and updates
+* the value of an HTML attribute called `starttime` based on the previous value of
+* `pushTSCounter`.
+* 
+* @returns {  } Based on the code provided:
+* 
+* The `pushTimeSlot()` function:
+* 
+* 1/ Decrements the `pushTSCounter` variable by 1.
+* 2/ Queryes all elements with the class name `.schedule-table` (presumably a table
+* containing schedules).
+* 3/ Selects the first (`0`) element of the array using `querySelector()` and retrieves
+* the `<thead>` element within it.
+* 4/ Selects the `<tr>` element within the `<thead>`, and then selects all the `<th>`
+* elements within that row using `querySelectorAll()`.
+* 5/ Retrieves the text content of the last `<th>` element (based on the `starttime`
+* attribute).
+* 6/ Updates a Diff object with the "push_time_slot" key and the values `pushTSCounter`,
+* `starttime`.
+* 
+* The output of this function would be the text content of the last `<th>` element
+* within the first table (in the .schedule-table class), after subtracting 1 from
+* the pushTSCounter variable.
+*/
 function pushTimeSlot() {
     pushTSCounter -= 1;
     schedules = document.querySelectorAll(".schedule-table");
@@ -297,6 +322,12 @@ function pushTimeSlot() {
 }
 
 // Define the function for the "popTimeSlot" event handler
+/**
+* @description This function does nothing because it is undefined.
+* 
+* @returns { any } The function `popTimeSlot()` will log the message "Pop Time Slot
+* button clicked!" to the console.
+*/
 function popTimeSlot() {
     // Add your logic for popping a timeslot here
     console.log("Pop Time Slot button clicked!");
