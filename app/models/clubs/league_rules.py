@@ -14,7 +14,7 @@ class LeagueRules(Model):
     max_concurrent_games = db.Column(db.Integer, default=2)
     max_games_week = db.Column(db.Integer, default=1)
     min_captained = db.Column(db.Integer, default=1)
-    max_captained = db.Column(db.Integer, default=-1)
+    max_captained = db.Column(db.Integer, default=3)
     max_week_gap = db.Column(db.Integer, default=2)
     players_per_match = db.Column(db.Integer, default=4)
     minimum_subs_per_game = db.Column(db.Float, default=0.7)

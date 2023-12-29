@@ -458,5 +458,96 @@ def build_league_from_json(my_club, data):
                 my_league.add_player_availability(player, ts, player_availability, add=True, commit=False, force=True)
     return my_league
     
+def facility_to_league(league, d):
+    # {'event': 'facility_in_league', 'ids': 1, 'values': False}
+    if d['values'] is True:
+        f = league.club.get_facility_by_id(d['ids'])
+        league.add_facility(f)
+    else:
+        league.remove_facility_by_id(d['ids'])
 
-    
+def update_game_duration(league, d):
+    new_duration_minutes = d['values']
+    for ts in league.timeslots:
+        new_end_time = ts.start_time + timedelta(minutes=new_duration_minutes)
+        ts.end_time = new_end_time
+
+def update_timeslot(league, d):
+    # {'event': 'timeslot', 'ids': 1, 'values': '2023-10-03T18:30:00.000'}
+    ts = league.get_timeslot_by_id(d['ids'])
+    new_start_time = datetime.strptime(d['values'], '%Y-%m-%dT%H:%M:%S.%f')
+    game_duration = league.get_game_duration()
+    new_end_time = new_start_time + timedelta(minutes=game_duration)
+    ts.start_time = new_start_time
+    ts.end_time = new_end_time
+
+def update_flight_name(league, d):
+    f = league.get_flight_by_id(d['ids'])
+    f.name = d['values']
+
+def add_player_to_league(league, d):
+    flight = league.get_flight_by_id(d['ids']['flight'])
+    player = league.club.get_player_by_id(d['ids']['player'])
+    print(player, type(player))
+    if player is not None:
+        flight.add_player(player)
+        league.add_player(player)
+        for i in range(len(league.timeslots)):
+                player_availability = 1
+                ts = league.timeslots[i]
+                league.add_player_availability(player, ts, player_availability, add=True, commit=False, force=True)
+
+def update_league_rules(league, d):
+    rules = d['values']
+    league.rules.min_games_total = rules["min_games_total"]
+    league.rules.max_games_total = rules["max_games_total"]
+    league.rules.players_per_match = rules["players_per_match"]
+    league.rules.max_games_week = rules["max_games_week"]
+    league.rules.min_games_day = rules["min_games_day"]
+    league.rules.max_games_day = rules["max_games_day"]
+    league.rules.max_week_gap = rules["max_week_gap"]
+    league.rules.max_double_headers = rules["max_double_headers"]
+    league.rules.min_captained = rules["min_captained"]
+    league.rules.max_captained = rules["max_captained"]
+    league.rules.minimum_subs_per_game = rules["minimum_subs_per_game"]
+    league.rules.assume_busy = rules["assume_busy"] == 'assume_busy'
+
+def remove_player(league, d):
+    player = league.club.get_player_by_id(d['ids']['player'])
+    league.remove_player(player)
+
+def change_flight(league, d):
+    player = league.club.get_player_by_id(d['ids']['player'])
+    flight = league.get_flight_by_id(d['values']['new_flight'])
+    for f in league.flights:
+        league.remove_player_from_flight(player, f)
+    flight.add_player(player)
+
+def apply_edits(league, updates):
+    # priority
+    for d in updates:
+        match d['event']:
+            case 'add_player_to_league':
+                add_player_to_league(league, d)
+    # others
+    for d in updates:
+        print(d)
+        match d['event']:
+            case 'facility_in_league':
+                facility_to_league(league, d)
+            case 'name':
+                league.name = d['values']
+            case 'duration':
+                update_game_duration(league, d)
+            case 'timeslot':
+                update_timeslot(league, d)
+            case 'flight_name':
+                update_flight_name(league, d)
+            case 'rule_update':
+                update_league_rules(league, d)
+            case 'remove_player_from_league':
+                remove_player(league, d)
+            case 'change_flight':
+                change_flight(league, d)
+            case 'availability':
+                pass

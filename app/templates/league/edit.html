@@ -1,13 +1,11 @@
 {% extends "tabler/dashboard_base.html" %} {% block title %}Edit {{ league.name }}{% endblock %} {% block js %} {%
 assets "tabler_plugins_css" %}
-<link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}" />
+<!-- <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}" /> -->
 {% endassets %} {% assets "tabler_plugins_js" %}
-<script type="text/javascript" src="{{ ASSET_URL }}"></script>
+<!-- <script type="text/javascript" src="{{ ASSET_URL }}"></script> -->
 {% endassets %} {% endblock %} {% block body %}
 
-<form id="hidden-form" style="display: none">
-    {{ simple_form.hidden_tag() }}
-</form>
+<form id="hidden-form" style="display: none">{{ simple_form.hidden_tag() }}</form>
 
 <div class="my-3 my-md-5">
     <div class="container">
@@ -15,12 +13,19 @@ assets "tabler_plugins_css" %}
             <div class="page-header">
                 <h1 class="page-title">Edit {{ league.name }}</h1>
             </div>
-            <button id="save-button" class="btn btn-lg" title="Save" aria-label="Save"><i class="fe fe-save" style="font-size: 1.5em;"></i></button>
+            <button type="button" id="save-button" class="btn btn-lg" title="Save" aria-label="Save">
+                <i class="fe fe-save" style="font-size: 1.5em"></i>
+            </button>
         </div>
         <div class="row row-cards">
-            {% include 'league/edit_info.html' %} {% include 'league/edit_facilities.html' %} {% include
-            'league/edit_add_player.html' %} {% include 'league/edit_league_rules.html' %}
+            {% include 'league/edit_info.html' %} {% include 'league/edit_facilities.html' %}
+            <div class="col col-cards" style="flex: 1">
+                <div class="col-12">
+                    {% include'league/edit_add_player.html' %} {% include'league/edit_add_remove_last_timeslot.html' %}
+                </div>
+            </div>
         </div>
+        <div class="row row-cards">{% include 'league/edit_league_rules.html' %}</div>
         {% include 'league/edit_schedule.html' %}
     </div>
 </div>

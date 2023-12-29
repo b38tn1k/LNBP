@@ -21,7 +21,7 @@
                     <tr>
                         <td facility="{{facility.id}}">
                             <div class="form-check mb-3 ">
-                                {% if facility in league.facilities%}
+                                {% if league.facility_in_league(facility) %}
                                 <input checked type="checkbox" class="form-check-input-lg facility-checker" facility="{{facility.id}}" id="facility-{{ facility.id }}" >
                                 {% else %}
                                 <input type="checkbox" class="form-check-input-lg facility-checker" facility="{{facility.id}}" id="facility-{{ facility.id }}" >

@@ -77,7 +77,6 @@ class Club(Model):
         facility_admin = ModelProxy.clubs.FacilityAdministrator(
             user=user, facility=facility
         )
-        print(user.club.facilities)
         return facility
 
     @transaction
@@ -110,6 +109,9 @@ class Club(Model):
             print('commit')
 
         return new_league
+    
+    def get_facility_by_id(self, id):
+        return next((f for f in self.facilities if f.id == id), None)
 
     def get_league_by_id(self, league_id):
         """
@@ -188,6 +190,12 @@ class Club(Model):
         if commit is True:
             db.session.commit()
         return player
+    
+    def get_player_by_id(self, id):
+        for p in self.players:
+            if p.id == id:
+                return p
+        return None
 
     
     def add_todo(self, task, add=True, commit=False):

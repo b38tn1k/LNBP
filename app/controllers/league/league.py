@@ -16,6 +16,7 @@ from app.models.clubs import Club, Facility
 from app.services.league_services import (
     league_wizard_csv_to_dicts,
     build_league_from_json,
+    apply_edits,
 )
 import json
 
@@ -64,8 +65,8 @@ def edit_league(id):
         return redirect(url_for("main.home"))
     if request.method == "POST":
         try:
-            data = request.json
-            print(data)
+            apply_edits(league, json.loads(request.json))
+            db.session.commit()
             flash('League updated successfully.', 'success')
             return jsonify({"status": "success"})
         except Exception as e:

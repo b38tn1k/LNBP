@@ -11,12 +11,12 @@
             <div class="col col-login mx-auto">
                 <div class="text-center mb-6">
                     {{ render_flashes() }}
-                    <img src="{{ url_for('static', filename='public/leagueninja/leagueninja-logo@2x.png') }}" class="h-6" alt="Tabler">
+                    <img src="{{ url_for('static', filename='public/leagueninja/leagueninja-vertical.svg') }}" alt="League Ninja">
                 </div>
                 <form role="form" class="card" action="{{ url_for('auth.login') }}" method="post">
 
                     <div class="card-body p-6">
-                        <div class="card-title">Login to your account</div>
+                        <!-- <div class="card-title">Login to your account</div> -->
                         {{ form.hidden_tag() }}
                         {{ render_field(form.email, placeholder='test@example.com') }}
                         {{ render_field(form.password, placeholder='Password') }}

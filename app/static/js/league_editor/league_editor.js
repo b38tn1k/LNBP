@@ -253,21 +253,82 @@ document.addEventListener("DOMContentLoaded", function () {
         const playerID = parseInt(playerSelector.value);
         const playerName = playerSelector.options[playerSelector.selectedIndex].textContent;
         const flightID = parseInt(document.getElementById("add_player_flight_select").value);
-        console.log(playerID, playerName, flightID);
         if (playerID != -1 && flightID != -1) {
             updateDelta(new Diff("add_player_to_league", { player: playerID, flight: flightID }, 0));
+            addNewPlayerToFlight(playerName, playerID, flightID);
         }
-        addNewPlayerToFlight(playerName, playerID, flightID);
     });
 
     document
         .querySelectorAll(".schedule-table")
         .forEach((table) => table.addEventListener("click", handleFlightTableClick));
 
+    const leagueRules = document.querySelectorAll(".league-rules");
+    leagueRules.forEach((rule) => {
+        rule.addEventListener("change", (event) => {
+            leagueRulesChangeCallback(event, leagueRules);
+        });
+    });
+
     document.getElementById("save-button").addEventListener("click", saveButtonCallback);
 
     document.querySelectorAll(".reveal-after").forEach((div) => (div.style.display = "block"));
 });
+
+function alignRules(min, max) {
+    if (parseInt(min.value) > parseInt(max.value)) {
+        max.value = parseInt(min.value);
+    }
+}
+
+function leagueRulesChangeCallback(event, allRules) {
+    newRules = {};
+    let minGT, maxGT, minGD, maxGD, minC, maxC;
+    for (let rule of allRules) {
+        switch (rule.name) {
+            case "min_games_total":
+                minGT = rule;
+                break;
+            case "max_games_total":
+                maxGT = rule;
+                break;
+            case "min_games_day":
+                minGD = rule;
+                break;
+            case "max_games_day":
+                maxGD = rule;
+                break;
+            case "min_captained":
+                minC = rule;
+                break;
+            case "max_captained":
+                maxC = rule;
+                break;
+        }
+    }
+
+    alignRules(minGT, maxGT);
+    alignRules(minGD, maxGD);
+    alignRules(minC, maxC);
+
+    for (let rule of allRules) {
+        value = rule.value;
+        if (rule.name != "assume_busy") {
+            if (rule.name == "minimum_subs_per_game") {
+                value = parseFloat(value);
+            } else {
+                value = parseInt(value);
+            }
+            
+            if (value < 0) {
+                rule.value = 0;
+                value = 0;
+            }
+        }
+        newRules[rule.name] = value;
+    }
+    updateDelta(new Diff("rule_update", 0, newRules));
+}
 
 function saveButtonCallback(event) {
     const saveString = JSON.stringify(delta);
