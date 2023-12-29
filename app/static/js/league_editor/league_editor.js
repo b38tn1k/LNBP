@@ -275,12 +275,46 @@ document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".reveal-after").forEach((div) => (div.style.display = "block"));
 });
 
+/**
+* @description The provided JavaScript function `alignRules` takes two input elements
+* with `value` properties (`min` and `max`), and updates the `value` property of the
+* `max` element to be equal to the value of the `min` element if the former is greater
+* than the latter.
+* 
+* @param { object } min - The `min` input parameter specifies the smaller value of
+* the two arrays being compared.
+* 
+* @param { object } max - The `max` input parameter is passed by reference and updated
+* within the function to be set equal to the value of `min` if `min` is greater than
+* `max`.
+* 
+* @returns { any } The function `alignRules` takes two parameters `min` and `max`,
+* both of which are `HTMLInputElement` objects representing input fields.
+*/
 function alignRules(min, max) {
     if (parseInt(min.value) > parseInt(max.value)) {
         max.value = parseInt(min.value);
     }
 }
 
+/**
+* @description This function takes an array of league rules and updates the values
+* for each rule. It aligns the minimum and maximum values for certain rules (games
+* total/day), and converts values to appropriate data types (integer/float).
+* 
+* @param { object } event - The `event` input parameter is not used or referenced
+* within the provided code snippet.
+* 
+* @param { object } allRules - The `allRules` input parameter is an array of all the
+* league rules that are being updated.
+* 
+* @returns { object } Based on the code provided:
+* 
+* The `leagueRulesChangeCallback` function takes two parameters: `event` and `allRules`.
+* It updates the `minGT`, `maxGT`, `minGD`, `maxGD`, `minC`, and `maxC` variables
+* with the values from the `allRules` array. It then aligns the rules using the
+* `alignRules` function.
+*/
 function leagueRulesChangeCallback(event, allRules) {
     newRules = {};
     let minGT, maxGT, minGD, maxGD, minC, maxC;
@@ -330,11 +364,33 @@ function leagueRulesChangeCallback(event, allRules) {
     updateDelta(new Diff("rule_update", 0, newRules));
 }
 
+/**
+* @description This function saves the data represented by the `delta` variable to
+* the server via a web request.
+* 
+* @param { object } event - The `event` parameter is not used anywhere inside the
+* `saveButtonCallback` function. It is passed as an argument to the function but is
+* not referred to or utilized within the code.
+* 
+* @returns {  } This function takes an `event` parameter and returns nothing (i.e.,
+* it does not return a value).
+*/
 function saveButtonCallback(event) {
     const saveString = JSON.stringify(delta);
     sendToServer(saveString);
 }
 
+/**
+* @description This function sends a POST request to the current URL with the given
+* data and handles the response from the server.
+* 
+* @param { object } data - The `data` input parameter is passed to the fetch API as
+* the body of the request.
+* 
+* @returns { Promise } This function takes a `data` parameter and sends it to the
+* server using fetch API. It then handles the response from the server and logs
+* messages to the console.
+*/
 function sendToServer(data) {
     const currentUrl = window.location.href;
     const csrf_token = document.querySelector('#hidden-form input[name="csrf_token"]').value;
@@ -364,6 +420,25 @@ function sendToServer(data) {
         .catch((error) => console.log("Fetch error: ", error));
 }
 
+/**
+* @description This function adds a new player to a flight table by cloning an
+* existing row and modifying its content with the given player name and ID.
+* 
+* @param { string } playerName - The `playerName` input parameter specifies the name
+* of the player to be added to the flight.
+* 
+* @param { string } playerID - The `playerID` input parameter is used to set the
+* `playerID` attribute for each new row added to the flight table.
+* 
+* @param { number } flightID - The `flightID` input parameter identifies which flight
+* the new player should be added to.
+* 
+* @returns { object } The `addNewPlayerToFlight` function takes three arguments:
+* `playerName`, `playerID`, and `flightID`. It first finds the target table with the
+* given flight ID and clones the first row of its tbody element. It then modifies
+* the content of the cloned row by setting the player name and player ID attributes.
+* Next it updates the availability cells and macro buttons on the row using event listeners.
+*/
 function addNewPlayerToFlight(playerName, playerID, flightID) {
     // Find flight table
     const flightTables = document.querySelectorAll(".flight-sub-table");
