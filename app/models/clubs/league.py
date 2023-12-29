@@ -137,6 +137,21 @@ class League(Model):
         return ts.get_duration()
     
     def get_player_availability_object(self, player, timeslot):
+        """
+        This function retrieves the availability of a player for a specific timeslot
+        by checking the player's associations and returning the earliest available
+        timeslot or None if no record is found.
+
+        Args:
+            player (): The `player` input parameter is used to specify the player
+                whose availability is being checked.
+            timeslot (): The `timeslot` input parameter specifies the timeslot for
+                which the player's availability is being checked.
+
+        Returns:
+            None: The output returned by this function is `None`.
+
+        """
         player_association = next(
             (
                 assoc
@@ -163,6 +178,24 @@ class League(Model):
 
 
     def get_player_availability(self, player, timeslot):
+        """
+        This function `get_player_availability` takes a `player` and a `timeslot`
+        as input and returns the availability of the player during that timeslot.
+
+        Args:
+            player (): The `player` input parameter is passed as an argument to
+                the `get_player_availability_object()` method inside this function.
+            timeslot (dict): The `timeslot` input parameter specifies for which
+                time slot the player availability should be checked.
+
+        Returns:
+            int: Based on the code provided:
+            
+            The output returned by the `get_player_availability` function is a
+            single integer value representing the availability of the player for
+            the given timeslot.
+
+        """
         player_availability = self.get_player_availability_object(player, timeslot)
         if player_availability:
             return player_availability.availability
