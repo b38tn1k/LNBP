@@ -25,6 +25,26 @@ from .player import *
 class ScheduleFitTool:
     @log_timer
     def __init__(self, flight, template, gameslots):
+        """
+        This function appears to be a recipe or algorithm for generating a schedule
+        of games for a set of players within a certain flight (or group) of players.
+        It takes three arguments: `flight`, `template`, and `gameslots`, and it
+        populates various attributes of the instance including `players`, `rules`,
+        `gameslots`, and others.
+
+        Args:
+            flight (): The `flight` parameter passed into the `__init__` function
+                of the `FlightScheduler` class contains information about a
+                particular flight and is used to set various attributes within the
+                scheduler object itself (e.g., `flight_id`, `rules`, `players`, etc.).
+            template (dict): The `template` input parameter is a dictionary of
+                default values for game attributes (such as court name and time
+                slot) that are used to initialize the `Gameslot` objects when the
+                `runCA` method is called.
+            gameslots (list): The `gameslots` input parameter is a list of gameslots
+                (time slots for matches) that are available for scheduling.
+
+        """
         self.flight_obj = flight
         self.flight_id = flight.id
         self.rules = tempRules
@@ -65,6 +85,16 @@ class ScheduleFitTool:
         
     @log_timer
     def runSF(self, toggle=True):
+        """
+        This function iterates over two lists of actions (`self.run_sequence` and
+        `self.run_sequence2`) and performs the actions each iteration.
+
+        Args:
+            toggle (bool): The `toggle` input parameter is used to determine which
+                sequence of actions (either `self.run_sequence` or `self.run_sequence2`)
+                to run.
+
+        """
         if toggle:
             for a in self.run_sequence:
                 a()
@@ -80,6 +110,14 @@ class ScheduleFitTool:
                 self.recalculate_players()
 
     def check_escape_conditions(self):
+        """
+        This function checks if a list of players satisfy certain conditions related
+        to their game schedules.
+
+        Returns:
+            bool: The output returned by this function is `True`.
+
+        """
         for player in self.players:
             # players have min games
             if player.satisfied == False:
@@ -117,6 +155,15 @@ class ScheduleFitTool:
         return True
 
     def check_all_conditions(self):
+        """
+        This function checks if all conditions of a player are satisfied (i.e.,
+        they have not played too many games on a single day or week), and returns
+        True if all conditions are met and False otherwise.
+
+        Returns:
+            bool: The output returned by this function is `True`.
+
+        """
         for player in self.players:
             if player.satisfied == False:
                 return False
@@ -157,12 +204,43 @@ class ScheduleFitTool:
 
     @log_timer
     def runCA(self):
+        """
+        This function generates and schedules games for a set of players according
+        to a set of rules and constraints. It uses a priority queue to select the
+        most suitable games based on player availability and other game preferences.
+
+        """
         def init_histories(players):
+            """
+            This function initializes the "other_player_history" dictionary for
+            each player with the ID of the other players as keys and a value of 0.
+
+            Args:
+                players (list): The `players` input parameter is a list of players
+                    that the function will loop over.
+
+            """
             for player in players:
                 for p in players:
                         player.other_player_history[p.id] = 0
 
         def get_histories(potential_game):
+            """
+            The function `get_histories` takes a list of players as an argument
+            and returns the total history (a sum) of each player's interactions
+            with all other players on the field.
+
+            Args:
+                potential_game (list): The `potential_game` input parameter is a
+                    list of players and it is used to loop through each player's
+                    history and calculate the total history for that player.
+
+            Returns:
+                int: The function `get_histories` takes a list of players
+                `potential_game` as input and returns the sum of the history values
+                of all possible pairs of players within the list.
+
+            """
             sum_history = 0
             for player in potential_game:
                 for p in potential_game:
@@ -170,6 +248,19 @@ class ScheduleFitTool:
             return sum_history
         
         def get_play_count(potential_game):
+            """
+            This function calculates the total number of plays that all players
+            have made across all games of a "potential game".
+
+            Args:
+                potential_game (list): The `potential_game` input parameter is a
+                    list of players and it allows the function to iterate through
+                    all possible combinations of players for a given game.
+
+            Returns:
+                int: The output returned by this function is `0`.
+
+            """
             sum_history = 0
             for player in potential_game:
                 for p in potential_game:
@@ -305,6 +396,24 @@ class ScheduleFitTool:
                       gs.add_player_to_match(p)  
 
     def summarise_tests(self):
+        """
+        This function collects and returns various satisfaction-related values
+        from the object's state.
+
+        Returns:
+            dict: The output returned by the function "summarise_tests" is a
+            dictionary containing four key-value pairs:
+            
+            	- "all_players_satisfied": value determined by the "all_players_satisfied()"
+            method
+            	- "player_days_satisfied": value determined by the "player_days_satisfied()"
+            method
+            	- "player_weeks_satisfied": value determined by the "player_weeks_satisfied()"
+            method
+            	- "no_players_overscheduled": value determined by the
+            "no_players_overscheduled()" method
+
+        """
         result = {}
         result['all_players_satisfied'] = self.all_players_satisfied()
         result['player_days_satisfied'] = self.player_days_satisfied()
@@ -313,12 +422,33 @@ class ScheduleFitTool:
         return result
 
     def backup_gameslots(self):
+        """
+        The `backup_gameslots` function creates a copy of the game slots with their
+        events attached.
+
+        Returns:
+            list: The output of the `backup_gameslots` function is a list `b`
+            containing copies of all the elements of the original list `self.gameslots`,
+            with each element being a copy of the corresponding game slot with its
+            events appended.
+
+        """
         b = []
         for g in self.gameslots:
             b.append(g.copy_with_events())
         return b
 
     def quick_log_game_count(self):
+        """
+        This function quick_log_game_count takes a player object and returns a
+        string of all players' game counts concatenated together with spaces between
+        them.
+
+        Returns:
+            str: The output returned by the function `quick_log_game_count` is an
+            empty string "" (a none-string).
+
+        """
         myString = ""
         for p in self.players:
             myString += str(p.game_count) + " "
@@ -326,6 +456,11 @@ class ScheduleFitTool:
         return myString.strip()
 
     def segment_players_on_availability(self):
+        """
+        This function takes a list of players and calculates the mean availability
+        score of the list.
+
+        """
         mean_score = statistics.mean(
             [player.availability_score for player in self.players]
         )
@@ -334,6 +469,11 @@ class ScheduleFitTool:
             # print(player.availability_score_greater_than_mean)
 
     def id_bad_timeslots(self):
+        """
+        This function checks which timeslots are underutilized and marks them as
+        bad for the purpose of availability calculation.
+
+        """
         gts = {}
         for p in self.players:
             for a in p.availability:
@@ -352,6 +492,11 @@ class ScheduleFitTool:
             # self.gameslots.remove(r)
 
     def check_test(self):
+        """
+        The function "check_test" checks for availability of players for each game
+        slot and adds them to the list of games if they are available.
+
+        """
         for g in self.gameslots:
             for p in self.players:
                 if p.availability[g.timeslot_id] != UNAVAILABLE:
@@ -362,6 +507,12 @@ class ScheduleFitTool:
         self.recalculate_players()
 
     def increase_average_game_count(self):
+        """
+        This function increases the average game count of players and redistributes
+        them to fill available slots while ensuring that no player is over-matched
+        or under-matched.
+
+        """
         average = sum([player.game_count for player in self.players]) / len(self.players)
         at_risk = [player for player in self.players if player.game_count < average]
         for p in at_risk:
@@ -384,6 +535,11 @@ class ScheduleFitTool:
                     self.recalculate_players()
 
     def sort_out_same_day_players(self):
+        """
+        This function sorts out players for the same day's games based on their
+        availability and fills up available game slots with suitable players.
+
+        """
         players, days = self.get_player_days_unsatisfied()
         for p in players:
             left_overs = []
@@ -400,6 +556,16 @@ class ScheduleFitTool:
 
 
     def force_match(self):
+        """
+        This function "force_match" takes a list of unsatisfied players (i.e.,
+        those who are not yet assigned to any match), and tries to find matches
+        for them by iterating through available gameslots and matching the players
+        with the games. It updates the "filtered" dictionary with the games that
+        were matched and removes the corresponding gameslots from the availability
+        dict. If there are no more games available for a particular player
+        satisfaction of "Unsatisfied", it deletes that key from the "filtered" dictionary.
+
+        """
         self.recalculate_players()
         bad_players = [p for p in self.players if p.satisfied == False]
         avail = {}
@@ -434,6 +600,31 @@ class ScheduleFitTool:
                     self.force_match()
     
     def get_appropriate_players(self, game, desperates):
+        """
+        This function returns a list of appropriate players for a match based on
+        the following conditions:
+        1/ The number of desperation moves (i.e., players who are already known
+        to be playing) is not more than the maximum number of players allowed per
+        match.
+        2/ If there are fewer than the maximum number of players allowed per match
+        among the desperation moves list), the function returns those players.
+        3/ If there are not enough desperation moves to reach the maximum number
+        of players allowed per match and some players have already played their
+        first move (hypothetically speaking), the function adds those players to
+        the candidates list for consideration.
+
+        Args:
+            game (): The `game` input parameter is used to determine which players
+                are eligible for selection based on the game's current state.
+            desperates (list): The `desperates` input parameter is a list of players
+                who have already been chosen for the game.
+
+        Returns:
+            list: The output returned by this function is a list of up to
+            `self.rules['playersPerMatch']` players selected from the `desperates`
+            list and the `self.players` list based on the conditions mentioned.
+
+        """
         if len(desperates) >= self.rules['playersPerMatch']:
             return desperates[:self.rules['playersPerMatch']]
         candidates = []
@@ -444,12 +635,26 @@ class ScheduleFitTool:
         return candidates
 
     def clear_everything(self):
+        """
+        This function clears all the game slots and their events and full states
+        of a list of gameslots belonging to an object of an unspecified class.
+
+        """
         for g in self.gameslots:
             g.game_event = []
             g.full = False
         self.recalculate_players()
 
     def print_problems(self, res):
+        """
+        This function prints the names of the players who are facing problems
+        during game play.
+
+        Args:
+            res (dict): The `res` input parameter is a list of dictionaries
+                representing game results.
+
+        """
         i = 0
         for r in res:
             print("PROBLEM: ", i)
@@ -461,6 +666,12 @@ class ScheduleFitTool:
 
     @log_timer
     def pool_swaps(self):
+        """
+        This function is a loop that attempts to optimize the players' luck by
+        doing easy swaps until a certain condition is met or a maximum number of
+        attempts is reached.
+
+        """
         self.recalculate_players()
         backup = self.get_average_and_max_player_luck()
         if backup["max"] == 1:
@@ -482,6 +693,16 @@ class ScheduleFitTool:
 
     @log_timer
     def get_potential_swaps(self):
+        """
+        This function identifies potential swaps of players between games that
+        have overlapping players and have not yet been matched with a swap.
+
+        Returns:
+            dict: The output returned by this function is a list of tuples named
+            "potential_swaps" which contains tuples with attributes: "_og", "_op",
+            "g" and "p".
+
+        """
         res = self.get_problem_players_and_games()
         potential_swaps = []
 
@@ -526,6 +747,23 @@ class ScheduleFitTool:
 
     @log_timer
     def find_best_swaps(self, potential_swaps):
+        """
+        This function takes a list of potential swaps (dictionaries containing the
+        player making the swap and the game they are swapping into), and returns
+        a dictionary mapping player IDs to information about the best swaps for
+        each player.
+
+        Args:
+            potential_swaps (dict): The `potential_swaps` input parameter is a
+                list of dictionaries containing information about potential swaps
+                (player ID from old game to player ID of new game) and their
+                corresponding deltas.
+
+        Returns:
+            dict: The function `find_best_swaps` returns a dictionary of potential
+            player swaps between two games.
+
+        """
         swaps = {}
 
         for s in potential_swaps:
@@ -568,6 +806,15 @@ class ScheduleFitTool:
 
     @log_timer
     def do_easy_swaps(self):
+        """
+        This function implements a simple swap algorithm to move gametic events
+        from one player's game event set to another player's set.
+
+        Returns:
+            int: The output returned by this function is a single integer value
+            representing the number of swaps made.
+
+        """
         potential_swaps = self.get_potential_swaps()
         if len(potential_swaps) == 0:
             return 0
@@ -596,6 +843,24 @@ class ScheduleFitTool:
 
     @log_timer
     def get_problem_players_and_games(self):
+        """
+        This function identifies problem players and games with unsatisfied days
+        (OD) for a given list of players and games. It first calculates the maximum
+        common count of a player's preferred days across all games they are part
+        of and selects the player with the highest common count as the most
+        consistent player. The function then loops through each game and calculates
+        the number of problem players for each event day.
+
+        Returns:
+            dict: The output of this function is a list of dictionaries each
+            containing information about a problematic game and the players involved.
+            Each dictionary has three keys: "game", "players", and "coupled". The
+            "game" key refers to the specific game instance being described. The
+            "players" key contains an iteratorable of one or more player objects
+            (which might have more than one player involved) for the game with no
+            other solutions for swappable player slots.
+
+        """
         max_common = 0
         problem_players = []
         # Single loop over players to find max_common and problem_players
@@ -643,6 +908,11 @@ class ScheduleFitTool:
 
     @log_timer
     def recalculate_players(self):
+        """
+        This function recalculates the satisfaction level of each player based on
+        their current games and history with other players.
+
+        """
         satisfied = {}
         for p in self.players:
             satisfied[p.id] = 0
@@ -673,6 +943,20 @@ class ScheduleFitTool:
 
     @log_timer
     def sort_out_captains(self, count=0):
+        """
+        This function sorts out the captains of games played by players registered
+        to a league instance.
+
+        Args:
+            count (int): The `count` input parameter is an optional integer that
+                specifies the number of attempts to assign captains to gameslots.
+                If all players have not been assigned as captain at least the
+                minimum number of times after `count` attempts are made (i.e.,
+                `self.all_players_captained_minimum()==False`), the function will
+                recalculate players and repeat the process (calling itself with
+                `count + 1`).
+
+        """
         players_to_assign = list(self.players)
         shuffle(players_to_assign)
         for game in self.gameslots:
@@ -700,6 +984,12 @@ class ScheduleFitTool:
     @log_timer
     def add_entropy(self):
         # Compute full_slots once outside the loop
+        """
+        This function takes a list of "slot" objects as input and adds entropy to
+        the list by repeatedly swapping one random full slot with another random
+        empty slot.
+
+        """
         full_slots = [
             slot
             for slot in self.gameslots
@@ -725,6 +1015,15 @@ class ScheduleFitTool:
             gs.try_exchange(ogs)
 
     def get_days(self):
+        """
+        This function returns a dictionary of day numbers to lists of GameSlot
+        objects that are fully booked on those days.
+
+        Returns:
+            dict: The output returned by this function is a dictionary of day
+            numbers to lists of game slots that are full on that day.
+
+        """
         full_slots = [slot for slot in self.gameslots if slot.full == True]
         days = {}
         for slot in full_slots:
@@ -735,6 +1034,18 @@ class ScheduleFitTool:
         return days
 
     def swap_player_to_game(self, player, src_game, dst_game):
+        """
+        This function swaps a player from one game to another.
+
+        Args:
+            player (): The `player` input parameter is the player object that needs
+                to be swapped from one game to another.
+            src_game (): The `src_game` input parameter is used to identify the
+                game from which the player being swapped is currently assigned.
+            dst_game (): The `dst_game` input parameter specifies the game to which
+                the player will be swapped.
+
+        """
         dst_player = dst_game.get_swap_candidate_player()
         if dst_player.availability[src_game.timeslot_id] == AVAILABLE:
             dst_game.remove_player_from_match(dst_player)
@@ -743,6 +1054,20 @@ class ScheduleFitTool:
             dst_game.add_player_to_match(player)
 
     def decide_how_to_swap(self, player, src_game, dst_game):
+        """
+        This function decides whether to swap two games or a player between two
+        games based on availability.
+
+        Args:
+            player (): The `player` input parameter specifies which player is being
+                swapped.
+            src_game (): The `src_game` input parameter specifies the game that
+                the player is currently playing and whose availability we are
+                checking for swapping purposes.
+            dst_game (): The `dst_game` parameter specifies the game slot that the
+                player will be swapped to.
+
+        """
         perfect_swap = True
         for p in src_game.game_event:
             perfect_swap = p.availability[dst_game.timeslot_id] == AVAILABLE
@@ -763,6 +1088,20 @@ class ScheduleFitTool:
             self.swap_player_to_game(player, src_game, dst_game)
 
     def swap_whole_game(self, src, dst):
+        """
+        This function swaps two player lists (src and dst) within a match. It first
+        copies the player list from src to a temporary list s and removes the
+        players from src's game event. Then it copies the player list from dst to
+        another temporary list d and removes the players from dst's game event.
+        After that it adds the players from s back into src's game event and adds
+        the players from d back into dst's game event.
+
+        Args:
+            src (): The `src` input parameter is the game object that we want to
+                swap players from.
+            dst (): The `dst` input parameter is a copy of the `src` input parameter.
+
+        """
         s = []
         for p in src.game_event:
             s.append(p)
@@ -778,6 +1117,12 @@ class ScheduleFitTool:
 
     @log_timer
     def sort_out_preferences(self):
+        """
+        This function sorts out the player's preferences by iterating through the
+        games on each day and selecting the best game for each player based on
+        their availability and preferences.
+
+        """
         days = self.get_days()
         for i in range(10):
             for key in days:
@@ -798,6 +1143,13 @@ class ScheduleFitTool:
     def shuffle_match(self):
         # print(len(self.gameslots))
         # Filter players based on the new property
+        """
+        This function shuffles the players and game slots to create a schedule for
+        a sport league. It first filters the players based on their availability
+        score and then iteratively matches the players with the available game
+        slots until all games are filled.
+
+        """
         less_than_mean = [
             player
             for player in self.players
@@ -829,6 +1181,11 @@ class ScheduleFitTool:
     def clean_schedule(self):
         # count = len([g for g in self.gameslots if len(g.game_event) > 0])
         # deep_clean = count > len(self.players)
+        """
+        This function cleans up the game schedule by removing completed games and
+        players who are no longer needed.
+
+        """
         for gs in self.gameslots:
             self.recalculate_players()
             if gs.full:
@@ -837,11 +1194,22 @@ class ScheduleFitTool:
             gs.self_destruct_if_incomplete()
 
     def tidy_schedule(self):
+        """
+        This function calls `recalculate_players` and then iterates over all
+        `Gameslot` objects associated with the current object (`gs`) and calls
+        their `self_destruct_if_incomplete` method if they are incomplete.
+
+        """
         self.recalculate_players()
         for gs in self.gameslots:
             gs.self_destruct_if_incomplete()
 
     def trim_schedule(self):
+        """
+        The `trim_schedule` function removes any full game slots (GS) from the
+        schedule and destroys them if unnecessary.
+
+        """
         self.recalculate_players()
         for gs in self.gameslots:
             if gs.full:
@@ -849,6 +1217,12 @@ class ScheduleFitTool:
 
     @log_timer
     def sort_unsatisfied_players(self):
+        """
+        This function sorts the list of unsatisfied players based on their
+        availability scores and assigns them to games according to their preferences
+        and availability.
+
+        """
         remainders = [player for player in self.players if not player.satisfied]
         remainders = sorted(remainders, key=lambda player: player.availability_score)
         avails = []
@@ -882,6 +1256,11 @@ class ScheduleFitTool:
 
     @log_timer
     def preliminary_schedule_match(self):
+        """
+        This function matches players with available gameslots to form a preliminary
+        schedule for the players.
+
+        """
         for player in [p for p in self.players if not p.availability_score_greater_than_mean]:
             all_options = [g for g in self.gameslots if g.player_can_be_added(player)]
             candidates = [gameslot for gameslot in all_options if gameslot.is_building_already() and not gameslot.full is True]
@@ -894,6 +1273,11 @@ class ScheduleFitTool:
 
     @log_timer
     def match_schedule(self):
+        """
+        This function iterates over the list of players and matches each player
+        with available game slots to create a match.
+
+        """
         for player in self.players:
             all_options = [g for g in self.gameslots if g.player_can_be_added(player) and g.full is False and not player in g.game_event]
             filtered_options = [g for g in all_options if g.good_availability  and g.full is False]
@@ -916,6 +1300,16 @@ class ScheduleFitTool:
 
     @log_timer
     def create_events(self, skip=False):
+        """
+        This function creates a game event for each gameslot object that is either
+        full or has a skip value of True.
+
+        Args:
+            skip (bool): The `skip` input parameter is a optional paramether that
+                if set to True will skip creating events for gameslots with the
+                full status
+
+        """
         for gameslot in self.gameslots:
             if gameslot.full is True or skip is True:
                 # def create_event(self, court, players):
@@ -932,18 +1326,54 @@ class ScheduleFitTool:
                 timeslot.create_event(court, players, captain)
 
     def all_players_satisfied(self):
+        """
+        The function `all_players_satisfied` checks whether all players included
+        as instances of `player` (the class or type of objects stored within the
+        container called `self.players`) satisfy the condition `satisfied = False`.
+        If a player is not satisfied (i.e., their condition is not False), then
+        the function returns False. However—and since the loop checks all players'
+        conditions—if every player has its satisfied attribute set to False (i.e.,
+        no player is not satisfied), the function returns True indicating all
+        players are indeed happy or pleased.
+
+        Returns:
+            bool: The output returned by this function is `True`.
+
+        """
         for player in self.players:
             if player.satisfied == False:
                 return False
         return True
     
     def no_players_overscheduled(self):
+        """
+        This function checks whether any of the players are overscheduled by
+        comparing their game count to the maximum number of games allowed for each
+        player according to their rules.
+
+        Returns:
+            bool: The output returned by the function "no_players_overscheduled"
+            is "True".
+
+        """
         for player in self.players:
             if player.game_count > player.rules['maxGamesTotal']:
                 return False
         return True
 
     def player_days_satisfied(self):
+        """
+        This function checks whether a list of players has played too many games
+        on any one day within the specified "maxGamesDay" limit. It iterates through
+        each player and checks if they have exceeded the maximum number of games
+        allowed per day by checking if the number of games played on that day is
+        greater than the specified limit. If any player has exceeded the limit
+        then the function returns False.
+
+        Returns:
+            bool: The output returned by this function is `True`.
+
+        """
         for player in self.players:
             days = {}
             for day in player.days:
@@ -959,6 +1389,14 @@ class ScheduleFitTool:
         return True
     
     def player_weeks_satisfied(self):
+        """
+        This function checks whether any player has played more than the maximum
+        number of games allowed per week for all the weeks they have played so far.
+
+        Returns:
+            bool: The output returned by this function is "True".
+
+        """
         for player in self.players:
             weeks = {}
             for w in player.weeks:
@@ -974,6 +1412,20 @@ class ScheduleFitTool:
         return True
     
     def get_player_days_unsatisfied(self):
+        """
+        This function retrieves a list of players and their corresponding unsatisfied
+        days (days where they have more games than the maximum allowed).
+
+        Returns:
+            dict: The output returned by this function is a tuple containing two
+            items:
+            
+            1/ A list of players (called "us") who have unsatisfied days (i.e.,
+            days with more games than the maximum allowed by their rules).
+            2/ A dictionary (called "bg") that maps each player ID to a list of
+            games played on the specific day that has too many games.
+
+        """
         us = []
         bg = {}
         for player in self.players:
@@ -993,6 +1445,23 @@ class ScheduleFitTool:
     
     
     def find_games_on_day_with_player(self, player, day):
+        """
+        This function finds all games on a given day that involve a specific player.
+        It loops through a list of game slots and checks if the player is present
+        as an event participant.
+
+        Args:
+            player (str): The `player` input parameter filters the games that are
+                returned based on whether or not they contain the given player as
+                a participant.
+            day (int): The `day` input parameter specifies the date for which games
+                are to be searched for.
+
+        Returns:
+            list: The function "find_games_on_day_with_player" takes two arguments:
+            player and day.
+
+        """
         res = []
         for g in [g for g in self.gameslots if g.day_number == day]:
             if player in g.game_event:
@@ -1000,6 +1469,11 @@ class ScheduleFitTool:
         return res
     
     def log_player_days_unsatisfied(self):
+        """
+        This function retrieves the player days unsatisfied and prints the player
+        names and start times of the events that took place on those days.
+
+        """
         p, d = self.get_player_days_unsatisfied()
         for i in p:
             print(i.player_name)
@@ -1008,11 +1482,38 @@ class ScheduleFitTool:
             print()
 
     def get_gameslots_by_day(self, day_number):
+        """
+        This function retrieves a list of `gameslot` objects from a list
+        `self.gameslots` that have a `day_number` matching the provided `day_number`
+        argument.
+
+        Args:
+            day_number (int): The `day_number` input parameter specifies which
+                day's gameslots the function should return.
+
+        Returns:
+            list: The output returned by this function is a list of gameslots.
+
+        """
         return [
             gameslot for gameslot in self.gameslots if gameslot.day_number == day_number
         ]
 
     def get_gameslots_by_week(self, week_number):
+        """
+        The function "get_gameslots_by_week" takes a "week_number" parameter and
+        returns a list of gameslots that have the specified week number.
+
+        Args:
+            week_number (int): The `week_number` input parameter specifies the
+                desired week for which the function should return the corresponding
+                game slots.
+
+        Returns:
+            list: The function "get_gameslots_by_week" returns a list of gameslots
+            that have a week number equal to the input "week_number".
+
+        """
         return [
             gameslot
             for gameslot in self.gameslots
@@ -1020,29 +1521,72 @@ class ScheduleFitTool:
         ]
 
     def log(self, dofilter=False):
+        """
+        This function logs data from all players and gameslots within an instance
+        of the object it's a method of.
+
+        Args:
+            dofilter (int): The `dofilter` parameter is passed to each object's
+                `log()` method as a truthy value (True) if it should filter its
+                output log statements or False otherwise.
+
+        """
         for p in self.players:
             p.log(dofilter)
         for gs in self.gameslots:
             gs.log(dofilter)
 
     def all_players_captained_minimum(self):
+        """
+        This function checks whether all players on a team have reached the minimum
+        number of games captained as specified by their rules.
+
+        Returns:
+            bool: The output returned by the function is "True".
+
+        """
         for p in self.players:
             if p.captain_count < p.rules["minCaptained"]:
                 return False
         return True
     
     def log_players_captained_minimum(self):
+        """
+        The function `log_players_captained_minimum` logs the player names of those
+        who have captained a minimum number of games according to their rules.
+
+        """
         for p in self.players:
             if p.captain_count < p.rules["minCaptained"]:
                 print(p.player_name)
 
     def all_games_captained(self):
+        """
+        This function checks if all games slots have a player as captain or not.
+
+        Returns:
+            bool: The output returned by this function is `True`.
+
+        """
         for g in self.gameslots:
             if g.full == True and g.captain is None:
                 return False
         return True
 
     def get_average_and_max_player_luck(self):
+        """
+        This function calculates the average and maximum common luck of a set of
+        players.
+
+        Returns:
+            dict: The output returned by this function is a dictionary containing
+            three variables:
+            
+            	- "average": the average of all the player luck values
+            	- "max": the maximum player luck value
+            	- "variance": the variance of all the player luck values
+
+        """
         total = 0
         max_common = 0
         acc = 0
@@ -1065,6 +1609,20 @@ class ScheduleFitTool:
         return {"average": average, "max": max_common, "variance": variance}
 
     def compare_basics(self, other):
+        """
+        This function compares two objects (presumably representing player lists)
+        and returns a dictionary containing the scores based on two satisfaction
+        criteria: all players satisfied and all players captained minimally.
+
+        Args:
+            other (): The `other` parameter is the object being compared to the
+                instance of the class that the function is a part of.
+
+        Returns:
+            dict: The output returned by the function `compare_basics` is a
+            dictionary with two keys: "new" and "old".
+
+        """
         other_score = 0
         self_score = 0
 
@@ -1076,6 +1634,11 @@ class ScheduleFitTool:
         return {"new": self_score, "old": other_score}
     
     def log_unsatisfied_players(self):
+        """
+        The given function prints the player names and game counts of players who
+        are not satisfied (i.e., their `satisfied` attribute is `False`).
+
+        """
         for p in self.players:
             if p.satisfied == False:
                 print(p.player_name, p.game_count)
