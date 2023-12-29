@@ -135,16 +135,8 @@ class League(Model):
         """
         ts = self.timeslots[0]
         return ts.get_duration()
-
-    def get_player_availability(self, player, timeslot):
-        """
-        Get a player's availability for a specific time slot in the league.
-
-        :param player: The player for whom availability is requested.
-        :param timeslot: The time slot for which availability is requested.
-        :return: The availability status (e.g., 0 for unavailable, 1 for available).
-        """
-        # Using self.player_associations to directly access the relevant associations
+    
+    def get_player_availability_object(self, player, timeslot):
         player_association = next(
             (
                 assoc
@@ -165,9 +157,17 @@ class League(Model):
                 None,
             )
             if player_availability:
-                return player_availability.availability
+                return player_availability
         # Default to unavailable if no availability record found
-        return 0
+        return None
+
+
+    def get_player_availability(self, player, timeslot):
+        player_availability = self.get_player_availability_object(player, timeslot)
+        if player_availability:
+            return player_availability.availability
+        else:
+            return 0
 
     @transaction
     def get_existing_game_event(self, player, facility, timeslot):

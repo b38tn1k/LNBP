@@ -619,6 +619,22 @@ def change_flight(league, d):
         league.remove_player_from_flight(player, f)
     flight.add_player(player)
 
+def update_availability(league, d):
+    # {'event': 'availability', 'ids': {'timeslot': 1, 'player': 10}, 'values': 2}
+    ts = league.get_timeslot_by_id(d['ids']['timeslot'])
+    player = league.club.get_player_by_id(d['ids']['player'])
+    a = d['values']
+    availability = league.get_player_availability_object(player, ts)
+    availability.availability = a
+
+def push_time_slot(league, d):
+    # {'event': 'push_time_slot', 'ids': -1, 'values': '2023-11-08 20:15:00'}
+    start_time = datetime.strptime(d['values'], '%Y-%m-%d %H:%M:%S')
+    game_duration = league.get_game_duration()
+    end_time = start_time + timedelta(minutes=game_duration)
+    league.create_timeslot(start_time, end_time)
+    
+
 def apply_edits(league, updates):
     # priority
     """
@@ -636,6 +652,8 @@ def apply_edits(league, updates):
         match d['event']:
             case 'add_player_to_league':
                 add_player_to_league(league, d)
+            case 'push_time_slot':
+                push_time_slot(league, d)
     # others
     for d in updates:
         print(d)
@@ -657,4 +675,4 @@ def apply_edits(league, updates):
             case 'change_flight':
                 change_flight(league, d)
             case 'availability':
-                pass
+                update_availability(league, d)

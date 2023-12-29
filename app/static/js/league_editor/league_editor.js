@@ -22,6 +22,7 @@ class Diff {
 }
 
 const delta = [];
+let pushTSCounter = 0;
 
 /**
  * @description This function updates a `delta` array with new differences between
@@ -167,6 +168,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const dates = document.querySelectorAll(".fp_dates");
     for (let date of dates) {
         dateString = date.getAttribute("startTime");
+        timeslot = date.getAttribute("ts")
         flatpickr(date, {
             defaultDate: new Date(date.getAttribute("startTime")),
             enableTime: true,
@@ -192,6 +194,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 date.innerHTML = dateStr;
                 const newDate = new Date(selectedDates);
                 updateDelta(new Diff("timeslot", parseInt(date.getAttribute("ts")), formatLocalDateTime(newDate)));
+                for (let otherDate of dates) {
+                    const otherTimeslot = otherDate.getAttribute("ts");
+                    if (otherTimeslot === timeslot) {
+                        console.log(otherDate)
+                        // TODO: Update matching dates
+                    }
+                }
             },
         });
     }
@@ -271,9 +280,27 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     document.getElementById("save-button").addEventListener("click", saveButtonCallback);
+    document.getElementById("push-timeslot-button").addEventListener("click", pushTimeSlot);
+    document.getElementById("pop-timeslot-button").addEventListener("click", popTimeSlot);
 
     document.querySelectorAll(".reveal-after").forEach((div) => (div.style.display = "block"));
 });
+
+function pushTimeSlot() {
+    pushTSCounter -= 1;
+    schedules = document.querySelectorAll(".schedule-table");
+    const tableHead = schedules[0].querySelector("thead");
+    const headerRow = tableHead.querySelector("tr");
+    const headerColumns = headerRow.querySelectorAll("th");
+    starttime = headerColumns[headerColumns.length - 1].getAttribute('starttime')
+    updateDelta(new Diff("push_time_slot", pushTSCounter, starttime));
+}
+
+// Define the function for the "popTimeSlot" event handler
+function popTimeSlot() {
+    // Add your logic for popping a timeslot here
+    console.log("Pop Time Slot button clicked!");
+}
 
 /**
 * @description The provided JavaScript function `alignRules` takes two input elements
