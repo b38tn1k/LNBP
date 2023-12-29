@@ -111,6 +111,19 @@ class Club(Model):
         return new_league
     
     def get_facility_by_id(self, id):
+        """
+        This function retrieves the facility with the given ID from a list of
+        facilities by iterating over the list and returning the first facility
+        that matches the ID or `None` if no match is found.
+
+        Args:
+            id (int): The `id` input parameter is used to filter the list of
+                facilities and retrieve a specific facility by its ID.
+
+        Returns:
+            : The function returns `None`.
+
+        """
         return next((f for f in self.facilities if f.id == id), None)
 
     def get_league_by_id(self, league_id):
@@ -192,6 +205,19 @@ class Club(Model):
         return player
     
     def get_player_by_id(self, id):
+        """
+        The given function `get_player_by_id` takes an integer `id` as input and
+        returns the player object associated with that ID or `None` if no player
+        found.
+
+        Args:
+            id (int): The `id` input parameter is used to search for a player with
+                the matching ID within the `players` list.
+
+        Returns:
+            None: The output returned by this function is `None`.
+
+        """
         for p in self.players:
             if p.id == id:
                 return p
