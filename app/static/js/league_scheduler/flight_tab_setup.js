@@ -230,6 +230,18 @@ function revealHidden() {
     });
 }
 
+/**
+* @description This function adds images to table data using the `addImageToTd()`
+* function for each td element with specified class names. It loops through gameCountTds
+* and captanCountTds to add images from respective arrays.
+* 
+* @returns { any } The output returned by the `addImagesToTableData` function is not
+* explicitly specified. However based on the code we can infer that:
+* 
+* The function takes no input and has no return statement. Therefore it doesn't
+* return any output explicitly. Instead the function modifies the DOM elements within
+* the specified classes.
+*/
 function addImagesToTableData() {
     // Select all <td> elements with the specified class names
     const gameCountTds = document.querySelectorAll(".game-count-icon");
@@ -237,6 +249,19 @@ function addImagesToTableData() {
     const lowPreferenceCountTds = document.querySelectorAll(".low-preference-count-icon");
 
     // Function to add an image to a <td> element
+/**
+* @description This function adds an <img> element to a td element using the imageSrc
+* parameter as the source of the image.
+* 
+* @param {  } td - The `td` input parameter is a HTML table cell element that the
+* function appends the inserted image to.
+* 
+* @param { string } imageSrc - The `imageSrc` input parameter is the source URL of
+* the image to be added to theTD element.
+* 
+* @returns { any } The output returned by the function `addImageToTd` is an image
+* element that is appended as a child of the specified `td` element.
+*/
     function addImageToTd(td, imageSrc) {
         const image = document.createElement("img");
         image.src = imageSrc;
@@ -257,17 +282,49 @@ function addImagesToTableData() {
     });
 }
 
+/**
+* @description This function gets a table element from the HTML document based on
+* its `class` and `flight` attribute value matching the provided `id`.
+* 
+* @param { string } id - The `id` input parameter passed to the function `getFlightTable`
+* specifies which table to look for and retrieve.
+* 
+* @returns { object } The output returned by this function is a HTML table element
+* that matches the given `id` attribute value and has the class `schedule-table`.
+*/
 function getFlightTable(id) {
     // Use querySelector to find the table with class schedule-table and flight attribute
     const selector = `.schedule-table[flight="${id}"]`;
     return document.querySelector(selector);
 }
 
+/**
+* @description The given function `getAllFlightTables` returns a collection of all
+* elements on the page that have a class name of `"schedule-table"`.
+* 
+* @returns {  } The function `getAllFlightTables()` returns a NodeList of all elements
+* on the page that have the class `schedule-table`. In other words，it retrieves all
+* the table elements with the specified class from the current document and returns
+* them as a list.
+*/
 function getAllFlightTables() {
     const selector = `.schedule-table`;
     return document.querySelectorAll(selector);
 }
 
+/**
+* @description This function retrieves the header cell for a given cell by fetching
+* the table of flights and returning the nth child <th> element within the first row
+* of the table.
+* 
+* @param {  } cell - The `cell` input parameter is used to retrieve the header cell
+* corresponding to a specific data cell within a table.
+* 
+* @returns {  } The function takes a `cell` element as an input and returns the
+* corresponding header cell for that cell. If the `flight` attribute of the given
+* cell is a valid flight number (an integer), the function searches for the table
+* with that flight number using `getFlightTable()`.
+*/
 function getHeaderCellForCell(cell) {
     let table = getFlightTable(parseInt(cell.getAttribute('flight')))
     if (table) {
@@ -279,6 +336,20 @@ function getHeaderCellForCell(cell) {
     return null;
 }
 
+/**
+* @description This function returns the availability of a player for a given cell
+* based on the value of an attribute with the player's name as a prefix.
+* 
+* @param { string } p - The `p` input parameter is a player index (a number from 0
+* to 3) that specifies which player's availability should be checked for the given
+* `cell`.
+* 
+* @param {  } cell - The `cell` input parameter passes a single cell from the grid
+* as an argument to the function.
+* 
+* @returns { integer } The output of the `getPlayerAvailabilityForCell` function is
+* `-1`.
+*/
 function getPlayerAvailabilityForCell(p, cell) {
     let playerAttributeTag = `player-${p}`;
     let headerCell = getHeaderCellForCell(cell);
@@ -288,6 +359,17 @@ function getPlayerAvailabilityForCell(p, cell) {
     return -1;
 }
 
+/**
+* @description This function retrieves the full column of cells at a specific column
+* index from a table.
+* 
+* @param { object } cell - The `cell` input parameter is a reference to an HTML table
+* cell element.
+* 
+* @returns { array } The `getFullColumn` function returns an array of cells from a
+* specific column of a table. It takes a cell as input and returns all the cells
+* that are located at the same column index as the input cell.
+*/
 function getFullColumn(cell) {
     let table = getFlightTable(parseInt(cell.getAttribute('flight')))
     if (table) {
