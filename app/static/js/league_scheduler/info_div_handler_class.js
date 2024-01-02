@@ -1,6 +1,10 @@
 var info;
 
 class InfoClass {
+/**
+* @description This constructor function retrieves information from a DIV element
+* with the class name ".info" and sets it as class properties for further use.
+*/
     constructor() {
         // Get the info div element by its class name
         this.infoDiv = document.querySelector('.info');
