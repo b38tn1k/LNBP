@@ -1,9 +1,24 @@
-{% extends "tabler/dashboard_base.html" %} {% block title %}League Ninja Home{% endblock %} {% block js %} {% assets
-"tabler_plugins_css" %}
-<link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}" />
-{% endassets %} {% assets "tabler_plugins_js" %}
-<script type="text/javascript" src="{{ ASSET_URL }}"></script>
-{% endassets %} {% endblock %} {% block body %}
+{% extends "tabler/dashboard_base.html" %} {% block title %}{{ league.name }} Scheduler{% endblock %} {% block js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.min.js" defer></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.min.css" />
+<script src="{{ url_for('static', filename='js/league_scheduler/info_div_handler_class.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/league_scheduler/flight_tab_setup.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/league_scheduler/dragula_config.js') }}" defer></script>
+
+{% endblock %} {% block body %}
+
+<div
+    class="info"
+    style="display: none"
+    captain_checked="{{url_for('static', filename='public/scheduler-icons/captain_checked.svg')}}"
+    captain_unchecked="{{url_for('static', filename='public/scheduler-icons/captain_unchecked.svg')}}"
+
+    face_neutral_warning="{{url_for('static', filename='public/scheduler-icons/face-neutral-warning.svg')}}"
+    face_neutral="{{url_for('static', filename='public/scheduler-icons/face-neutral.svg')}}"
+
+    tennis_racket_warning="{{url_for('static', filename='public/scheduler-icons/tennis-racket-warning.svg')}}"
+    tennis_racket="{{url_for('static', filename='public/scheduler-icons/tennis-racket.svg')}}"
+></div>
 
 <div class="my-3 my-md-5">
     <div class="container">
@@ -11,10 +26,93 @@
             <h1 class="page-title">{{ league.name }} Scheduler</h1>
         </div>
 
-        <div class="row row-cards">
-            
+        <!-- Tab navigation -->
+        <ul class="nav nav-tabs" id="flight-tabs">
+            {% set first_flight = league.flights | first %} {% if league.flights %} {% for flight in league.flights %}
+            <li class="nav-item">
+                <a
+                    href="javascript:void(0);"
+                    class="nav-link flight-tab {% if flight == first_flight %}active{% endif %}"
+                    id="flight-tab-{{ flight.id }}"
+                    flight-id="{{ flight.id }}"
+                    onclick="selectTab('{{ flight.id }}')"
+                >
+                    {{ flight.name }}
+                </a>
+            </li>
+            {% set is_first_tab = false %} {% endfor %} {% endif %}
+        </ul>
+
+        <!-- Tab content -->
+        {% if league.flights %} {% for flight in league.flights %}
+        <div class="tab-content" id="flight-tab-content" flight-id="{{flight.id}}">
+            <div class="row row-cards reveal-after" style="display: none">
+                <div class="col-12">
+                    <!-- You can add content related to each flight here -->
+                    <div class="card">
+                        <div class="card-header">{{flight.name}}: Schedule</div>
+                        <div class="card-body" style="overflow-x: auto; overflow-y: hidden; margin-right: 16px">
+                            <table
+                                id="flight-{{ flightCounter }}"
+                                flight="{{ flight.id }}"
+                                flight-number="{{ flightCounter }}"
+                                class="schedule-table csv-table flight-sub-table table table-bordered table-hover table-sm"
+                            >
+                                <thead>
+                                    <tr>
+                                        <th>Facilities</th>
+                                        {% if league.timeslots %} {% for ts in league.timeslots %}
+                                        <th ts="{{ts.id}}" startTime="{{ ts.start_time }}" class="fp_dates">
+                                            {{ ts.human_readable_mmdd_hhmm() }}
+                                        </th>
+                                        {% endfor %} {% endif %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for facility in club.facilities %}
+                                    <tr>
+                                        {% if league.facility_in_league(facility) %}
+                                        <th>{{ facility.name }}</th>
+                                        {% for ts in league.timeslots %}
+                                        <td facility="{{ facility.id }}" timeslote="{{ ts.id }}"></td>
+                                        {% endfor %} {%endif%}
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row row-cards reveal-after" style="display: none">
+                <div class="col-12">
+                    <div class="card player-flight-source" flight-id="{{flight.id}}">
+                        <div class="card-header">{{flight.name}}: Players</div>
+                        <fieldset>
+                            <div class="card-body d-flex flex-wrap justify-content-start">
+                                {% if league.players %} {% if league.players|length > 0 %} {% for p in league.players %}
+                                {% if p.in_flight(flight) %}
+                                <div class="col-6 col-sm-6 col-lg-3 mb-4">
+                                    <div
+                                        class="card player-card"
+                                        player-id="{{ p.id }}"
+                                        player-name="{{ p.first_name[0] }} {{ p.last_name[:10] }}"
+                                        player-full-name="{{p.full_name}}"
+                                    >
+                                        <div class="card-header draggable-source draggable-target"></div>
+                                        <div class="card-body">
+                                            <!-- Add player card content here if needed -->
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %} {% endfor %} {% endif %} {% endif %}
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="row row-cards"></div>
+        {% endfor %} {% endif %}
     </div>
 </div>
 {% endblock %}

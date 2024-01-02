@@ -3,10 +3,9 @@ hr.thin {
     margin-bottom: 1rem !important;
 }
 
-.bg-free {
+/* .bg-free {
     background-color: #4F97D7 !important;
 }
-
 
 .bg-busy {
     background-color: #9A52B9 !important;
@@ -14,4 +13,37 @@ hr.thin {
 
 .bg-unavailable {
     background-color: #F57373 !important;
+} */
+
+.bg-free {
+    background-color: #8ee68a !important; /* Pastel Green */
+}
+
+.bg-busy {
+    background-color: #f4e87c !important; /* Pastel Yellow */
+}
+
+.bg-unavailable {
+    background-color: #f79898 !important; /* Pastel Red */
+}
+
+.draggable-item {
+    min-width: 80px;
+    width: 110px;
+    border: solid 1px black;
+    color: black;
+    border-radius: 5px;
+    margin: 5px;
+    cursor: move;
+    white-space: nowrap;
+    user-select: none;
+    /* Flexbox settings */
+    display: flex;
+    padding: 0 10px; /* Add some padding on left and right */
+    /* text-transform: uppercase; */
+  }
+
+  .draggable-item::selection {
+    background: transparent;
+    color: inherit; /* Inherit the color from the parent element */
 }
