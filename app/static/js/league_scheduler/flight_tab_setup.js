@@ -236,6 +236,19 @@ function makeDraggablePlayerTile(id, name, fullname, flightID) {
     return draggable;
 }
 
+/**
+* @description The function `revealHidden()` selects all elements with the class
+* `reveal-after` and sets their `display` style to `"block"`, revealing them on the
+* page.
+* 
+* @returns { any } The function `revealHidden()` uses `document.querySelectorAll()`
+* to select all elements with the class `"reveal-after"`, and then uses `forEach()`
+* to set the `display` style of each selected element to `"block"`.
+* 
+* The output returned by this function is that all elements with the class
+* `"reveal-after"` will have their display changed to `"block"`, revealing any hidden
+* content within them.
+*/
 function revealHidden() {
     document.querySelectorAll(".reveal-after").forEach(function (item) {
         item.style.display = "block";
