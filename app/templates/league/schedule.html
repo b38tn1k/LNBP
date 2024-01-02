@@ -1,21 +1,21 @@
-{% extends "tabler/dashboard_base.html" %} {% block title %}{{ league.name }} Scheduler{% endblock %} {% block js %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.min.js" defer></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.min.css" />
-<script src="{{ url_for('static', filename='js/league_scheduler/info_div_handler_class.js') }}" defer></script>
-<script src="{{ url_for('static', filename='js/league_scheduler/flight_tab_setup.js') }}" defer></script>
-<script src="{{ url_for('static', filename='js/league_scheduler/dragula_config.js') }}" defer></script>
-
-{% endblock %} {% block body %}
+{% extends "tabler/dashboard_base.html" %} {% block title %}{{ league.name }} Scheduler{% endblock %} {% assets
+"common_js" %}
+<script type="text/javascript" src="{{ ASSET_URL }}"></script>
+{% endassets %} {% assets "common_css" %}
+<link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}" />
+{% endassets %} {% assets "scheduler_css" %}
+<link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}" />
+{% endassets %} {% assets "scheduler_js" %}
+<script type="text/javascript" src="{{ ASSET_URL }}"></script>
+{% endassets %} {% block body %}
 
 <div
     class="info"
     style="display: none"
     captain_checked="{{url_for('static', filename='public/scheduler-icons/captain_checked.svg')}}"
     captain_unchecked="{{url_for('static', filename='public/scheduler-icons/captain_unchecked.svg')}}"
-
     face_neutral_warning="{{url_for('static', filename='public/scheduler-icons/face-neutral-warning.svg')}}"
     face_neutral="{{url_for('static', filename='public/scheduler-icons/face-neutral.svg')}}"
-
     tennis_racket_warning="{{url_for('static', filename='public/scheduler-icons/tennis-racket-warning.svg')}}"
     tennis_racket="{{url_for('static', filename='public/scheduler-icons/tennis-racket.svg')}}"
 ></div>
@@ -74,7 +74,7 @@
                                         {% if league.facility_in_league(facility) %}
                                         <th>{{ facility.name }}</th>
                                         {% for ts in league.timeslots %}
-                                        <td facility="{{ facility.id }}" timeslote="{{ ts.id }}"></td>
+                                        <td class="draggable-target" facility="{{ facility.id }}" timeslote="{{ ts.id }}"></td>
                                         {% endfor %} {%endif%}
                                     </tr>
                                     {% endfor %}
@@ -115,4 +115,16 @@
         {% endfor %} {% endif %}
     </div>
 </div>
+
+<script>
+    var info;
+    
+    document.addEventListener("DOMContentLoaded", function () {
+        info = new InfoClass();
+        setupPlayerDraggableOrigins();
+        setupShowActiveFlight();
+        revealHidden();
+        setupDragula();
+    });
+</script>
 {% endblock %}

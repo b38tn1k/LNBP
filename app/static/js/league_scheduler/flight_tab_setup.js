@@ -236,10 +236,8 @@ function makeDraggablePlayerTile(id, name, fullname, flightID) {
     return draggable;
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-    setupPlayerDraggableOrigins();
-    setupShowActiveFlight();
+function revealHidden() {
     document.querySelectorAll(".reveal-after").forEach(function (item) {
         item.style.display = "block";
     });
-});
+}

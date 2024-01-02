@@ -89,3 +89,19 @@ tabler_plugins_js = Bundle(
     # Other Plugins as needed.
     output='public/js/tabler-plugins.js'
 )
+
+scheduler_css = Bundle(
+    'https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.min.css',
+    filters='cssmin',
+    output='public/css/scheduler.css'
+)
+
+scheduler_js = Bundle(
+    "https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.min.js",
+    'js/league_scheduler/info_div_handler_class.js',
+    'js/league_scheduler/flight_tab_setup.js',
+    'js/league_scheduler/dragula_config.js',
+    filters='jsmin',
+
+output='public/js/scheduler.js'
+)
