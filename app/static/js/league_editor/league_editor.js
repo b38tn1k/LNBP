@@ -165,7 +165,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // SCHEDULE
     const leagueTypeSelector = document.getElementById("league-type-input");
     leagueTypeSelector.value = info.getAttribute("leagueType");
-    const dates = document.querySelectorAll(".fp_dates");
+    const dates = document.querySelectorAll(".timeslot_header");
     for (let date of dates) {
         dateString = date.getAttribute("startTime");
         timeslot = date.getAttribute("ts")

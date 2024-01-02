@@ -63,7 +63,8 @@ tabler_css = Bundle(
 
 tabler_js = Bundle(
     'tabler/js/vendors/jquery-3.2.1.min.js',
-    'tabler/js/vendors/bootstrap.bundle.min.js',
+    # 'tabler/js/vendors/bootstrap.bundle.min.js',
+    'https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js',
     'tabler/js/vendors/circle-progress.min.js',
     'tabler/js/vendors/selectize.min.js',
     'tabler/js/vendors/jquery.tablesorter.min.js',
@@ -90,17 +91,15 @@ tabler_plugins_js = Bundle(
     output='public/js/tabler-plugins.js'
 )
 
-scheduler_css = Bundle(
-    'https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.min.css',
-    filters='cssmin',
-    output='public/css/scheduler.css'
-)
-
 scheduler_js = Bundle(
     "https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.min.js",
     'js/league_scheduler/info_div_handler_class.js',
     'js/league_scheduler/flight_tab_setup.js',
+    'js/league_scheduler/schedule_legend.js',
+    'js/league_scheduler/dragula_drop_logic.js',
     'js/league_scheduler/dragula_config.js',
+    'js/league_scheduler/save_button.js',
+    'js/league_scheduler/player_update.js',
     filters='jsmin',
 
 output='public/js/scheduler.js'

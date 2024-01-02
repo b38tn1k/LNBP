@@ -106,7 +106,7 @@ def schedule_league(id):
     if league is None:
         return redirect(url_for("main.home"))
     return render_template(
-        "league/schedule.html", league=league, club=current_user.club
+        "league/schedule.html", simple_form=SimpleForm(), league=league, club=current_user.club
     )
 
 

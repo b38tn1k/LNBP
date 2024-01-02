@@ -27,9 +27,36 @@ hr.thin {
     background-color: #f79898 !important; /* Pastel Red */
 }
 
+/* Dragula */
+
+.gu-mirror {
+    position: fixed !important;
+    margin: 0 !important;
+    z-index: 9999 !important;
+    opacity: 0.8;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
+    filter: alpha(opacity=80);
+}
+.gu-hide {
+    display: none !important;
+}
+.gu-unselectable {
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    user-select: none !important;
+}
+.gu-transit {
+    opacity: 0.2;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
+    filter: alpha(opacity=20);
+}
+/* End Dragula */
+
 .draggable-item {
     min-width: 80px;
     width: 110px;
+    height: 30px;
     border: solid 1px black;
     color: black;
     border-radius: 5px;
@@ -37,13 +64,36 @@ hr.thin {
     cursor: move;
     white-space: nowrap;
     user-select: none;
+    text-align: right;
     /* Flexbox settings */
     display: flex;
     padding: 0 10px; /* Add some padding on left and right */
     /* text-transform: uppercase; */
-  }
+}
 
-  .draggable-item::selection {
-    background: transparent;
-    color: inherit; /* Inherit the color from the parent element */
+table.schedule-table {
+    flex-grow: 1;
+}
+
+table.tiny-table {
+    border-collapse: collapse;
+    border: none;
+    text-align: center;
+    margin: 0;
+    /* margin-bottom: 5px; */
+    width: 100%;
+    /* table-layout: fixed; */
+}
+
+.tiny-table td,
+.tiny-table th {
+    min-height: 1em;
+    padding: 0.5em; /* Adjusts the padding */
+    text-align: center; /* Adjusts the text alignment */
+    vertical-align: middle;
+}
+
+.captain-radio {
+    min-width: 10px !important;
+    padding-top: 4px !important;
 }

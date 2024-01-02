@@ -17,7 +17,7 @@
                                 />
                             </th>
                             {% if league.timeslots %} {% for ts in league.timeslots %}
-                            <th ts="{{ts.id}}" startTime="{{ ts.start_time }}" class="fp_dates">
+                            <th ts="{{ts.id}}" startTime="{{ ts.start_time }}" class="timeslot_header">
                                 {{ ts.human_readable_mmdd_hhmm() }}
                             </th>
                             {% endfor %} {% endif %}

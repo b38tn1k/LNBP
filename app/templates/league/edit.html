@@ -1,9 +1,5 @@
-{% extends "tabler/dashboard_base.html" %} {% block title %}Edit {{ league.name }}{% endblock %} {% block js %} {%
-assets "tabler_plugins_css" %}
-<!-- <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}" /> -->
-{% endassets %} {% assets "tabler_plugins_js" %}
-<!-- <script type="text/javascript" src="{{ ASSET_URL }}"></script> -->
-{% endassets %} {% endblock %} {% block body %}
+{% extends "tabler/dashboard_base.html" %} {% block title %}Edit {{ league.name }}{% endblock %} 
+{% block body %}
 
 <form id="hidden-form" style="display: none">{{ simple_form.hidden_tag() }}</form>
 

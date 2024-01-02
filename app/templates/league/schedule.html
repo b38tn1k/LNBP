@@ -1,13 +1,9 @@
 {% extends "tabler/dashboard_base.html" %} {% block title %}{{ league.name }} Scheduler{% endblock %} {% assets
-"common_js" %}
-<script type="text/javascript" src="{{ ASSET_URL }}"></script>
-{% endassets %} {% assets "common_css" %}
-<link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}" />
-{% endassets %} {% assets "scheduler_css" %}
-<link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}" />
-{% endassets %} {% assets "scheduler_js" %}
+"scheduler_js" %}
 <script type="text/javascript" src="{{ ASSET_URL }}"></script>
 {% endassets %} {% block body %}
+
+<form id="hidden-form" style="display: none">{{ simple_form.hidden_tag() }}</form>
 
 <div
     class="info"
@@ -18,12 +14,28 @@
     face_neutral="{{url_for('static', filename='public/scheduler-icons/face-neutral.svg')}}"
     tennis_racket_warning="{{url_for('static', filename='public/scheduler-icons/tennis-racket-warning.svg')}}"
     tennis_racket="{{url_for('static', filename='public/scheduler-icons/tennis-racket.svg')}}"
+    league_rules_min_games_total="{{ league.rules.min_games_total }}"
+    league_rules_max_games_total="{{ league.rules.max_games_total }}"
+    league_rules_max_players_per_match="{{ league.rules.players_per_match }}"
+    league_rules_max_games_week="{{ league.rules.max_games_week }}"
+    league_rules_min_games_day="{{ league.rules.min_games_day }}"
+    league_rules_max_games_day="{{ league.rules.max_games_day }}"
+    league_rules_max_week_gap="{{ league.rules.max_week_gap }}"
+    league_rules_max_double_headers="{{ league.rules.max_double_headers }}"
+    league_rules_min_captained="{{ league.rules.min_captained }}"
+    league_rules_minimum_subs_per_game="{{ league.rules.minimum_subs_per_game }}"
+    league_rules_assume_busy="{{league.rules.assume_busy}}"
 ></div>
 
 <div class="my-3 my-md-5">
     <div class="container">
-        <div class="page-header">
-            <h1 class="page-title">{{ league.name }} Scheduler</h1>
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="page-header">
+                <h1 class="page-title">{{ league.name }} Scheduler</h1>
+            </div>
+            <button type="button" id="save-button" class="btn btn-lg" title="Save" aria-label="Save">
+                <i class="fe fe-save" style="font-size: 1.5em"></i>
+            </button>
         </div>
 
         <!-- Tab navigation -->
@@ -62,8 +74,21 @@
                                     <tr>
                                         <th>Facilities</th>
                                         {% if league.timeslots %} {% for ts in league.timeslots %}
-                                        <th ts="{{ts.id}}" startTime="{{ ts.start_time }}" class="fp_dates">
-                                            {{ ts.human_readable_mmdd_hhmm() }}
+                                        <th
+                                            ts="{{ts.id}}"
+                                            startTime="{{ ts.start_time }}"
+                                            class="timeslot_header"
+                                            {%
+                                            if
+                                            league.players
+                                            %}
+                                            {%
+                                            if
+                                            league.players|length
+                                        >
+                                            0 %} {% for p in league.players %} {% if p.in_flight(flight) %}
+                                            player-{{p.id}}={{league.get_player_availability(p, ts)}} {% endif %} {%
+                                            endfor %} {% endif %} {% endif %}> {{ ts.human_readable_mmdd_hhmm() }}
                                         </th>
                                         {% endfor %} {% endif %}
                                     </tr>
@@ -74,10 +99,28 @@
                                         {% if league.facility_in_league(facility) %}
                                         <th>{{ facility.name }}</th>
                                         {% for ts in league.timeslots %}
-                                        <td class="draggable-target" facility="{{ facility.id }}" timeslote="{{ ts.id }}"></td>
+                                        <td
+                                            class="draggable-target facility-timeslot"
+                                            facility="{{ facility.id }}"
+                                            timeslot="{{ ts.id }}"
+                                            flight="{{ flight.id }}"
+                                        ></td>
                                         {% endfor %} {%endif%}
                                     </tr>
                                     {% endfor %}
+
+                                    <!-- <tr>
+                                        <th>SUB</th>
+                                        {% for ts in league.timeslots %}
+                                        <td
+                                            class="draggable-target"
+                                            facility="-1"
+                                            timeslot="{{ ts.id }}"
+                                            flight="{{ flight.id }}"
+                                        ></td>
+                                        {% endfor %}
+                                    </tr> -->
+
                                 </tbody>
                             </table>
                         </div>
@@ -96,12 +139,23 @@
                                     <div
                                         class="card player-card"
                                         player-id="{{ p.id }}"
-                                        player-name="{{ p.first_name[0] }} {{ p.last_name[:10] }}"
+                                        player-name="{{ p.first_name[0] }} {{ p.last_name[:8] }}"
                                         player-full-name="{{p.full_name}}"
                                     >
-                                        <div class="card-header draggable-source draggable-target"></div>
+                                        <div class="pool draggable-source draggable-target"></div>
                                         <div class="card-body">
-                                            <!-- Add player card content here if needed -->
+                                            <table class="tiny-table">
+                                                <tr>
+                                                    <td class="game-count-icon"></td>
+                                                    <td class="captain-count-icon"></td>
+                                                    <td class="low-preference-count-icon"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td><span class="player-game-count">0</span></td>
+                                                    <td><span class="player-captain-count">0</span></td>
+                                                    <td><span class="player-badtimeslot-count">0/0</span></td>
+                                                </tr>
+                                            </table>
                                         </div>
                                     </div>
                                 </div>
@@ -118,13 +172,19 @@
 
 <script>
     var info;
-    
+    const FREE = 1;
+    const BUSY = 2;
+    const UNAVAILABLE = 3;
+
     document.addEventListener("DOMContentLoaded", function () {
         info = new InfoClass();
         setupPlayerDraggableOrigins();
         setupShowActiveFlight();
+        addImagesToTableData();
         revealHidden();
         setupDragula();
+        saveButton = document.getElementById("save-button");
+        saveButton.addEventListener("click", saveButtonCallback);
     });
 </script>
 {% endblock %}
