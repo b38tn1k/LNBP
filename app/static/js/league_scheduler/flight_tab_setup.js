@@ -1,3 +1,16 @@
+/**
+* @description This function selects a tab based on a flight ID and displays the
+* associated content by removing the 'active' class from all tabs and adding it to
+* the selected tab and setting the display property of the corresponding content
+* section to 'block' or 'none'.
+* 
+* @param { string } flightId - The `flightId` input parameter is used to select the
+* appropriate tab based on its value.
+* 
+* @returns { object } The output returned by this function is a toggle effect on all
+* tabs with the class "flight-tab", where only the tab with the corresponding flightId
+* has the "active" class added to it and the others have it removed.
+*/
 function selectTab(flightId) {
     // Remove the 'active' class from all tabs
     const tabs = document.querySelectorAll(".flight-tab");
@@ -19,6 +32,25 @@ function selectTab(flightId) {
     });
 }
 
+/**
+* @description This function sets up the display of content tabs based on which tab
+* is currently active.
+* 
+* @returns { any } The output returned by the given function `setupShowActiveFlight`
+* is not specified directly. Instead it is inferred from the code that the function
+* modifies the `display` CSS property of elements with a specific `flight-id` attribute
+* to either "block" or "none".
+* 
+* More specifically:
+* 
+* 	- The function selects all elements with the class ".tab-content" and iterates
+* over them using `.forEach()`.
+* 	- For each element content(), it checks if the `flightId` attribute matches the
+* current active flight by parsing the value of `getAttribute("flight-id")` to a
+* number and comparing it to the `flightId`.
+* 	- If the `content` element is active (i.e., its `flightId` matches the current
+* active flight), the function sets its `display` property to "block".
+*/
 function setupShowActiveFlight() {
     const tabs = document.querySelectorAll(".flight-tab");
     tabs.forEach((tab) => {
@@ -36,6 +68,18 @@ function setupShowActiveFlight() {
     });
 }
 
+/**
+* @description This function sets up draggable elements on a web page by giving them
+* a random starting hue based on their position and a consistent hue step between
+* each item.
+* 
+* @returns { any } This function takes a list of elements with class `.draggable-source
+* .draggable-item` and sets their background color randomly using a hue range from
+* startHue to hueStep times the index of the element.
+* 
+* Output: Randomly set background colors for each element within the class specification
+* using hue ranges and random starting point.
+*/
 function setupPlayerDraggableOriginsOld() {
     let flights = document.querySelectorAll(".player-flight-source");
 
@@ -51,6 +95,15 @@ function setupPlayerDraggableOriginsOld() {
     });
 }
 
+/**
+* @description This function takes all `.player-flight-source` elements and makes
+* their card headers draggable by wrapping them with a tile containing the player
+* ID and name.
+* 
+* @returns {  } The `setupPlayerDraggableOrigins` function returns nothing (i.e.,
+* it has no return statement) and instead modifies the HTML elements contained within
+* the `.player-flight-source` elements that are passed as arguments to the function.
+*/
 function setupPlayerDraggableOrigins() {
     let flights = document.querySelectorAll(".player-flight-source");
 
@@ -77,6 +130,24 @@ function setupPlayerDraggableOrigins() {
     });
 }
 
+/**
+* @description This function creates a radio input field and two images (checked and
+* unchecked) to represent the options "Captain" and "Not Captain".
+* 
+* @param { string } id - The `id` input parameter is used to generate a unique
+* identifier for the radio input element and its associated label element. It is
+* used to construct the `for` attribute of the label element and is also included
+* as a part of the `id` attribute of the radio input element.
+* 
+* @param { string } flightID - The `flightID` input parameter is used to create a
+* unique name for the radio input element.
+* 
+* @returns { array } The function `createCaptainRadioInput` returns an array containing
+* two elements: a radio input element and a label element. The radio input element
+* has a unique ID and is initially hidden. The label element contains two image
+* elements representing "Captain" and "Not Captain", and is associated with the radio
+* input element through the `for` attribute.
+*/
 function createCaptainRadioInput(id, flightID) {
 
     // Create the radio input element
@@ -127,6 +198,27 @@ function createCaptainRadioInput(id, flightID) {
     return [radioInput, label];
 }
 
+/**
+* @description This function creates a draggable div element representing a player
+* tile with the given name and id.
+* 
+* @param { string } id - The `id` input parameter is used to set the `player-id`
+* attribute of the created draggable div element.
+* 
+* @param { string } name - In the provided function `makeDraggablePlayerTile`, the
+* `name` input parameter is used to set the text content of a `<div>` element that
+* represents the player's name.
+* 
+* @param { string } fullname - The `fullname` input parameter is used to set the
+* title of the div element created by the function.
+* 
+* @param { string } flightID - The `flightID` input parameter is used to set the
+* value of the `player-id` attribute on the generated `<div>` element.
+* 
+* @returns {  } Based on the code provided: The `makeDraggablePlayerTile()` function
+* creates a new `div` element with a class list that includes "draggable-item",
+* "d-flex", "justify-content-between", and "align-items-center".
+*/
 function makeDraggablePlayerTile(id, name, fullname, flightID) {
     let draggable = document.createElement("div");
     draggable.classList.add("draggable-item", "d-flex", "justify-content-between", "align-items-center");
