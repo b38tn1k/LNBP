@@ -1,3 +1,12 @@
+/**
+* @description The function "recountPlayers" updates the game count and busy scheduled
+* count for each player based on the draggable items dropped on a facility timeslot
+* table and the player availability for that cell.
+* 
+* @param { string } flight - The `flight` input parameter is used to retrieve a
+* specific flight's table from the HTML structure and update the player data for
+* that flight.
+*/
 function recountPlayers(flight) {
     let table = getFlightTable(flight);
     let playerFlightSource = document.querySelector(`.player-flight-source[flight-id="${flight}"]`);
