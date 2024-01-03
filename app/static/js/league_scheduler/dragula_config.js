@@ -8,7 +8,7 @@ function setupDragula() {
         moves: isDraggableItem,
         copy: isDraggableSource,
         accepts: canAcceptDrop,
-        removeOnSpill: true, 
+        removeOnSpill: true,
     });
 
     drake.on("drag", handleDrag);
@@ -142,6 +142,8 @@ function handleDrop(el, target, source) {
         let duplicates = !checkForNoDuplicates(playerID, target);
         if (noFreeSpace || duplicates) {
             el.remove();
+        } else {
+            renameRadio(el, target);
         }
     }
 }
@@ -157,8 +159,8 @@ function handleDragEnd(event) {
     // Code to handle drag end
     console.log("Handle drag end");
     resetScheduleLegend();
-    let flight = parseInt(event.getAttribute('flight-id'));
-    recountPlayers(flight)
+    let flight = parseInt(event.getAttribute("flight-id"));
+    updatePlayerCards(flight);
 }
 
 /**

@@ -80,14 +80,12 @@ table.tiny-table {
     border: none;
     text-align: center;
     margin: 0;
-    /* margin-bottom: 5px; */
     width: 100%;
-    /* table-layout: fixed; */
 }
 
 .tiny-table td,
 .tiny-table th {
-    min-height: 1em;
+    min-height: 0.5em;
     padding: 0.5em; /* Adjusts the padding */
     text-align: center; /* Adjusts the text alignment */
     vertical-align: middle;

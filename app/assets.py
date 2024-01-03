@@ -94,12 +94,13 @@ tabler_plugins_js = Bundle(
 scheduler_js = Bundle(
     "https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.2/dragula.min.js",
     'js/league_scheduler/info_div_handler_class.js',
+    'js/league_scheduler/dragula_drop_actions.js',
     'js/league_scheduler/flight_tab_setup.js',
-    'js/league_scheduler/schedule_legend.js',
+    'js/league_scheduler/dragula_legend_controls.js',
     'js/league_scheduler/dragula_drop_logic.js',
     'js/league_scheduler/dragula_config.js',
     'js/league_scheduler/save_button.js',
-    'js/league_scheduler/player_update.js',
+    
     filters='jsmin',
 
 output='public/js/scheduler.js'

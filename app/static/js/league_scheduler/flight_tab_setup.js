@@ -125,43 +125,27 @@ function createCaptainRadioInput(id, flightID) {
     // Create the radio input element
     let radioInput = document.createElement("input");
     radioInput.type = "radio";
+    radioInput.setAttribute("flight", flightID);
     radioInput.name = `flight-${flightID}-captain`;
     radioInput.id = `player-radio-${id}`;
     radioInput.style.display = "none";
+    // radioInput.classList.add("captain-radio", "source-radio");
     radioInput.classList.add("captain-radio");
-
-    // Create the checked and unchecked images
     let checkedImage = document.createElement("img");
+    checkedImage.classList.add("checked-img");
     checkedImage.src = info.captainChecked.src; // Use the provided info
     checkedImage.alt = "Captain";
-
     let uncheckedImage = document.createElement("img");
+    uncheckedImage.classList.add("unchecked-img");
     uncheckedImage.src = info.captainUnchecked.src; // Use the provided info
     uncheckedImage.alt = "Not Captain";
-
-    // Create a label element to wrap the images and associate it with the radio input
     let label = document.createElement("label");
     label.htmlFor = `player-radio-${id}`;
-    label.style.cursor = "pointer"; // Add pointer cursor for label
-
-    // Append the images to the label
+    label.style.cursor = "pointer";
     label.appendChild(checkedImage);
     label.appendChild(uncheckedImage);
     label.classList.add("captain-radio");
-
-    // Add a change event listener to the radio input
-    radioInput.addEventListener("change", function () {
-        if (radioInput.checked) {
-            // If the radio input is checked, show the checked image and hide the unchecked image
-            checkedImage.style.display = "inline";
-            uncheckedImage.style.display = "none";
-        } else {
-            // If the radio input is unchecked, show the unchecked image and hide the checked image
-            checkedImage.style.display = "none";
-            uncheckedImage.style.display = "inline";
-        }
-    });
-    // Initially, set the visibility based on the initial state of the radio input
+    // radioInput.addEventListener("click", captainRadioClickCallback);
     if (radioInput.checked) {
         checkedImage.style.display = "inline";
         uncheckedImage.style.display = "none";
@@ -170,6 +154,20 @@ function createCaptainRadioInput(id, flightID) {
         uncheckedImage.style.display = "inline";
     }
     return [radioInput, label];
+}
+
+function captainRadioClickCallback(event) {
+    let radioInput = event.target;
+    const parentNode = radioInput.parentNode.parentNode;
+    parentNode.querySelectorAll(`input[name='${radioInput.name}']`).forEach((radio) => {
+        radio.checked = false;
+        radio.labels[0].querySelector(".checked-img").style.display = "none";
+        radio.labels[0].querySelector(".unchecked-img").style.display = "inline";
+    });
+    radioInput.checked = true;
+    radioInput.labels[0].querySelector(".checked-img").style.display = "inline";
+    radioInput.labels[0].querySelector(".unchecked-img").style.display = "none";
+    updatePlayerCards(parseInt(radioInput.getAttribute("flight")));
 }
 
 /**
@@ -231,17 +229,17 @@ function revealHidden() {
 }
 
 /**
-* @description This function adds images to table data using the `addImageToTd()`
-* function for each td element with specified class names. It loops through gameCountTds
-* and captanCountTds to add images from respective arrays.
-* 
-* @returns { any } The output returned by the `addImagesToTableData` function is not
-* explicitly specified. However based on the code we can infer that:
-* 
-* The function takes no input and has no return statement. Therefore it doesn't
-* return any output explicitly. Instead the function modifies the DOM elements within
-* the specified classes.
-*/
+ * @description This function adds images to table data using the `addImageToTd()`
+ * function for each td element with specified class names. It loops through gameCountTds
+ * and captanCountTds to add images from respective arrays.
+ *
+ * @returns { any } The output returned by the `addImagesToTableData` function is not
+ * explicitly specified. However based on the code we can infer that:
+ *
+ * The function takes no input and has no return statement. Therefore it doesn't
+ * return any output explicitly. Instead the function modifies the DOM elements within
+ * the specified classes.
+ */
 function addImagesToTableData() {
     // Select all <td> elements with the specified class names
     const gameCountTds = document.querySelectorAll(".game-count-icon");
@@ -249,19 +247,19 @@ function addImagesToTableData() {
     const lowPreferenceCountTds = document.querySelectorAll(".low-preference-count-icon");
 
     // Function to add an image to a <td> element
-/**
-* @description This function adds an <img> element to a td element using the imageSrc
-* parameter as the source of the image.
-* 
-* @param {  } td - The `td` input parameter is a HTML table cell element that the
-* function appends the inserted image to.
-* 
-* @param { string } imageSrc - The `imageSrc` input parameter is the source URL of
-* the image to be added to theTD element.
-* 
-* @returns { any } The output returned by the function `addImageToTd` is an image
-* element that is appended as a child of the specified `td` element.
-*/
+    /**
+     * @description This function adds an <img> element to a td element using the imageSrc
+     * parameter as the source of the image.
+     *
+     * @param {  } td - The `td` input parameter is a HTML table cell element that the
+     * function appends the inserted image to.
+     *
+     * @param { string } imageSrc - The `imageSrc` input parameter is the source URL of
+     * the image to be added to theTD element.
+     *
+     * @returns { any } The output returned by the function `addImageToTd` is an image
+     * element that is appended as a child of the specified `td` element.
+     */
     function addImageToTd(td, imageSrc) {
         const image = document.createElement("img");
         image.src = imageSrc;
@@ -270,7 +268,7 @@ function addImagesToTableData() {
 
     // Loop through and add images to the <td> elements
     gameCountTds.forEach((td) => {
-        addImageToTd(td, info.tennisRacket.src);
+        addImageToTd(td, info.tennisRacketWarning.src);
     });
 
     captainCountTds.forEach((td) => {
@@ -283,15 +281,15 @@ function addImagesToTableData() {
 }
 
 /**
-* @description This function gets a table element from the HTML document based on
-* its `class` and `flight` attribute value matching the provided `id`.
-* 
-* @param { string } id - The `id` input parameter passed to the function `getFlightTable`
-* specifies which table to look for and retrieve.
-* 
-* @returns { object } The output returned by this function is a HTML table element
-* that matches the given `id` attribute value and has the class `schedule-table`.
-*/
+ * @description This function gets a table element from the HTML document based on
+ * its `class` and `flight` attribute value matching the provided `id`.
+ *
+ * @param { string } id - The `id` input parameter passed to the function `getFlightTable`
+ * specifies which table to look for and retrieve.
+ *
+ * @returns { object } The output returned by this function is a HTML table element
+ * that matches the given `id` attribute value and has the class `schedule-table`.
+ */
 function getFlightTable(id) {
     // Use querySelector to find the table with class schedule-table and flight attribute
     const selector = `.schedule-table[flight="${id}"]`;
@@ -299,34 +297,34 @@ function getFlightTable(id) {
 }
 
 /**
-* @description The given function `getAllFlightTables` returns a collection of all
-* elements on the page that have a class name of `"schedule-table"`.
-* 
-* @returns {  } The function `getAllFlightTables()` returns a NodeList of all elements
-* on the page that have the class `schedule-table`. In other words，it retrieves all
-* the table elements with the specified class from the current document and returns
-* them as a list.
-*/
+ * @description The given function `getAllFlightTables` returns a collection of all
+ * elements on the page that have a class name of `"schedule-table"`.
+ *
+ * @returns {  } The function `getAllFlightTables()` returns a NodeList of all elements
+ * on the page that have the class `schedule-table`. In other words，it retrieves all
+ * the table elements with the specified class from the current document and returns
+ * them as a list.
+ */
 function getAllFlightTables() {
     const selector = `.schedule-table`;
     return document.querySelectorAll(selector);
 }
 
 /**
-* @description This function retrieves the header cell for a given cell by fetching
-* the table of flights and returning the nth child <th> element within the first row
-* of the table.
-* 
-* @param {  } cell - The `cell` input parameter is used to retrieve the header cell
-* corresponding to a specific data cell within a table.
-* 
-* @returns {  } The function takes a `cell` element as an input and returns the
-* corresponding header cell for that cell. If the `flight` attribute of the given
-* cell is a valid flight number (an integer), the function searches for the table
-* with that flight number using `getFlightTable()`.
-*/
+ * @description This function retrieves the header cell for a given cell by fetching
+ * the table of flights and returning the nth child <th> element within the first row
+ * of the table.
+ *
+ * @param {  } cell - The `cell` input parameter is used to retrieve the header cell
+ * corresponding to a specific data cell within a table.
+ *
+ * @returns {  } The function takes a `cell` element as an input and returns the
+ * corresponding header cell for that cell. If the `flight` attribute of the given
+ * cell is a valid flight number (an integer), the function searches for the table
+ * with that flight number using `getFlightTable()`.
+ */
 function getHeaderCellForCell(cell) {
-    let table = getFlightTable(parseInt(cell.getAttribute('flight')))
+    let table = getFlightTable(parseInt(cell.getAttribute("flight")));
     if (table) {
         let cellIndex = cell.cellIndex;
         let headerCell = table.querySelector("tr:first-child th:nth-child(" + (cellIndex + 1) + ")");
@@ -337,19 +335,19 @@ function getHeaderCellForCell(cell) {
 }
 
 /**
-* @description This function returns the availability of a player for a given cell
-* based on the value of an attribute with the player's name as a prefix.
-* 
-* @param { string } p - The `p` input parameter is a player index (a number from 0
-* to 3) that specifies which player's availability should be checked for the given
-* `cell`.
-* 
-* @param {  } cell - The `cell` input parameter passes a single cell from the grid
-* as an argument to the function.
-* 
-* @returns { integer } The output of the `getPlayerAvailabilityForCell` function is
-* `-1`.
-*/
+ * @description This function returns the availability of a player for a given cell
+ * based on the value of an attribute with the player's name as a prefix.
+ *
+ * @param { string } p - The `p` input parameter is a player index (a number from 0
+ * to 3) that specifies which player's availability should be checked for the given
+ * `cell`.
+ *
+ * @param {  } cell - The `cell` input parameter passes a single cell from the grid
+ * as an argument to the function.
+ *
+ * @returns { integer } The output of the `getPlayerAvailabilityForCell` function is
+ * `-1`.
+ */
 function getPlayerAvailabilityForCell(p, cell) {
     let playerAttributeTag = `player-${p}`;
     let headerCell = getHeaderCellForCell(cell);
@@ -360,18 +358,18 @@ function getPlayerAvailabilityForCell(p, cell) {
 }
 
 /**
-* @description This function retrieves the full column of cells at a specific column
-* index from a table.
-* 
-* @param { object } cell - The `cell` input parameter is a reference to an HTML table
-* cell element.
-* 
-* @returns { array } The `getFullColumn` function returns an array of cells from a
-* specific column of a table. It takes a cell as input and returns all the cells
-* that are located at the same column index as the input cell.
-*/
+ * @description This function retrieves the full column of cells at a specific column
+ * index from a table.
+ *
+ * @param { object } cell - The `cell` input parameter is a reference to an HTML table
+ * cell element.
+ *
+ * @returns { array } The `getFullColumn` function returns an array of cells from a
+ * specific column of a table. It takes a cell as input and returns all the cells
+ * that are located at the same column index as the input cell.
+ */
 function getFullColumn(cell) {
-    let table = getFlightTable(parseInt(cell.getAttribute('flight')))
+    let table = getFlightTable(parseInt(cell.getAttribute("flight")));
     if (table) {
         let columnIndex = cell.cellIndex;
         let columnCells = [];
