@@ -156,6 +156,18 @@ function createCaptainRadioInput(id, flightID) {
     return [radioInput, label];
 }
 
+/**
+* @description This function sets all the radio buttons with the same name as the
+* target button to false and hides their checked images; it then sets the target
+* button to true and shows its checked image.
+* 
+* @param { object } event - In the given function `captainRadioClickCallback`, the
+* `event` input parameter is used to get the target radio input element that triggered
+* the callback function.
+* 
+* @returns { any } This function takes an event object as a parameter and returns
+* no output.
+*/
 function captainRadioClickCallback(event) {
     let radioInput = event.target;
     const parentNode = radioInput.parentNode.parentNode;
