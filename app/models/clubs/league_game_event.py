@@ -33,10 +33,31 @@ class LeagueGameEvent(Model):
     GDPR_EXPORT_COLUMNS = {}
 
     def get_players(self):
+        """
+        This function returns a list of all players stored within the instance's
+        `players` attribute.
+
+        Returns:
+            list: The function `get_players()` returns a list of players (`[player
+            for player...]` is a list comprehension that creates a list of all
+            players stored within `self.players`).
+
+        """
         return [player for player in self.players]
         
 
     def __repr__(self):
+        """
+        This function defines a special method named `__repr__` (short for
+        "representation") that takes an object of class `LeagueGameEvent` and
+        returns a string representation of the object.
+
+        Returns:
+            str: The output returned by this function is a string:
+            
+            "<LeagueGameEvent(id=,..., players=[...])>".
+
+        """
         players = [player for player in self.players]
         return f"<LeagueGameEvent(id={self.id}, captain_id={self.captain_id}, " \
                f"league_id={self.league_id}, flight_id={self.flight_id}, " \
