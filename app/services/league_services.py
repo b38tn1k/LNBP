@@ -702,3 +702,25 @@ def apply_edits(league, updates):
                 change_flight(league, d)
             case 'availability':
                 update_availability(league, d)
+
+def create_games_from_request(league, data):
+    for flight in data:
+        for game in flight['games']:
+            print(game)
+            flight = league.get_flight_by_id(game['flight'])
+            print(flight)
+            timeslot = league.get_timeslot_by_id(game['flight'])
+            print(timeslot)
+            captain = False
+            if game['captain'] != -1:
+                captain = league.club.get_player_by_id(game['captain'])
+            print(captain)
+            players = []
+            for p in game['players']:
+                players.append(league.club.get_player_by_id(p))
+            print(players)
+            
+            print(flight, timeslot, captain, [p for p in players])
+
+
+            # league.create_game_event()

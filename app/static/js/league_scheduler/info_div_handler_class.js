@@ -22,7 +22,7 @@ class InfoClass {
             this.tennisRacketWarning.src = this.infoDiv.getAttribute("tennis_racket_warning");
             this.leagueRulesMinGamesTotal = parseInt(this.infoDiv.getAttribute("league_rules_min_games_total"));
             this.leagueRulesMaxGamesTotal = parseInt(this.infoDiv.getAttribute("league_rules_max_games_total"));
-            this.leagueRulesMaxPlayersPerMatch = parseInt(this.infoDiv.getAttribute("league_rules_max_players_per_match"));
+            this.leagueRulesPlayersPerMatch = parseInt(this.infoDiv.getAttribute("league_rules_players_per_match"));
             this.leagueRulesMaxGamesWeek = parseInt(this.infoDiv.getAttribute("league_rules_max_games_week"));
             this.leagueRulesMinGamesDay = parseInt(this.infoDiv.getAttribute("league_rules_min_games_day"));
             this.leagueRulesMaxGamesDay = parseInt(this.infoDiv.getAttribute("league_rules_max_games_day"));

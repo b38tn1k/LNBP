@@ -157,17 +157,17 @@ function createCaptainRadioInput(id, flightID) {
 }
 
 /**
-* @description This function sets all the radio buttons with the same name as the
-* target button to false and hides their checked images; it then sets the target
-* button to true and shows its checked image.
-* 
-* @param { object } event - In the given function `captainRadioClickCallback`, the
-* `event` input parameter is used to get the target radio input element that triggered
-* the callback function.
-* 
-* @returns { any } This function takes an event object as a parameter and returns
-* no output.
-*/
+ * @description This function sets all the radio buttons with the same name as the
+ * target button to false and hides their checked images; it then sets the target
+ * button to true and shows its checked image.
+ *
+ * @param { object } event - In the given function `captainRadioClickCallback`, the
+ * `event` input parameter is used to get the target radio input element that triggered
+ * the callback function.
+ *
+ * @returns { any } This function takes an event object as a parameter and returns
+ * no output.
+ */
 function captainRadioClickCallback(event) {
     let radioInput = event.target;
     const parentNode = radioInput.parentNode.parentNode;
@@ -394,4 +394,50 @@ function getFullColumn(cell) {
 
         return columnCells;
     }
+}
+
+function captainRadioIsChecked(di) {
+    return di.querySelector("input[type=radio]").checked;
+}
+
+function getGameInfoFromCell(cell) {
+    let flight = parseInt(cell.getAttribute("flight"));
+    let timeslot = parseInt(cell.getAttribute("timeslot"));
+    let facility = parseInt(cell.getAttribute("facility"));
+    let players = [];
+    let captain = -1;
+    cell.querySelectorAll(".draggable-item").forEach((di) => {
+        let pid = parseInt(di.getAttribute("player-id"));
+        players.push(pid);
+        if (captainRadioIsChecked(di)) {
+            captain = pid;
+        }
+    });
+    let game = {
+        flight: flight,
+        timeslot: timeslot,
+        facility: facility,
+        players: players,
+        captain: captain,
+    };
+    return game;
+}
+
+function getAllGames() {
+    let flights = [];
+    let tables = getAllFlightTables();
+    for (let t of tables) {
+        let fid = t.getAttribute("flight");
+        flight = { flight: fid };
+        flight["games"] = [];
+        let f = t.querySelector("tbody");
+        f.querySelectorAll("td").forEach((pg) => {
+            let game = getGameInfoFromCell(pg);
+            if (game["players"].length == info.leagueRulesPlayersPerMatch) {
+                flight["games"].push(game);
+            }
+        });
+        flights.push(flight);
+    }
+    return flights;
 }

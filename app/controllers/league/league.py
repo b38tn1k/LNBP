@@ -17,6 +17,7 @@ from app.services.league_services import (
     league_wizard_csv_to_dicts,
     build_league_from_json,
     apply_edits,
+    create_games_from_request,
 )
 import json
 
@@ -105,6 +106,14 @@ def schedule_league(id):
     league = current_user.club.get_league_by_id(id)
     if league is None:
         return redirect(url_for("main.home"))
+    if request.method == "POST":
+        try:
+            data = request.json
+            if data['contents'] == 'games':
+                create_games_from_request(league, data['data'])
+            return jsonify({"status": "success"})
+        except Exception as e:
+            return jsonify({"status": "failure", "error": str(e)})
     return render_template(
         "league/schedule.html", simple_form=SimpleForm(), league=league, club=current_user.club
     )

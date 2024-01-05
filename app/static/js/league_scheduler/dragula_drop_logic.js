@@ -36,7 +36,7 @@ function checkAvailabilityBeforeDrop(p, target) {
 */
 function checkFreeSpaceBeforeDrop(el, target) {
     let items = target.querySelectorAll(".draggable-item");
-    return items.length <= info.leagueRulesMaxPlayersPerMatch;
+    return items.length <= info.leagueRulesPlayersPerMatch;
 }
 
 /**

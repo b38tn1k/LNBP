@@ -135,7 +135,7 @@ class League(Model):
         """
         ts = self.timeslots[0]
         return ts.get_duration()
-    
+
     def get_player_availability_object(self, player, timeslot):
         """
         This function retrieves the availability of a player for a specific timeslot
@@ -176,7 +176,6 @@ class League(Model):
         # Default to unavailable if no availability record found
         return None
 
-
     def get_player_availability(self, player, timeslot):
         """
         This function `get_player_availability` takes a `player` and a `timeslot`
@@ -190,7 +189,7 @@ class League(Model):
 
         Returns:
             int: Based on the code provided:
-            
+
             The output returned by the `get_player_availability` function is a
             single integer value representing the availability of the player for
             the given timeslot.
@@ -416,8 +415,12 @@ class League(Model):
 
         """
         league_association = next(
-            (association for association in self.player_associations if association.player == player),
-            None
+            (
+                association
+                for association in self.player_associations
+                if association.player == player
+            ),
+            None,
         )
         if league_association:
             self.player_associations.remove(league_association)
@@ -442,12 +445,15 @@ class League(Model):
 
         """
         flight_association = next(
-            (association for association in flight.player_associations if association.player == player),
-            None
+            (
+                association
+                for association in flight.player_associations
+                if association.player == player
+            ),
+            None,
         )
         if flight_association:
             flight.player_associations.remove(flight_association)
-
 
     def add_facility(self, facility, add=True, commit=False):
         """
@@ -463,7 +469,7 @@ class League(Model):
         if commit is True:
             db.session.commit()
 
-    def remove_facility_by_id(self, id, add=True, commit=False):
+    def remove_facility_by_id(self, id, commit=False):
         # Find the association with the given facility ID
         """
         This function removes a facility from a collection of facility associations
@@ -488,8 +494,6 @@ class League(Model):
             self.facility_associations.remove(facility_to_remove)
             if commit:
                 db.session.commit()
-            elif add:
-                db.session.add(self)
 
     def facility_in_league(self, facility):
         """
@@ -511,3 +515,78 @@ class League(Model):
             association.facility == facility
             for association in self.facility_associations
         )
+
+    def create_game_event(
+        self, players, facility, timeslot, captain=False, add=True, commit=False
+    ):
+        """
+        Create a new game event for the league.
+
+        Args:
+            players (list of Player): The list of players associated with the game event.
+            facility (Facility): The facility where the game event takes place.
+            timeslot (Timeslot): The timeslot when the game event occurs.
+            captain (bool): True if one of the players is the captain for this game event, False otherwise.
+
+        Returns:
+            LeagueGameEvent: The newly created game event.
+        """
+        # Check if a game event with the same facility and timeslot already exists
+        existing_game_event = self.get_game_event(None, facility, timeslot)
+        if existing_game_event:
+            return existing_game_event
+
+        # Create a new game event
+        game_event = ModelProxy.clubs.LeagueGameEvent(
+            facility=facility,
+            timeslot=timeslot,
+            captain=captain,
+        )
+
+        # Associate players with the game event
+        for player in players:
+            game_event.players.append(player)
+
+        self.game_events.append(game_event)
+        if add is True:
+            db.session.add(game_event)
+        if commit is True:
+            db.session.commit()
+        return game_event
+
+    def get_game_event(self, players=None, facility=None, timeslot=None):
+        """
+        Get game events in the league based on optional filters.
+
+        Args:
+            players (list of Player): Optional list of players for player-specific game events.
+            facility (Facility): Optional filter for facility-specific game events.
+            timeslot (Timeslot): Optional filter for timeslot-specific game events.
+
+        Returns:
+            list: A list of game events in the league that match the given filters.
+        """
+        game_events = self.game_events
+
+        if players:
+            # Filter game events based on any of the specified players
+            game_events = [
+                ge
+                for ge in game_events
+                if any(player in ge.players for player in players)
+            ]
+
+        if facility:
+            game_events = [ge for ge in game_events if ge.facility == facility]
+
+        if timeslot:
+            game_events = [ge for ge in game_events if ge.timeslot == timeslot]
+
+        if facility and timeslot:
+            game_events = [
+                ge
+                for ge in game_events
+                if ge.facility == facility and ge.timeslot == timeslot
+            ]
+
+        return game_events

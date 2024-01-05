@@ -95,3 +95,11 @@ table.tiny-table {
     min-width: 10px !important;
     padding-top: 4px !important;
 }
+
+.fg-success {
+    color: green !important; /* Pastel Green */
+}
+
+.fg-failure {
+    color: red !important; /* Pastel Red */
+}

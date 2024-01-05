@@ -17,7 +17,7 @@
     tennis_racket="{{url_for('static', filename='public/scheduler-icons/tennis-racket.svg')}}"
     league_rules_min_games_total="{{ league.rules.min_games_total }}"
     league_rules_max_games_total="{{ league.rules.max_games_total }}"
-    league_rules_max_players_per_match="{{ league.rules.players_per_match }}"
+    league_rules_players_per_match="{{ league.rules.players_per_match }}"
     league_rules_max_games_week="{{ league.rules.max_games_week }}"
     league_rules_min_games_day="{{ league.rules.min_games_day }}"
     league_rules_max_games_day="{{ league.rules.max_games_day }}"
@@ -116,7 +116,7 @@
                                         </tr>
                                         {% endfor %}
 
-                                        <!-- <tr>
+                                        <tr>
                                         <th>SUB</th>
                                         {% for ts in league.timeslots %}
                                         <td
@@ -126,7 +126,7 @@
                                             flight="{{ flight.id }}"
                                         ></td>
                                         {% endfor %}
-                                    </tr> -->
+                                    </tr>
                                     </tbody>
                                 </table>
                             </fieldset>
@@ -193,7 +193,7 @@
         addImagesToTableData();
         revealHidden();
         setupDragula();
-        
+
         for (let id of info.flightIds) {
             updatePlayerCards(id);
         }

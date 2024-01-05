@@ -13,10 +13,10 @@
                 <i class="fe fe-save" style="font-size: 1.5em"></i>
             </button>
         </div>
-        <div class="row row-cards">
+        <div class="row row-cards" style="flex: 1">
             {% include 'league/edit_info.html' %} {% include 'league/edit_facilities.html' %}
-            <div class="col col-cards" style="flex: 1">
-                <div class="col-12">
+            <div class="col-4 col-cards">
+                <div class="col-12" >
                     {% include'league/edit_add_player.html' %} {% include'league/edit_add_remove_last_timeslot.html' %}
                 </div>
             </div>
