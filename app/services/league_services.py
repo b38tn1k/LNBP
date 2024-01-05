@@ -704,6 +704,19 @@ def apply_edits(league, updates):
                 update_availability(league, d)
 
 def create_games_from_request(league, data):
+    """
+    This function creates a new game event for each game included within a PandaX
+    data flight.
+
+    Args:
+        league (): The `league` input parameter is used to access other functions
+            or methods of the same league object.
+        data (dict): The `data` input parameter is a dictionary that contains the
+            flight and game information. It is iterated over twice within the
+            function: first for the outer loop over all flights within the given
+            league data and then for each game within a specific flight.
+
+    """
     for flight in data:
         for game in flight['games']:
             print(game)
