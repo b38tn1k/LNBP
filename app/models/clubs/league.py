@@ -538,10 +538,12 @@ class League(Model):
 
         # Create a new game event
         game_event = ModelProxy.clubs.LeagueGameEvent(
+            captain=captain,
+            league=self,
             facility=facility,
             timeslot=timeslot,
-            captain=captain,
         )
+        print("done")
 
         # Associate players with the game event
         for player in players:
@@ -566,27 +568,28 @@ class League(Model):
         Returns:
             list: A list of game events in the league that match the given filters.
         """
-        game_events = self.game_events
+        game_events = []
 
         if players:
             # Filter game events based on any of the specified players
             game_events = [
                 ge
-                for ge in game_events
+                for ge in self.game_events
                 if any(player in ge.players for player in players)
             ]
 
-        if facility:
-            game_events = [ge for ge in game_events if ge.facility == facility]
+        if facility and not timeslot:
+            game_events = [ge for ge in self.game_events if ge.facility == facility]
 
-        if timeslot:
-            game_events = [ge for ge in game_events if ge.timeslot == timeslot]
+        if timeslot and not facility:
+            game_events = [ge for ge in self.game_events if ge.timeslot == timeslot]
 
         if facility and timeslot:
             game_events = [
                 ge
-                for ge in game_events
+                for ge in self.game_events
                 if ge.facility == facility and ge.timeslot == timeslot
             ]
+        print(game_events)
 
         return game_events

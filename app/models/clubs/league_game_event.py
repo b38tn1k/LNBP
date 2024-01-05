@@ -31,3 +31,14 @@ class LeagueGameEvent(Model):
     players = db.relationship('Player', secondary=game_event_player_association, backref=db.backref('game_events', lazy=True))
 
     GDPR_EXPORT_COLUMNS = {}
+
+    def get_players(self):
+        return [player for player in self.players]
+        
+
+    def __repr__(self):
+        players = [player for player in self.players]
+        return f"<LeagueGameEvent(id={self.id}, captain_id={self.captain_id}, " \
+               f"league_id={self.league_id}, flight_id={self.flight_id}, " \
+               f"facility_id={self.facility_id}, timeslot_id={self.timeslot_id}, " \
+               f"players={players})>"

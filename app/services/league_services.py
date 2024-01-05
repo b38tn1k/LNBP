@@ -719,21 +719,14 @@ def create_games_from_request(league, data):
     """
     for flight in data:
         for game in flight['games']:
-            print(game)
             flight = league.get_flight_by_id(game['flight'])
-            print(flight)
-            timeslot = league.get_timeslot_by_id(game['flight'])
-            print(timeslot)
+            timeslot = league.get_timeslot_by_id(game['timeslot'])
+            facility = league.club.get_facility_by_id(game['facility'])
             captain = False
             if game['captain'] != -1:
                 captain = league.club.get_player_by_id(game['captain'])
-            print(captain)
             players = []
             for p in game['players']:
                 players.append(league.club.get_player_by_id(p))
-            print(players)
-            
-            print(flight, timeslot, captain, [p for p in players])
-
-
-            # league.create_game_event()
+            # print(flight, timeslot, captain, facility, [p for p in players])
+            league.create_game_event(players, facility, timeslot, captain=captain)

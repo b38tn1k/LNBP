@@ -111,6 +111,8 @@ def schedule_league(id):
             data = request.json
             if data['contents'] == 'games':
                 create_games_from_request(league, data['data'])
+                db.session.commit()
+                print(league.game_events)
             return jsonify({"status": "success"})
         except Exception as e:
             return jsonify({"status": "failure", "error": str(e)})

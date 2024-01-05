@@ -111,7 +111,17 @@
                                                 facility="{{ facility.id }}"
                                                 timeslot="{{ ts.id }}"
                                                 flight="{{ flight.id }}"
-                                            ></td>
+                                            >
+
+                                            {% set games = league.get_game_event(facility=facility, timeslot=ts) %}
+
+                                            {% for game in games %}
+                                            {% for p in game.players %}
+                                            {{p.full_name}},
+                                            {% endfor %}
+                                            {% endfor %}
+                                        
+                                        </td>
                                             {% endfor %} {%endif%}
                                         </tr>
                                         {% endfor %}
