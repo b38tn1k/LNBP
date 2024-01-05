@@ -396,10 +396,33 @@ function getFullColumn(cell) {
     }
 }
 
+/**
+* @description This function retrieves the state of a radio button within the passed
+* Element's (`di`) HTML document using `querySelector` method and returns its checked
+* status as a boolean value.
+* 
+* @param { object } di - The `di` input parameter is an arbitrary DOM element to
+* which the function applies the selection and checking of the radio button.
+* 
+* @returns { boolean } The output returned by the `captainRadioIsChecked` function
+* is a Boolean value indicating whether the radio button with the given `di` parameter
+* is checked or not.
+*/
 function captainRadioIsChecked(di) {
     return di.querySelector("input[type=radio]").checked;
 }
 
+/**
+* @description This function retrieves information about a game (flight number
+* ,timeslot facility name and captain) from cells within it which have specific
+* classnames and attributes .
+* 
+* @param {  } cell - The `cell` input parameter is a DOM element representing a table
+* cell containing data for a specific game.
+* 
+* @returns { object } The `getGameInfoFromCell` function takes a cell element as
+* input and returns an object representing the game information.
+*/
 function getGameInfoFromCell(cell) {
     let flight = parseInt(cell.getAttribute("flight"));
     let timeslot = parseInt(cell.getAttribute("timeslot"));
@@ -423,6 +446,17 @@ function getGameInfoFromCell(cell) {
     return game;
 }
 
+/**
+* @description This function retrieves all games from HTML tables and stores them
+* within an array of game objects. Each game object contains flight details (e.g.
+* ID) and information about the players participating.
+* 
+* @returns { object } The function `getAllGames` takes an empty object `{}` as its
+* argument and returns an array of objects each representing a flight with an
+* associated list of games. Each object `flight` contains one attribute 'flight'
+* which is a string with the flight number and an 'games' property that contains an
+* array of game objects.
+*/
 function getAllGames() {
     let flights = [];
     let tables = getAllFlightTables();
