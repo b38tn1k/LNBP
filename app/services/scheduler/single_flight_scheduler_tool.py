@@ -208,6 +208,18 @@ class SingleFlightScheduleTool:
         return tpp, ts
     
     def initCA(self):
+        """
+        This function initializes the combat agent's player pool and histories
+        using the `generate_timeslot_player_pool` and `init_histories` methods.
+        It then shuffles the timeslot list to assign random positions to players.
+
+        Returns:
+            list: The function `initCA` returns two items:
+            
+            1/ A tuple of player objects `tpd` containing all the player objects.
+            2/ A list `ts_list` of timeslot objects randomly shuffled.
+
+        """
         tpp, ts = self.generate_timeslot_player_pool()
         init_histories(self.players)
         ts_list = list(ts)
@@ -215,6 +227,25 @@ class SingleFlightScheduleTool:
         return tpp, ts_list
     
     def schedule_games_for_timeslot(self, tpp, ts_list, all_scheduled_games):
+        """
+        This function schedules games for a given timeslot while ensuring that
+        certain rules are satisfied. These rules include having available slots
+        for the timeslot and not scheduling too many games for any one player or
+        on any one day or week.
+
+        Args:
+            tpp (dict): The `tpp` input parameter is a dictionary that contains
+                the current state of the timeslots for each player.
+            ts_list (list): The `ts_list` input parameter is a list of tuples
+                containing timeslot information (day and week) for which games are
+                to be scheduled.
+            all_scheduled_games (list): The `all_scheduled_games` input parameter
+                is a list that accumulates all the scheduled games for each timeslot
+                during the scheduling process. It is initially empty and is filled
+                as the scheduling loop adds scheduled games to it at the end of
+                each iteration.
+
+        """
         while True:
             game_added = 0
             timeslot_count = 0
@@ -298,6 +329,20 @@ class SingleFlightScheduleTool:
                 break
 
     def force_assign(self, tpp, ts_list):
+        """
+        This function takes a list of tuples `ts_list` and a dict of tournament
+        pairs `ttpp`, and it forces player assignments to matches based on facility
+        IDs.
+
+        Args:
+            tpp (dict): The `tpp` input parameter is a dictionary of tennis
+                tournament schedules and it is used to store the tournament schedule
+                data after sorting the times and forcing player-game matches.
+            ts_list (dict): The `ts_list` input parameter is a list of dicts
+                containing player data. Each dict represents a single player and
+                contains the key "times" with a list of games played by that player.
+
+        """
         for t in ts_list:
             tpp[t]["times"] = sorted(tpp[t]["times"], key=lambda x: x.facility_id)
             if len(tpp[t]["sgames"]) != 0:
