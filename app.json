@@ -1,16 +1,14 @@
 {
 
-  "name": "app",
-  "description": "Flask App",
+  "name": "League Ninja",
+  "description": "Social Sports Scheduler",
   "keywords": [
-    "flask",
-    "saas",
-    "scaffolding",
-    "ignite"
+    "sport",
+    "schedule"
   ],
-  "website": "https://github.com/sumukh/ignite/",
-  "repository": "https://github.com/sumukh/ignite/",
-  "logo": "https://github.com/Sumukh/Ignite/raw/master/app/static/public/leagueninja/leagueninja-icon.png",
+  "website": "https://github.com/b38tn1k/",
+  "repository": "https://github.com/b38tn1k/LNBP",
+  "logo": "app/static/public/leagueninja/leagueninja-icon.png",
   "success_url": "/",
   "scripts": {
     "predeploy": "flask assets build",
