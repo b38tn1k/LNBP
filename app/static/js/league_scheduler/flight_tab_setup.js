@@ -104,6 +104,19 @@ function setupPlayerDraggableOrigins() {
     });
 }
 
+/**
+* @description This function makes all the players draggable on the games canvas and
+* renames the radios for each player based on their id.
+* 
+* @returns { any } Based on the code provided:
+* 
+* The output returned by this function is not defined.
+* 
+* Explanation: The function does not have a return statement and instead modifies
+* the HTML elements on the page. It creates draggable tiles for each player and
+* renames the radios associated with those tiles. It also toggleCaptain functionality
+* based on if the player is the captain or not.
+*/
 function setupPlayerDraggableInGames() {
     for (let i = 0; i < info.games.length; i++) {
         let target = info.games[i]["target"];
@@ -177,6 +190,28 @@ function createCaptainRadioInput(id, flightID) {
     return [radioInput, label];
 }
 
+/**
+* @description This function is a callback function for a click event on a radio button.
+* 
+* @param { object } event - In the provided JavaScript function `captainRadioClickCallback`,
+* the `event` parameter represents the Event Object that is triggered when a radio
+* button is clicked.
+* 
+* @returns { any } This function takes an event object as an argument and performs
+* the following actions:
+* 
+* 1/ It sets the checked attribute of all radio buttons with the same name as the
+* input element that triggered the event to false.
+* 2/ It hides the "checked" image and shows the "unchecked" image for each radio
+* button with the same name.
+* 3/ It calls the `toggleCaptain()` function and passes the input element as an argument.
+* 4/ It calls the `updatePlayerCards()` function with the value of the `flight`
+* attribute of the input element.
+* 
+* The output returned by this function is not explicitly defined as it is meant to
+* be a callback function that operates on other elements based on the input element
+* that triggered the event.
+*/
 function captainRadioClickCallback(event) {
     let radioInput = event.target;
     const parentNode = radioInput.parentNode.parentNode;
@@ -189,6 +224,18 @@ function captainRadioClickCallback(event) {
     updatePlayerCards(parseInt(radioInput.getAttribute("flight")));
 }
 
+/**
+* @description The function `toggleCaptain` takes a `radioInput` element as an
+* argument and sets its `checked` property to `true`, displays the "checked" image
+* for that label using CSS (`style.display = "inline"`), and hides the "unchecked"
+* image (`style.display = "none"`).
+* 
+* @param {  } radioInput - The `radioInput` input parameter is the reference to the
+* radio button element that triggers the function.
+* 
+* @returns { any } The function takes a `radioInput` element as an argument and sets
+* its `checked` property to `true`.
+*/
 function toggleCaptain(radioInput) {
     radioInput.checked = true;
     radioInput.labels[0].querySelector(".checked-img").style.display = "inline";

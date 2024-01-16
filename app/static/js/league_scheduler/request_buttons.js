@@ -37,6 +37,19 @@ function saveButtonCallback(event) {
     sendToServer(data, success, failure);
 }
 
+/**
+* @description This function creates a callback for a button click event that schedules
+* a flight. It retrieves the currently active flight tab and passes its ID to the
+* server along with other data.
+* 
+* @param {  } event - The `event` input parameter is passed to the function from the
+* button's `onClick` event listener.
+* 
+* @returns { object } This function takes an event object as a parameter and returns
+* nothing (undefined) because it does not have a return statement. The function
+* prepares data to be sent to the server based on the active flight tab and disables
+* the button. It then calls two functions: success and failure.
+*/
 function generateButtonCallback(event) {
     let data = {contents: 'schedule'}
     const tabs = document.querySelectorAll(".flight-tab");
@@ -49,11 +62,26 @@ function generateButtonCallback(event) {
     data['data'] = {flight_id : target_flight}
     let button = event.target.closest("button");
     button.disabled = true;
+/**
+* @description This function sets a toggle button's disabled status to false (enabling
+* it), flashes an icon next to the button indicating success and replaces it with a
+* different icon afterwards.
+* 
+* @returns { any } The function `success` returns nothing (undefined) because it is
+* an anonymous function and does not have a return statement.
+*/
     function success() {
         toggleButtonDisabled(button);
         flashButtonResult(button, "fe-check-circle", "fg-success", "fe-star");
         window.location.reload();
     }
+/**
+* @description This function triggers the failure state of a button by disabling it
+* and changing its appearance with icons and colors.
+* 
+* @returns {  } The output of the `failure()` function is not defined because the
+* function contains statements that do not return any value.
+*/
     function failure() {
         toggleButtonDisabled(button);
         flashButtonResult(button, "fe-x-circle", "fg-failure", "fe-star");

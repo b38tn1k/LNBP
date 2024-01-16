@@ -202,6 +202,20 @@ class League(Model):
             return -1
         
     def get_player_availability_dict(self, player):
+        """
+        This function returns a dictionary of player availability for each timeslot
+        (represented by an ID) based on the given player and the availability of
+        that player during each timeslot.
+
+        Args:
+            player (): The `player` input parameter specifies the player for whom
+                to determine availability.
+
+        Returns:
+            dict: The function `get_player_availability_dict` returns a dictionary
+            with the player availability for each time slot.
+
+        """
         a = {}
         for t in self.timeslots:
             a[t.id] = self.get_player_availability(player, t)

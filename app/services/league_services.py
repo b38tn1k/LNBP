@@ -767,6 +767,19 @@ def create_games_from_request(league, data):
             )
 
 def create_game_from_scheduler(league, flight, game):
+    """
+    This function creates a new game event for a given league using the information
+    provided.
+
+    Args:
+        league (int): The `league` input parameter provides access to the league
+            object which contains information such as clubs and their facilities.
+        flight (int): The `flight` input parameter specifies the flight number of
+            the game event.
+        game (dict): The `game` input parameter is a dictionary containing information
+            about the game to be created.
+
+    """
     print('create ', game)
     timeslot = league.get_timeslot_by_id(game["timeslot"])
     facility = league.club.get_facility_by_id(game["facility"])
@@ -783,6 +796,30 @@ def create_game_from_scheduler(league, flight, game):
 
 
 def create_player_objects(flight, league, rules):
+    """
+    This function creates a list of `Player` objects from a flight's player
+    associations and computes the mean availability score for the players based
+    on league availability data.
+
+    Args:
+        flight (): The `flight` input parameter is a list of player associations
+            from which the function creates players.
+        league (dict): The `league` input parameter is used to retrieve player
+            availability information for each player association.
+        rules (dict): The `rules` input parameter defines the ruleset for player
+            creation; it is used to initialise the player object's attributes like
+            avg.
+
+    Returns:
+        list: The output returned by the `create_player_objects` function is a
+        list of `Player` objects. Each `Player` object has an `id`, `rules`, and
+        an `availability_score` attribute set based on the player's availability
+        according to the `league` object's `get_player_availability_dict`. The
+        `mean_availability_score` variable is computed as the average availability
+        score of all players and each player's `availability_score` attribute is
+        set relative to this mean.
+
+    """
     players = []
     mean_availability_score = 0
     for a in flight.player_associations:
@@ -796,6 +833,21 @@ def create_player_objects(flight, league, rules):
     return players
 
 def create_gameslot_objects(league, rules):
+    """
+    This function creates a list of `GameSlot` objects based on the availability
+    of facilities and timeslots for a given league.
+
+    Args:
+        league (): The `league` input parameter is a League object that provides
+            information about the available timeslots and facility associations
+            for scheduling games.
+        rules (): The `rules` input parameter defines the game slot object's
+            parameters and restrictions such as scoring format or duration constraints.
+
+    Returns:
+        list: The output returned by this function is a list of `GameSlot` objects.
+
+    """
     gameslots = []
     for t in league.timeslots:
         for f in league.facility_associations:
@@ -807,6 +859,16 @@ def create_gameslot_objects(league, rules):
 
 
 def schedule_wizard(league, flight_id):
+    """
+    This function creates a scheduling system for a single flight of games using
+    a league's rules and player information.
+
+    Args:
+        league (): The `league` input parameter passes the league object to the function.
+        flight_id (int): The `flight_id` input parameter specifies the unique
+            identifier of the flight for which to schedule games.
+
+    """
     print("Schedule", league, flight_id)
     rules = league.get_league_rules_dict()
     flight = league.get_flight_by_id(flight_id)

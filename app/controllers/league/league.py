@@ -44,6 +44,23 @@ def check_for_membership(*args, **kwargs):
 @blueprint.route("/<int:id>", methods=["GET", "POST"])
 @login_required
 def league_home(id):
+    """
+    This function renders the "league/league_home.html" template with data specific
+    to the current user's club and league (passed as `league` and `club`), checks
+    if the user is authenticated and has a primary membership ID (and displays an
+    error message if not), and redirects to the "main.home" page if no league with
+    the given ID could be found.
+
+    Args:
+        id (int): The `id` input parameter passes an identifier to the function
+            and allows it to fetch a specific League that corresponds with the identifier.
+
+    Returns:
+        str: Based on the code provided:
+        
+        The output returned by `league_home(id)` is a HTML page with the name "league/league_home.html"
+
+    """
     if not current_user.is_authenticated or current_user.primary_membership_id is None:
         flash("You currently do not have accesss to app", "warning")
         return redirect(url_for("main.home"))
