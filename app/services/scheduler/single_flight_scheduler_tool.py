@@ -163,6 +163,7 @@ class SingleFlightScheduleTool:
         shuffle(gameslots)
         self.gameslots = sorted(gameslots, key=lambda gs: gs.facility_id, reverse=True)
         self.gameslots = sorted(self.gameslots, key=lambda gs: gs.availability_score)
+        print ([g.availability_score for g in self.gameslots])
         self.players = sorted(players, key=lambda player: player.availability_score)
 
     def generate_timeslot_player_pool(self):
@@ -175,7 +176,6 @@ class SingleFlightScheduleTool:
             pools and a set of all available timeslots.
 
         """
-        # print("Generate Time Slot Player Pool")
         ts = set([g.timeslot_id for g in self.gameslots])
         tpp = {}  # timeslot player pool
         for t in ts:
@@ -220,10 +220,10 @@ class SingleFlightScheduleTool:
             2/ A list `ts_list` of timeslot objects randomly shuffled.
 
         """
-        tpp, ts = self.generate_timeslot_player_pool()
         init_histories(self.players)
+        tpp, ts = self.generate_timeslot_player_pool()
         ts_list = list(ts)
-        shuffle(ts_list)
+        # shuffle(ts_list)
         return tpp, ts_list
     
     def schedule_games_for_timeslot(self, tpp, ts_list, all_scheduled_games):
@@ -351,87 +351,7 @@ class SingleFlightScheduleTool:
                     for p in sg:
                         gs.force_player_to_match(p)
 
-    def runCA(self):
-        """
-        This function is trying to resolve scheduling conflicts between players
-        by matching them with games that are scheduled at the same time. It does
-        this by iteratively grouping players into potential match groups based on
-        the overlap of their preferences and existing game assignments.
-
-        """
-        # print("Run CA")
-        tpp, ts_list = self.initCA()
-        all_scheduled_games = []
-        self.schedule_games_for_timeslot(tpp, ts_list, all_scheduled_games)
-        self.recalculate_players()
-        self.force_assign(tpp, ts_list)
-
-        self.recalculate_players()
-        for p in self.players:
-            _ = p.find_potential_slots_in_current_layout(self.gameslots)
-
-        
-        unsatisfied_friends = []
-        unsatisfied = [p for p in self.players if p.satisfied is False]
-        counter = 0
-        while counter < len(unsatisfied) - 2:
-            common_elments = set(unsatisfied[counter].potentials)
-            common_elments.intersection_update(unsatisfied[counter + 1].potentials)
-            if len(common_elments) != 0:
-                unsatisfied_friends.append(
-                    {
-                        "players": [unsatisfied[counter], unsatisfied[counter + 1]],
-                        "overlap": common_elments,
-                    }
-                )
-            counter += 1
-
-        second_iteration = []
-        if len(unsatisfied_friends) != 0:
-            f2_old = unsatisfied_friends[0]["players"][1]
-            f_old = unsatisfied_friends[0]
-            for f in unsatisfied_friends:
-                if f2_old == f["players"][0]:
-                    common_elments = set(f["overlap"])
-                    common_elments.intersection_update(f_old["overlap"])
-                    if len(common_elments) != 0:
-                        new_group = {
-                            "players": [
-                                f_old["players"][0],
-                                f_old["players"][1],
-                                f["players"][1],
-                            ],
-                            "overlap": common_elments,
-                        }
-                        second_iteration.append(new_group)
-                f2_old = f["players"][1]
-                f_old = f
-        
-        third_iteration = []
-        if len(second_iteration) != 0:
-            f3_old = second_iteration[0]["players"][1]
-            f_old = second_iteration[0]
-            to_remove = []
-            for gr in second_iteration:
-                if f3_old == gr["players"][0]:
-                    common_elments = set(f["overlap"])
-                    common_elments.intersection_update(f_old["overlap"])
-                    if len(common_elments) != 0:
-                        p1 = [p for p in f_old["players"]]
-                        p2 = [p for p in gr["players"]]
-                        for np in p2:
-                            if not np in p1:
-                                p1.append(np)
-                        new_group = {"players": p1, "overlap": common_elments}
-                        third_iteration.append(new_group)
-                        to_remove.append(f_old)
-                        to_remove.append(gr)
-                f3_old = gr["players"][1]
-                f_old = gr
-                for d in to_remove:
-                    if d in second_iteration:
-                        second_iteration.remove(d)
-
+    def second_force_assign(self, third_iteration):
         for match in third_iteration:
             selected_gs = None
             for gs in match["overlap"]:
@@ -441,6 +361,24 @@ class SingleFlightScheduleTool:
                 for p in match["players"]:
                     selected_gs.force_player_to_match(p)
                     self.recalculate_players()
+
+    def runCA(self):
+        """
+        This function is trying to resolve scheduling conflicts between players
+        by matching them with games that are scheduled at the same time. It does
+        this by iteratively grouping players into potential match groups based on
+        the overlap of their preferences and existing game assignments.
+
+        """
+        print("Run CA")
+        tpp, ts_list = self.initCA()
+        all_scheduled_games = []
+        print("schedule games")
+        self.schedule_games_for_timeslot(tpp, ts_list, all_scheduled_games)
+        self.recalculate_players()
+        print("force assign")
+        self.force_assign(tpp, ts_list)
+        self.recalculate_players()
 
     def recalculate_players(self):
         """

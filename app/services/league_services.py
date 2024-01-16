@@ -884,6 +884,6 @@ def schedule_wizard(league, flight_id):
     scheduler.assign_captains()
     print('Build New Schedule')
     events = scheduler.return_events()
-    print('GAMES:', events)
+    # print('GAMES:', events)
     for e in events:
         create_game_from_scheduler(league, flight, e)
