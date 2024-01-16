@@ -1,9 +1,9 @@
-<div class="col-8 col-sm-8 col-lg-8">
-    <div class="card">
+<div class="col-6 col-sm-6 col-lg-6">
+    <div class="card" style="flex: 1;">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h3 class="card-title">Leagues Summary</h3>
             <a href="{{ url_for('league.create_league') }}" class="btn btn-primary btn-sm" aria-label="New League" title="New League">
-                <i class="fe fe-plus-circle"></i>
+                <i class="fe fe-plus-circle"></i> New League
             </a>
         </div>
 
@@ -15,26 +15,27 @@
                             <table class="table">
                                 <thead>
                                     <tr>
+                                        <!-- <td colspan="6"><h4>{{ league_type|capitalize }} Leagues</h4></td> -->
+                                        <th colspan="6">{{ league_type|capitalize }} Leagues</th>
+                                    </tr>
+                                    <tr>
                                         <th>Name</th>
                                         <th>Start Date</th>
                                         <th>End Date</th>
                                         <th>Player Count</th>
-                                        <th>Edit</th>
-                                        <th>Schedule</th>
+                                        <!-- <th>Edit</th>
+                                        <th>Schedule</th> -->
                                         <th>Delete</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td colspan="6"><h4>{{ league_type|capitalize }} Leagues</h4></td>
-                                    </tr>
                                     {% for league in league_list %}
                                         <tr>
-                                            <td><a href="{{ url_for('league.league_home', id=league['id']) }}">{{ league['name'] }}</a></td>
+                                            <td><a href="{{ url_for('league.league_home', id=league['id']) }}"><h3>{{ league['name'] }}</h3></a></td>
                                             <td>{{ league['start_date'] }}</td>
                                             <td>{{ league['end_date'] }}</td>
                                             <td>{{ league['player_count'] }}</td>
-                                            <td>
+                                            <!-- <td>
                                                 <a href="{{ url_for('league.edit_league', id=league['id']) }}" class="btn btn-primary">
                                                     <i class="fe fe-edit"></i>
                                                 </a>
@@ -43,7 +44,7 @@
                                                 <a href="{{ url_for('league.schedule_league', id=league['id']) }}" class="btn btn-primary">
                                                     <i class="fe fe-star"></i>
                                                 </a>
-                                            </td>
+                                            </td> -->
                                             <td>
                                                 <a href="{{ url_for('league.delete_league', id=league['id']) }}" class="btn btn-danger">
                                                     <i class="fe fe-trash"></i>
