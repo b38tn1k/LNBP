@@ -17,6 +17,5 @@ def generateGameSlotAvailabilityScores(gameslots, players):
         for p in players:
             if p.availability[gs.timeslot_id] == AVAILABLE:
                 gs.availability_score += p.availability_score
-        print(gs, gs.availability_score)
 
             

@@ -206,29 +206,18 @@ class SingleFlightScheduleTool:
                 for g in combinations(tpp[t]["all"], self.rules["players_per_match"]):
                     tpp[t]["pgames"].append(g)
         return tpp, ts
-
-    def runCA(self):
-        """
-        This function is trying to resolve scheduling conflicts between players
-        by matching them with games that are scheduled at the same time. It does
-        this by iteratively grouping players into potential match groups based on
-        the overlap of their preferences and existing game assignments.
-
-        """
-        # print("Run CA")
+    
+    def initCA(self):
         tpp, ts = self.generate_timeslot_player_pool()
+        init_histories(self.players)
         ts_list = list(ts)
         shuffle(ts_list)
-        all_scheduled_games = []
-        init_histories(self.players)
-        total_games_added = 0
-        loop_count = 0
-        games_considered = 0
-        # print("Start Loop")
+        return tpp, ts_list
+    
+    def schedule_games_for_timeslot(self, tpp, ts_list, all_scheduled_games):
         while True:
             game_added = 0
             timeslot_count = 0
-            loop_count += 1
             already_added = False
             for t in ts_list:
                 timeslot_count += 1
@@ -250,7 +239,6 @@ class SingleFlightScheduleTool:
                     sorted_games = lower_than_average
                 day, week = tpp[t]["day"], tpp[t]["week"]
                 for potential_game in sorted_games:
-                    games_considered += 1
                     # only consider 1 game per loop
                     if already_added:
                         break
@@ -287,7 +275,6 @@ class SingleFlightScheduleTool:
                     tpp[t]["sgames"].append(potential_game)
                     tpp[t]["available_slots"] -= 1
                     game_added += 1
-                    total_games_added += 1
                     already_added = True
 
                     # Track all scheduled games also
@@ -309,27 +296,39 @@ class SingleFlightScheduleTool:
                         continue
             if game_added == 0:
                 break
-        self.recalculate_players()
 
-        counter = 0
+    def force_assign(self, tpp, ts_list):
         for t in ts_list:
             tpp[t]["times"] = sorted(tpp[t]["times"], key=lambda x: x.facility_id)
             if len(tpp[t]["sgames"]) != 0:
                 for i, sg in enumerate(tpp[t]["sgames"]):
                     gs = tpp[t]["times"][i]
-                    counter += 1
                     for p in sg:
                         gs.force_player_to_match(p)
+
+    def runCA(self):
+        """
+        This function is trying to resolve scheduling conflicts between players
+        by matching them with games that are scheduled at the same time. It does
+        this by iteratively grouping players into potential match groups based on
+        the overlap of their preferences and existing game assignments.
+
+        """
+        # print("Run CA")
+        tpp, ts_list = self.initCA()
+        all_scheduled_games = []
+        self.schedule_games_for_timeslot(tpp, ts_list, all_scheduled_games)
+        self.recalculate_players()
+        self.force_assign(tpp, ts_list)
 
         self.recalculate_players()
         for p in self.players:
             _ = p.find_potential_slots_in_current_layout(self.gameslots)
 
+        
+        unsatisfied_friends = []
         unsatisfied = [p for p in self.players if p.satisfied is False]
         counter = 0
-        unsatisfied_friends = []
-        second_iteration = []
-        third_iteration = []
         while counter < len(unsatisfied) - 2:
             common_elments = set(unsatisfied[counter].potentials)
             common_elments.intersection_update(unsatisfied[counter + 1].potentials)
@@ -341,6 +340,8 @@ class SingleFlightScheduleTool:
                     }
                 )
             counter += 1
+
+        second_iteration = []
         if len(unsatisfied_friends) != 0:
             f2_old = unsatisfied_friends[0]["players"][1]
             f_old = unsatisfied_friends[0]
@@ -360,6 +361,8 @@ class SingleFlightScheduleTool:
                         second_iteration.append(new_group)
                 f2_old = f["players"][1]
                 f_old = f
+        
+        third_iteration = []
         if len(second_iteration) != 0:
             f3_old = second_iteration[0]["players"][1]
             f_old = second_iteration[0]
