@@ -1071,6 +1071,11 @@ class SingleFlightScheduleTool:
                 print(p.id, p.game_count)
 
     def assign_captains(self):
+        """
+        This function assigns a captain to each game slot that has a full team and
+        doesn't already have a captain assigned.
+
+        """
         assigned = set()
         self.recalculate_players()
         for p in self.players:
