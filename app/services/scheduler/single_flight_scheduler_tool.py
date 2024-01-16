@@ -486,22 +486,33 @@ class SingleFlightScheduleTool:
         doesn't already have a captain assigned.
 
         """
-        assigned = set()
-        self.recalculate_players()
-        for p in self.players:
-            p.captain_count = 0
-        full_games_length = len([g for g in self.gameslots if g.full is True])
-        shuffle(self.gameslots)
-        for g in self.gameslots:
-            if g.full is True:
-                if g.captain is None:
-                    for p in g.game_event:
-                        if not p.id in assigned or len(assigned) == full_games_length:
-                            g.captain = p
-                            p.captain_count += 1
-                            assigned.add(p.id)
-                            self.recalculate_players()
-                            break
+        counter = 0
+        while counter < 5:
+            counter += 1
+            good = True
+            assigned = set()
+            self.recalculate_players()
+            for p in self.players:
+                p.captain_count = 0
+            for g in self.gameslots:
+                if g.full is True:
+                    g.captain = None
+            shuffle(self.gameslots)
+            for g in self.gameslots:
+                if g.full is True:
+                    if g.captain is None:
+                        for p in g.game_event:
+                            if not p.id in assigned:
+                                g.captain = p
+                                p.captain_count += 1
+                                print(p.id)
+                                assigned.add(p.id)
+                                print(assigned)
+                                break
+                        if g.captain is None:
+                            good = False
+            if good is True:
+                    break
 
 
 
