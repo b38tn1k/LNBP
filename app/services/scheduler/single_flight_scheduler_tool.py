@@ -13,7 +13,7 @@ def init_histories(players):
             and it is used to loop over all the players In the game.
 
     """
-    print("Init Histories")
+    # print("Init Histories")
     for player in players:
         for p in players:
             player.other_player_history[p.id] = 0
@@ -225,6 +225,7 @@ class SingleFlightScheduleTool:
 
         shuffle(gameslots)
         self.gameslots = sorted(gameslots, key=lambda gs: gs.facility_id, reverse=True)
+        self.gameslots = sorted(self.gameslots, key=lambda gs: gs.availability_score)
         self.players = sorted(players, key=lambda player: player.availability_score)
 
     def check_escape_conditions(self, log=False):
@@ -343,7 +344,7 @@ class SingleFlightScheduleTool:
             pools and a set of all available timeslots.
 
         """
-        print("Generate Time Slot Player Pool")
+        # print("Generate Time Slot Player Pool")
         ts = set([g.timeslot_id for g in self.gameslots])
         tpp = {}  # timeslot player pool
         for t in ts:
@@ -383,7 +384,7 @@ class SingleFlightScheduleTool:
         the overlap of their preferences and existing game assignments.
 
         """
-        print("Run CA")
+        # print("Run CA")
         tpp, ts = self.generate_timeslot_player_pool()
         ts_list = list(ts)
         shuffle(ts_list)
@@ -392,7 +393,7 @@ class SingleFlightScheduleTool:
         total_games_added = 0
         loop_count = 0
         games_considered = 0
-        print("Start Loop")
+        # print("Start Loop")
         while True:
             game_added = 0
             timeslot_count = 0
@@ -651,7 +652,7 @@ class SingleFlightScheduleTool:
         player based on the current state of the gameslot and the player's history.
 
         """
-        print("Recalculate Players")
+        # print("Recalculate Players")
         satisfied = {}
         for p in self.players:
             satisfied[p.id] = 0
@@ -733,11 +734,16 @@ class SingleFlightScheduleTool:
         events = []
         for gameslot in self.gameslots:
             if gameslot.full is True:
+                captain = None
+                if gameslot.captain is None:
+                    captain = gameslot.game_event[0].id
+                else:
+                    captain = gameslot.captain.id
                 events.append(
                     {
                         'timeslot': gameslot.timeslot_id,
                         'facility': gameslot.facility_id,
-                        'captain': gameslot.game_event[0].id,
+                        'captain': captain,
                         'players': [p.id for p in gameslot.game_event],
                     }
                 )
@@ -1063,3 +1069,24 @@ class SingleFlightScheduleTool:
         for p in self.players:
             if p.satisfied == False:
                 print(p.id, p.game_count)
+
+    def assign_captains(self):
+        assigned = set()
+        self.recalculate_players()
+        for p in self.players:
+            p.captain_count = 0
+        full_games_length = len([g for g in self.gameslots if g.full is True])
+        shuffle(self.gameslots)
+        for g in self.gameslots:
+            if g.full is True:
+                if g.captain is None:
+                    for p in g.game_event:
+                        if not p.id in assigned or len(assigned) == full_games_length:
+                            g.captain = p
+                            p.captain_count += 1
+                            assigned.add(p.id)
+                            self.recalculate_players()
+                            break
+
+
+

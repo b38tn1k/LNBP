@@ -190,7 +190,7 @@ class Player:
                 specific game event information to be added to the game list.
 
         """
-        print("Add Game Event")
+        # print("Add Game Event")
         game_event = gameslot.game_event
         self.game_count += 1
         self.satisfied = (self.game_count >= self.rules["min_games_total"]) and (

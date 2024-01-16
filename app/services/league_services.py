@@ -7,7 +7,7 @@ from dateutil import parser
 import dateutil
 import re
 import csv
-from app.services.scheduler import Player, GameSlot, SingleFlightScheduleTool
+from app.services.scheduler import Player, GameSlot, SingleFlightScheduleTool, generateGameSlotAvailabilityScores
 
 
 def is_date_like(s):
@@ -783,7 +783,7 @@ def create_game_from_scheduler(league, flight, game):
     print('create ', game)
     timeslot = league.get_timeslot_by_id(game["timeslot"])
     facility = league.club.get_facility_by_id(game["facility"])
-    if game["captain"] != -1:
+    if game["captain"] is not None:
         captain = league.club.get_player_by_id(game["captain"])
     else:
         captain = league.club.get_player_by_id(game["players"][0])
@@ -875,13 +875,15 @@ def schedule_wizard(league, flight_id):
     flight.delete_all_game_events()
     players = create_player_objects(flight, league, rules)
     gameslots = create_gameslot_objects(league, rules)
-
+    generateGameSlotAvailabilityScores(gameslots, players)
     print('Create Scheduler')
     scheduler = SingleFlightScheduleTool(flight.id, rules, players, gameslots)
     print('Run Scheduler')
     scheduler.runCA()
-    print('Ran Scheduler')
+    print('Assign Captains')
+    scheduler.assign_captains()
+    print('Build New Schedule')
     events = scheduler.return_events()
-    print(events)
+    print('GAMES:', events)
     for e in events:
         create_game_from_scheduler(league, flight, e)

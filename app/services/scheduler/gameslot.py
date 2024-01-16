@@ -45,6 +45,7 @@ class GameSlot:
         self.captain = None
         self.good_availability = True
         self.event_obj = None
+        self.availability_score = 0
 
     def __hash__(self):
         """
@@ -216,7 +217,7 @@ class GameSlot:
                 specific player to match.
 
         """
-        print("Force Player To Match")
+        # print("Force Player To Match")
         player.add_game_event(self)
         self.game_event.append(player)
         if len(self.game_event) == self.rules["players_per_match"]:
