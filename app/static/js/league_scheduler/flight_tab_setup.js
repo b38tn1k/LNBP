@@ -95,12 +95,33 @@ function setupPlayerDraggableOrigins() {
         var sources = flight.querySelectorAll(".draggable-source .draggable-item");
         var hueStep = 360 / sources.length;
         var startHue = Math.floor(Math.random() * 360); // Random starting point
-
+        startHue = 0;
         sources.forEach(function (item, index) {
             var hue = (startHue + hueStep * index) % 360;
             item.style.backgroundColor = `hsl(${hue}, 100%, 80%)`;
+            info.playerColors[item.getAttribute("player-id")] = item.style.backgroundColor;
         });
     });
+}
+
+function setupPlayerDraggableInGames() {
+    for (let i = 0; i < info.games.length; i++) {
+        let target = info.games[i]["target"];
+        let origin = info.games[i]["origin"];
+        let flightId = info.games[i]["flight"];
+        for (let p of info.games[i]["players"]) {
+            let tile = makeDraggablePlayerTile(p["id"], p["name"], p["full_name"], flightId);
+            target.append(tile);
+            renameRadio(tile, target);
+            if (p["captain"] == 1) {
+                toggleCaptain(tile.querySelector('[type="radio"]'))
+            }
+
+            tile.style.backgroundColor = info.playerColors[parseInt(p["id"])];
+        }
+        // renameRadio(tile, target)
+        origin.remove();
+    }
 }
 
 /**
@@ -156,18 +177,6 @@ function createCaptainRadioInput(id, flightID) {
     return [radioInput, label];
 }
 
-/**
- * @description This function sets all the radio buttons with the same name as the
- * target button to false and hides their checked images; it then sets the target
- * button to true and shows its checked image.
- *
- * @param { object } event - In the given function `captainRadioClickCallback`, the
- * `event` input parameter is used to get the target radio input element that triggered
- * the callback function.
- *
- * @returns { any } This function takes an event object as a parameter and returns
- * no output.
- */
 function captainRadioClickCallback(event) {
     let radioInput = event.target;
     const parentNode = radioInput.parentNode.parentNode;
@@ -176,10 +185,14 @@ function captainRadioClickCallback(event) {
         radio.labels[0].querySelector(".checked-img").style.display = "none";
         radio.labels[0].querySelector(".unchecked-img").style.display = "inline";
     });
+    toggleCaptain(radioInput);
+    updatePlayerCards(parseInt(radioInput.getAttribute("flight")));
+}
+
+function toggleCaptain(radioInput) {
     radioInput.checked = true;
     radioInput.labels[0].querySelector(".checked-img").style.display = "inline";
     radioInput.labels[0].querySelector(".unchecked-img").style.display = "none";
-    updatePlayerCards(parseInt(radioInput.getAttribute("flight")));
 }
 
 /**
@@ -397,32 +410,32 @@ function getFullColumn(cell) {
 }
 
 /**
-* @description This function retrieves the state of a radio button within the passed
-* Element's (`di`) HTML document using `querySelector` method and returns its checked
-* status as a boolean value.
-* 
-* @param { object } di - The `di` input parameter is an arbitrary DOM element to
-* which the function applies the selection and checking of the radio button.
-* 
-* @returns { boolean } The output returned by the `captainRadioIsChecked` function
-* is a Boolean value indicating whether the radio button with the given `di` parameter
-* is checked or not.
-*/
+ * @description This function retrieves the state of a radio button within the passed
+ * Element's (`di`) HTML document using `querySelector` method and returns its checked
+ * status as a boolean value.
+ *
+ * @param { object } di - The `di` input parameter is an arbitrary DOM element to
+ * which the function applies the selection and checking of the radio button.
+ *
+ * @returns { boolean } The output returned by the `captainRadioIsChecked` function
+ * is a Boolean value indicating whether the radio button with the given `di` parameter
+ * is checked or not.
+ */
 function captainRadioIsChecked(di) {
     return di.querySelector("input[type=radio]").checked;
 }
 
 /**
-* @description This function retrieves information about a game (flight number
-* ,timeslot facility name and captain) from cells within it which have specific
-* classnames and attributes .
-* 
-* @param {  } cell - The `cell` input parameter is a DOM element representing a table
-* cell containing data for a specific game.
-* 
-* @returns { object } The `getGameInfoFromCell` function takes a cell element as
-* input and returns an object representing the game information.
-*/
+ * @description This function retrieves information about a game (flight number
+ * ,timeslot facility name and captain) from cells within it which have specific
+ * classnames and attributes .
+ *
+ * @param {  } cell - The `cell` input parameter is a DOM element representing a table
+ * cell containing data for a specific game.
+ *
+ * @returns { object } The `getGameInfoFromCell` function takes a cell element as
+ * input and returns an object representing the game information.
+ */
 function getGameInfoFromCell(cell) {
     let flight = parseInt(cell.getAttribute("flight"));
     let timeslot = parseInt(cell.getAttribute("timeslot"));
@@ -447,16 +460,16 @@ function getGameInfoFromCell(cell) {
 }
 
 /**
-* @description This function retrieves all games from HTML tables and stores them
-* within an array of game objects. Each game object contains flight details (e.g.
-* ID) and information about the players participating.
-* 
-* @returns { object } The function `getAllGames` takes an empty object `{}` as its
-* argument and returns an array of objects each representing a flight with an
-* associated list of games. Each object `flight` contains one attribute 'flight'
-* which is a string with the flight number and an 'games' property that contains an
-* array of game objects.
-*/
+ * @description This function retrieves all games from HTML tables and stores them
+ * within an array of game objects. Each game object contains flight details (e.g.
+ * ID) and information about the players participating.
+ *
+ * @returns { object } The function `getAllGames` takes an empty object `{}` as its
+ * argument and returns an array of objects each representing a flight with an
+ * associated list of games. Each object `flight` contains one attribute 'flight'
+ * which is a string with the flight number and an 'games' property that contains an
+ * array of game objects.
+ */
 function getAllGames() {
     let flights = [];
     let tables = getAllFlightTables();
@@ -464,14 +477,19 @@ function getAllGames() {
         let fid = t.getAttribute("flight");
         flight = { flight: fid };
         flight["games"] = [];
+        flight["to-remove"] = [];
         let f = t.querySelector("tbody");
         f.querySelectorAll("td").forEach((pg) => {
             let game = getGameInfoFromCell(pg);
+            // console.log(game["players"].length, info.leagueRulesPlayersPerMatch);
             if (game["players"].length == info.leagueRulesPlayersPerMatch) {
                 flight["games"].push(game);
+            } else if  (game["players"].length != 0) {
+                flight["to-remove"].push(game)
             }
         });
         flights.push(flight);
     }
+    console.log(flights)
     return flights;
 }

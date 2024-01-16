@@ -92,7 +92,7 @@ function updatePlayerCards(flight) {
         if (targetPlayer.captain_count < info.leagueRulesMinCaptained) {
             captainCount.src = info.captainUnchecked.src;
         } else if (targetPlayer.captain_count > info.leagueRulesMaxCaptained) {
-            captainCount.src = info.captain_warning.src;
+            captainCount.src = info.captainWarning.src;
         } else {
             captainCount.src = info.captainChecked.src;
         }

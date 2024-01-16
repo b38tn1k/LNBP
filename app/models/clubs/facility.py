@@ -30,3 +30,12 @@ class Facility(Model):
         db.session.add(facility)
         db.session.commit()
         return facility
+    
+    def is_available(self, t):
+        day_number = t.since_y2k['days']
+        for g in self.game_events:
+            if day_number == g.timeslot.since_y2k['days']:
+                if t.check_overlap(g.timeslot):
+                    return False
+        return True
+

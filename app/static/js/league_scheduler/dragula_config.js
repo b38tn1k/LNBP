@@ -9,6 +9,8 @@ function setupDragula() {
         copy: isDraggableSource,
         accepts: canAcceptDrop,
         removeOnSpill: true,
+        slideFactorX: 5,
+        slideFactorY: 5, 
     });
 
     drake.on("drag", handleDrag);
@@ -170,5 +172,5 @@ function handleDragEnd(event) {
 function handleDragCancel(el) {
     // Code to handle drag cancel
     console.log("Handle drag cancel");
-    el.remove();
+    // el.remove();
 }

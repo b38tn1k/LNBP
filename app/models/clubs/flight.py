@@ -39,3 +39,12 @@ class Flight(Model):
         if commit is True:
             db.session.commit()
         return association
+    
+    def delete_all_game_events(self):
+        """
+        Delete all game events associated with the league.
+        """
+        for game_event in self.game_events:
+            db.session.delete(game_event)
+        self.game_events = []
+        db.session.commit()

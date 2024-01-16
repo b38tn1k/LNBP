@@ -18,6 +18,7 @@ from app.services.league_services import (
     build_league_from_json,
     apply_edits,
     create_games_from_request,
+    schedule_wizard,
 )
 import json
 
@@ -40,6 +41,21 @@ def check_for_membership(*args, **kwargs):
         flash("You currently do not have accesss to app", "warning")
         return redirect(url_for("main.home"))
 
+@blueprint.route("/<int:id>", methods=["GET", "POST"])
+@login_required
+def league_home(id):
+    if not current_user.is_authenticated or current_user.primary_membership_id is None:
+        flash("You currently do not have accesss to app", "warning")
+        return redirect(url_for("main.home"))
+    league = current_user.club.get_league_by_id(id)
+    if league is None:
+        return redirect(url_for("main.home"))
+    return render_template(
+        "league/league_home.html",
+        simple_form=SimpleForm(),
+        league=league,
+        club=current_user.club,
+    )
 
 @blueprint.route("/edit/<int:id>", methods=["GET", "POST"])
 @login_required
@@ -112,7 +128,9 @@ def schedule_league(id):
             if data['contents'] == 'games':
                 create_games_from_request(league, data['data'])
                 db.session.commit()
-                print(league.game_events)
+            elif data['contents'] == 'schedule':
+                schedule_wizard(league, data['data']['flight_id'])
+                db.session.commit()
             return jsonify({"status": "success"})
         except Exception as e:
             return jsonify({"status": "failure", "error": str(e)})

@@ -39,9 +39,14 @@
             <div class="page-header">
                 <h1 class="page-title">{{ league.name }} Scheduler</h1>
             </div>
-            <button type="button" id="save-button" class="btn btn-lg" title="Save" aria-label="Save">
-                <i class="fe fe-save" style="font-size: 1.5em"></i>
-            </button>
+            <div>
+                <button style="margin-right: 10px;" type="button" id="generate-button" class="btn btn-lg" title="Schedule" aria-label="Schedule">
+                    <i class="fe fe-star" style="font-size: 1.5em"></i>
+                </button>
+                <button type="button" id="save-button" class="btn btn-lg" title="Save" aria-label="Save">
+                    <i class="fe fe-save" style="font-size: 1.5em"></i>
+                </button>
+            </div>
         </div>
 
         <!-- Tab navigation -->
@@ -112,31 +117,38 @@
                                                 timeslot="{{ ts.id }}"
                                                 flight="{{ flight.id }}"
                                             >
+                                                {% set games = league.get_game_event(facility=facility, timeslot=ts,
+                                                flight=flight) %} {% if games %}
 
-                                            {% set games = league.get_game_event(facility=facility, timeslot=ts) %}
+                                                <div class="served_game_info_div" flight-id="{{flight.id}}">
+                                                    {% for p in games[0].players %}
+                                                    <div
+                                                        class="player_in_sg"
+                                                        player-id="{{p.id}}"
+                                                        player-fullname="{{p.full_name}}"
+                                                        player-name="{{ p.first_name[0] }} {{ p.last_name[:8] }}"
+                                                        captain="{{ 1 if p.id == games[0].captain.id else 0 }}"
+                                                    ></div>
+                                                    {% endfor %}
+                                                </div>
 
-                                            {% for game in games %}
-                                            {% for p in game.players %}
-                                            {{p.full_name}},
-                                            {% endfor %}
-                                            {% endfor %}
-                                        
-                                        </td>
+                                                {%endif%}
+                                            </td>
                                             {% endfor %} {%endif%}
                                         </tr>
                                         {% endfor %}
 
                                         <tr>
-                                        <th>SUB</th>
-                                        {% for ts in league.timeslots %}
-                                        <td
-                                            class="draggable-target"
-                                            facility="-1"
-                                            timeslot="{{ ts.id }}"
-                                            flight="{{ flight.id }}"
-                                        ></td>
-                                        {% endfor %}
-                                    </tr>
+                                            <th>SUB</th>
+                                            {% for ts in league.timeslots %}
+                                            <td
+                                                class="draggable-target"
+                                                facility="-1"
+                                                timeslot="{{ ts.id }}"
+                                                flight="{{ flight.id }}"
+                                            ></td>
+                                            {% endfor %}
+                                        </tr>
                                     </tbody>
                                 </table>
                             </fieldset>
@@ -199,6 +211,7 @@
     document.addEventListener("DOMContentLoaded", function () {
         info = new InfoClass();
         setupPlayerDraggableOrigins();
+        setupPlayerDraggableInGames();
         setupShowActiveFlight();
         addImagesToTableData();
         revealHidden();
@@ -209,6 +222,10 @@
         }
         saveButton = document.getElementById("save-button");
         saveButton.addEventListener("click", saveButtonCallback);
+
+        generateButton = document.getElementById("generate-button");
+        generateButton.addEventListener("click", generateButtonCallback);
+        
     });
 </script>
 {% endblock %}

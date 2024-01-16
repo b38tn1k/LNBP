@@ -30,12 +30,14 @@ class InfoClass {
             this.leagueRulesMaxDoubleHeaders = parseInt(this.infoDiv.getAttribute("league_rules_max_double_headers"));
             this.leagueRulesMinCaptained = parseInt(this.infoDiv.getAttribute("league_rules_min_captained"));
             this.leagueRulesMaxCaptained = parseInt(this.infoDiv.getAttribute("league_rules_max_captained"));
-            this.leagueRulesMinimumSubsPerGame = parseInt(this.infoDiv.getAttribute("league_rules_minimum_subs_per_game"));
+            this.leagueRulesMinimumSubsPerGame = parseInt(
+                this.infoDiv.getAttribute("league_rules_minimum_subs_per_game")
+            );
             this.leagueRulesAssumeBusy = this.infoDiv.getAttribute("league_rules_assume_busy");
             this.flightIds = [];
-            const flightIdElements = this.infoDiv.querySelectorAll('[data-flight-id]');
-            flightIdElements.forEach(element => {
-                const flightId = parseInt(element.getAttribute('data-flight-id'));
+            const flightIdElements = this.infoDiv.querySelectorAll("[data-flight-id]");
+            flightIdElements.forEach((element) => {
+                const flightId = parseInt(element.getAttribute("data-flight-id"));
                 if (!isNaN(flightId)) {
                     this.flightIds.push(flightId);
                 }
@@ -43,5 +45,24 @@ class InfoClass {
         } else {
             console.error("Info div not found.");
         }
+
+        this.games = [];
+        document.querySelectorAll(".served_game_info_div").forEach((pg) => {
+            let g = {};
+            g["target"] = pg.parentNode;
+            g["origin"] = pg;
+            g["flight"] = pg.getAttribute("flight-id");
+            g["players"] = [];
+            pg.querySelectorAll(".player_in_sg").forEach((p) => {
+                let player = {};
+                player["id"] = p.getAttribute("player-id");
+                player["full_name"] = p.getAttribute("player-fullname");
+                player["name"] = p.getAttribute("player-name");
+                player["captain"] = Boolean(parseInt(p.getAttribute("captain")));
+                g["players"].push(player);
+            });
+            this.games.push(g);
+        });
+        this.playerColors = {};
     }
 }

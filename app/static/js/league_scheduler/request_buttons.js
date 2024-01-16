@@ -17,7 +17,7 @@ function saveButtonCallback(event) {
 */
     function success() {
         toggleButtonDisabled(button);
-        flashButtonResult(button, "fe-check-circle", "fg-success");
+        flashButtonResult(button, "fe-check-circle", "fg-success", "fe-save");
     }
 
 /**
@@ -31,9 +31,34 @@ function saveButtonCallback(event) {
 */
     function failure() {
         toggleButtonDisabled(button);
-        flashButtonResult(button, "fe-x-circle", "fg-failure");
+        flashButtonResult(button, "fe-x-circle", "fg-failure", "fe-save");
     }
 
+    sendToServer(data, success, failure);
+}
+
+function generateButtonCallback(event) {
+    let data = {contents: 'schedule'}
+    const tabs = document.querySelectorAll(".flight-tab");
+    let target_flight = -1;
+    tabs.forEach((tab) => {
+        if (tab.classList.contains("active")) {
+            target_flight = parseInt(tab.getAttribute("flight-id"));
+        }
+    });
+    data['data'] = {flight_id : target_flight}
+    let button = event.target.closest("button");
+    button.disabled = true;
+    function success() {
+        toggleButtonDisabled(button);
+        flashButtonResult(button, "fe-check-circle", "fg-success", "fe-star");
+        window.location.reload();
+    }
+    function failure() {
+        toggleButtonDisabled(button);
+        flashButtonResult(button, "fe-x-circle", "fg-failure", "fe-star");
+        window.location.reload();
+    }
     sendToServer(data, success, failure);
 }
 
@@ -64,13 +89,13 @@ function saveButtonCallback(event) {
 * 	- Remove class names "c1" and "c2" from the `i` element after 1 second.
 * 	- Remove class name "fe-save" from the `i` element.
 */
-function flashButtonResult(button, c1, c2) {
+function flashButtonResult(button, c1, c2, defaultClass) {
     let r = button.querySelector("i");
-    r.classList.remove("fe-save");
+    r.classList.remove(defaultClass);
     r.classList.add(c1, c2);
     setTimeout(function () {
         r.classList.remove(c1, c2);
-        r.classList.add("fe-save");
+        r.classList.add(defaultClass);
     }, 1000);
 }
 

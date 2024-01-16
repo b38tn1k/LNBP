@@ -7,6 +7,7 @@ from dateutil import parser
 import dateutil
 import re
 import csv
+from app.services.scheduler import Player, GameSlot, SingleFlightScheduleTool
 
 
 def is_date_like(s):
@@ -115,7 +116,7 @@ def csv_wizard_time(group):
     Returns:
         list: Based on the given code snippet; the output returned by `csv_wizard_time`
         function is two values -
-        
+
         1/ 'shape', a string indicating either "tall" or "wide" based on the max
         col and row lengths of the provided group's CSV data
         2/ 'dates', a list of combined date strings extracted from the 'date-like'
@@ -168,7 +169,7 @@ def group_outline(data):
     Returns:
         dict: The output returned by this function is a dictionary with four
         key-value pairs:
-        
+
         {
         "min_row": 1000000 (the minimum row number),
         "min_col": 1000000 (the minimum column number),
@@ -221,7 +222,7 @@ def get_marker_strings_from_csv(my_csv, t_dict):
     marker_strings = {
         "available-marker": "",
         "unavailable-marker": "",
-        "low-preference-marker": ""
+        "low-preference-marker": "",
     }
 
     # Iterate through the CSV to find marker strings
@@ -229,8 +230,8 @@ def get_marker_strings_from_csv(my_csv, t_dict):
         for key in marker_strings.keys():
             marker_info = t_dict.get(key)
             if marker_info:
-                marker_row = marker_info['row']
-                marker_col = marker_info['col']
+                marker_row = marker_info["row"]
+                marker_col = marker_info["col"]
                 if row_index == marker_row:
                     marker_strings[key] = row[marker_col]
 
@@ -308,19 +309,23 @@ def wide_get_players_and_availability(target_flight, my_csv, t_dict):
 
             # Convert availability based on markers
             converted_availability = [
-                1 if cell == available_marker else
-                2 if cell == low_preference_marker else
-                3 if cell == unavailable_marker else
-                1  # Default to 1 (available) if none of the markers match
+                1
+                if cell == available_marker
+                else 2
+                if cell == low_preference_marker
+                else 3
+                if cell == unavailable_marker
+                else 1  # Default to 1 (available) if none of the markers match
                 for cell in availability
             ]
 
             player_info = {
                 "names": player_names,
-                "availability": converted_availability
+                "availability": converted_availability,
             }
             players.append(player_info)
     return players
+
 
 def extract_html_attributes(html_string):
     # Regular expression pattern to find attributes and their values
@@ -344,7 +349,7 @@ def extract_html_attributes(html_string):
 
     # Convert matches to a dictionary
     attributes = {attr: value for attr, value in matches}
-    
+
     # Convert numerical values to integers
     for key, value in attributes.items():
         if value.isdigit():
@@ -358,9 +363,9 @@ def league_wizard_csv_to_dicts(data):
     This function takes a list of dictionaries representing CSV data for a fantasy
     football league schedule and returns a list of dictionaries representing the
     league data with the following structure:
-    	- Each dictionary represents one flight (time slot)
-    	+ "timeslots": A list of time slots available during the flight
-    	+ "players": A list of player availability information for each player during
+        - Each dictionary represents one flight (time slot)
+        + "timeslots": A list of time slots available during the flight
+        + "players": A list of player availability information for each player during
     the flight
     The function performs the following operations:
     1/ First pass: Extract shape (wide or not), CSV table data and timeslots from
@@ -368,8 +373,8 @@ def league_wizard_csv_to_dicts(data):
     2/ Define dictionaries for each type of data: "time", "csv" and for the types
     of markers ("available-marker", "unavailable-marker", "low-preference-marker")
     3/ For each input dictionary:
-    	a. Check if it contains "type" and if it's one of the supported types
-    	b.
+        a. Check if it contains "type" and if it's one of the supported types
+        b.
 
     Args:
         data (dict): The `data` input parameter is a list of dictionaries representing
@@ -378,13 +383,20 @@ def league_wizard_csv_to_dicts(data):
 
     Returns:
         dict: Based on the code provided:
-        
+
         The output returned by this function is `league`, which is a list of
         dictionaries containing information about flights and their players' availability.
 
     """
     t_dict = {}
-    for k in ["flight", "availability", "player", "available-marker","unavailable-marker","low-preference-marker"]:
+    for k in [
+        "flight",
+        "availability",
+        "player",
+        "available-marker",
+        "unavailable-marker",
+        "low-preference-marker",
+    ]:
         t_dict[k] = []
     # first pass, grab the shape, the csv table, and the times (just because)
     for d in data:
@@ -408,8 +420,8 @@ def league_wizard_csv_to_dicts(data):
                 "unavailable-marker",
                 "low-preference-marker",
             ]:
-                t_dict[d["type"]] = (extract_html_attributes(d["data"]))
-                
+                t_dict[d["type"]] = extract_html_attributes(d["data"])
+
     league = []
     if shape == "wide":
         for f in t_dict["flight"]:
@@ -420,6 +432,7 @@ def league_wizard_csv_to_dicts(data):
             )
             league.append(flight)
     return league
+
 
 def build_league_from_json(my_club, data):
     """
@@ -435,29 +448,36 @@ def build_league_from_json(my_club, data):
 
     """
     print(data)
-    datetime_objects = [datetime.fromisoformat(iso_string) for iso_string in data['timeslots']]
+    datetime_objects = [
+        datetime.fromisoformat(iso_string) for iso_string in data["timeslots"]
+    ]
     earliest_date = min(datetime_objects)
     latest_date = max(datetime_objects)
-    game_duration_hours = data['game_duration'] 
+    game_duration_hours = data["game_duration"]
     duration = timedelta(hours=game_duration_hours)
     latest_date = latest_date + duration
-    my_league = my_club.create_league(data['name'], data['type'], earliest_date, latest_date, add=True, commit=False)
-    
+    my_league = my_club.create_league(
+        data["name"], data["type"], earliest_date, latest_date, add=True, commit=False
+    )
+
     for t in datetime_objects:
         my_league.create_timeslot(t, t + duration, add=True, commit=False)
 
-    for flight in data['flights']:
-        my_flight = my_league.create_flight(flight['name'])
-        for p in flight['players_and_availabilities']:
-            player = my_club.find_or_create_player(p['name'])
+    for flight in data["flights"]:
+        my_flight = my_league.create_flight(flight["name"])
+        for p in flight["players_and_availabilities"]:
+            player = my_club.find_or_create_player(p["name"])
             my_flight.add_player(player)
             my_league.add_player(player)
-            for i in range(len(p['availability'])):
-                player_availability = p['availability'][i]
+            for i in range(len(p["availability"])):
+                player_availability = p["availability"][i]
                 ts = my_league.timeslots[i]
-                my_league.add_player_availability(player, ts, player_availability, add=True, commit=False, force=True)
+                my_league.add_player_availability(
+                    player, ts, player_availability, add=True, commit=False, force=True
+                )
     return my_league
-    
+
+
 def facility_to_league(league, d):
     # {'event': 'facility_in_league', 'ids': 1, 'values': False}
     """
@@ -474,11 +494,12 @@ def facility_to_league(league, d):
             about the facility to be added or removed from the league.
 
     """
-    if d['values'] is True:
-        f = league.club.get_facility_by_id(d['ids'])
+    if d["values"] is True:
+        f = league.club.get_facility_by_id(d["ids"])
         league.add_facility(f)
     else:
-        league.remove_facility_by_id(d['ids'])
+        league.remove_facility_by_id(d["ids"])
+
 
 def update_game_duration(league, d):
     """
@@ -492,10 +513,11 @@ def update_game_duration(league, d):
             for the game duration minutes.
 
     """
-    new_duration_minutes = d['values']
+    new_duration_minutes = d["values"]
     for ts in league.timeslots:
         new_end_time = ts.start_time + timedelta(minutes=new_duration_minutes)
         ts.end_time = new_end_time
+
 
 def update_timeslot(league, d):
     # {'event': 'timeslot', 'ids': 1, 'values': '2023-10-03T18:30:00.000'}
@@ -508,18 +530,19 @@ def update_timeslot(league, d):
             object from the league's database based on the given ID.
         d (dict): In this function `d` is a dictionary containing information about
             the timeslot to be updated. It has one key-value pair:
-            
-            	- `ids`: the ID of the timeslot to be updated (int)
-            	- `values`: the start time of the game as a string format
+
+                - `ids`: the ID of the timeslot to be updated (int)
+                - `values`: the start time of the game as a string format
             'YYYY-MM-DDTHH:MM:SS.FFF' (e.g.
 
     """
-    ts = league.get_timeslot_by_id(d['ids'])
-    new_start_time = datetime.strptime(d['values'], '%Y-%m-%dT%H:%M:%S.%f')
+    ts = league.get_timeslot_by_id(d["ids"])
+    new_start_time = datetime.strptime(d["values"], "%Y-%m-%dT%H:%M:%S.%f")
     game_duration = league.get_game_duration()
     new_end_time = new_start_time + timedelta(minutes=game_duration)
     ts.start_time = new_start_time
     ts.end_time = new_end_time
+
 
 def update_flight_name(league, d):
     """
@@ -533,8 +556,9 @@ def update_flight_name(league, d):
             for the flight name to be updated.
 
     """
-    f = league.get_flight_by_id(d['ids'])
-    f.name = d['values']
+    f = league.get_flight_by_id(d["ids"])
+    f.name = d["values"]
+
 
 def add_player_to_league(league, d):
     """
@@ -549,16 +573,19 @@ def add_player_to_league(league, d):
             the player to be added to the league.
 
     """
-    flight = league.get_flight_by_id(d['ids']['flight'])
-    player = league.club.get_player_by_id(d['ids']['player'])
+    flight = league.get_flight_by_id(d["ids"]["flight"])
+    player = league.club.get_player_by_id(d["ids"]["player"])
     print(player, type(player))
     if player is not None:
         flight.add_player(player)
         league.add_player(player)
         for i in range(len(league.timeslots)):
-                player_availability = 1
-                ts = league.timeslots[i]
-                league.add_player_availability(player, ts, player_availability, add=True, commit=False, force=True)
+            player_availability = 1
+            ts = league.timeslots[i]
+            league.add_player_availability(
+                player, ts, player_availability, add=True, commit=False, force=True
+            )
+
 
 def update_league_rules(league, d):
     """
@@ -572,7 +599,7 @@ def update_league_rules(league, d):
             league rules as keys and values.
 
     """
-    rules = d['values']
+    rules = d["values"]
     league.rules.min_games_total = rules["min_games_total"]
     league.rules.max_games_total = rules["max_games_total"]
     league.rules.players_per_match = rules["players_per_match"]
@@ -584,7 +611,8 @@ def update_league_rules(league, d):
     league.rules.min_captained = rules["min_captained"]
     league.rules.max_captained = rules["max_captained"]
     league.rules.minimum_subs_per_game = rules["minimum_subs_per_game"]
-    league.rules.assume_busy = rules["assume_busy"] == 'assume_busy'
+    league.rules.assume_busy = rules["assume_busy"] == "assume_busy"
+
 
 def remove_player(league, d):
     """
@@ -598,8 +626,9 @@ def remove_player(league, d):
             to be removed.
 
     """
-    player = league.club.get_player_by_id(d['ids']['player'])
+    player = league.club.get_player_by_id(d["ids"]["player"])
     league.remove_player(player)
+
 
 def change_flight(league, d):
     """
@@ -613,11 +642,12 @@ def change_flight(league, d):
             flight information and the player ID to be added to the new flight.
 
     """
-    player = league.club.get_player_by_id(d['ids']['player'])
-    flight = league.get_flight_by_id(d['values']['new_flight'])
+    player = league.club.get_player_by_id(d["ids"]["player"])
+    flight = league.get_flight_by_id(d["values"]["new_flight"])
     for f in league.flights:
         league.remove_player_from_flight(player, f)
     flight.add_player(player)
+
 
 def update_availability(league, d):
     # {'event': 'availability', 'ids': {'timeslot': 1, 'player': 10}, 'values': 2}
@@ -632,11 +662,12 @@ def update_availability(league, d):
             availability tracking purposes.
 
     """
-    ts = league.get_timeslot_by_id(d['ids']['timeslot'])
-    player = league.club.get_player_by_id(d['ids']['player'])
-    a = d['values']
+    ts = league.get_timeslot_by_id(d["ids"]["timeslot"])
+    player = league.club.get_player_by_id(d["ids"]["player"])
+    a = d["values"]
     availability = league.get_player_availability_object(player, ts)
     availability.availability = a
+
 
 def push_time_slot(league, d):
     # {'event': 'push_time_slot', 'ids': -1, 'values': '2023-11-08 20:15:00'}
@@ -655,11 +686,11 @@ def push_time_slot(league, d):
             '2023-11-08 20:15:00'}
 
     """
-    start_time = datetime.strptime(d['values'], '%Y-%m-%d %H:%M:%S')
+    start_time = datetime.strptime(d["values"], "%Y-%m-%d %H:%M:%S")
     game_duration = league.get_game_duration()
     end_time = start_time + timedelta(minutes=game_duration)
     league.create_timeslot(start_time, end_time)
-    
+
 
 def apply_edits(league, updates):
     # priority
@@ -675,33 +706,34 @@ def apply_edits(league, updates):
 
     """
     for d in updates:
-        match d['event']:
-            case 'add_player_to_league':
+        match d["event"]:
+            case "add_player_to_league":
                 add_player_to_league(league, d)
-            case 'push_time_slot':
+            case "push_time_slot":
                 push_time_slot(league, d)
     # others
     for d in updates:
         print(d)
-        match d['event']:
-            case 'facility_in_league':
+        match d["event"]:
+            case "facility_in_league":
                 facility_to_league(league, d)
-            case 'name':
-                league.name = d['values']
-            case 'duration':
+            case "name":
+                league.name = d["values"]
+            case "duration":
                 update_game_duration(league, d)
-            case 'timeslot':
+            case "timeslot":
                 update_timeslot(league, d)
-            case 'flight_name':
+            case "flight_name":
                 update_flight_name(league, d)
-            case 'rule_update':
+            case "rule_update":
                 update_league_rules(league, d)
-            case 'remove_player_from_league':
+            case "remove_player_from_league":
                 remove_player(league, d)
-            case 'change_flight':
+            case "change_flight":
                 change_flight(league, d)
-            case 'availability':
+            case "availability":
                 update_availability(league, d)
+
 
 def create_games_from_request(league, data):
     """
@@ -717,16 +749,77 @@ def create_games_from_request(league, data):
             league data and then for each game within a specific flight.
 
     """
+    league.delete_all_game_events()
     for flight in data:
-        for game in flight['games']:
-            flight = league.get_flight_by_id(game['flight'])
-            timeslot = league.get_timeslot_by_id(game['timeslot'])
-            facility = league.club.get_facility_by_id(game['facility'])
-            captain = False
-            if game['captain'] != -1:
-                captain = league.club.get_player_by_id(game['captain'])
+        for game in flight["games"]:
+            flight = league.get_flight_by_id(game["flight"])
+            timeslot = league.get_timeslot_by_id(game["timeslot"])
+            facility = league.club.get_facility_by_id(game["facility"])
+            if game["captain"] != -1:
+                captain = league.club.get_player_by_id(game["captain"])
+            else:
+                captain = league.club.get_player_by_id(game["players"][0])
             players = []
-            for p in game['players']:
+            for p in game["players"]:
                 players.append(league.club.get_player_by_id(p))
-            # print(flight, timeslot, captain, facility, [p for p in players])
-            league.create_game_event(players, facility, timeslot, captain=captain)
+            league.create_game_event(
+                players, facility, timeslot, flight, captain=captain
+            )
+
+def create_game_from_scheduler(league, flight, game):
+    print('create ', game)
+    timeslot = league.get_timeslot_by_id(game["timeslot"])
+    facility = league.club.get_facility_by_id(game["facility"])
+    if game["captain"] != -1:
+        captain = league.club.get_player_by_id(game["captain"])
+    else:
+        captain = league.club.get_player_by_id(game["players"][0])
+    players = []
+    for p in game["players"]:
+        players.append(league.club.get_player_by_id(p))
+    league.create_game_event(
+        players, facility, timeslot, flight, captain=captain
+    )
+
+
+def create_player_objects(flight, league, rules):
+    players = []
+    mean_availability_score = 0
+    for a in flight.player_associations:
+        avail = league.get_player_availability_dict(a.player)
+        p = Player(a.player.id, rules, avail)
+        mean_availability_score += p.availability_score
+        players.append(p)
+    mean_availability_score /= len(players)
+    for p in players:
+        p.set_availability_score_relation(mean_availability_score)
+    return players
+
+def create_gameslot_objects(league, rules):
+    gameslots = []
+    for t in league.timeslots:
+        for f in league.facility_associations:
+            if f.facility.is_available(t):
+                y2k_counter = t.since_y2k
+                gs = GameSlot(t.id, f.id, y2k_counter, rules)
+                gameslots.append(gs)
+    return gameslots
+
+
+def schedule_wizard(league, flight_id):
+    print("Schedule", league, flight_id)
+    rules = league.get_league_rules_dict()
+    flight = league.get_flight_by_id(flight_id)
+    flight.delete_all_game_events()
+    players = create_player_objects(flight, league, rules)
+    gameslots = create_gameslot_objects(league, rules)
+
+    print('Create Scheduler')
+    scheduler = SingleFlightScheduleTool(flight.id, rules, players, gameslots)
+    print('Run Scheduler')
+    scheduler.runCA()
+    print('Ran Scheduler')
+    events = scheduler.return_events()
+    print(events)
+    for e in events:
+        create_game_from_scheduler(league, flight, e)

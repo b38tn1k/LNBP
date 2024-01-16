@@ -99,7 +99,7 @@ scheduler_js = Bundle(
     'js/league_scheduler/dragula_legend_controls.js',
     'js/league_scheduler/dragula_drop_logic.js',
     'js/league_scheduler/dragula_config.js',
-    'js/league_scheduler/save_button.js',
+    'js/league_scheduler/request_buttons.js',
     
     filters='jsmin',
 

@@ -173,7 +173,7 @@ class League(Model):
             )
             if player_availability:
                 return player_availability
-        # Default to unavailable if no availability record found
+        # Default to UNK if no availability record found
         return None
 
     def get_player_availability(self, player, timeslot):
@@ -199,55 +199,14 @@ class League(Model):
         if player_availability:
             return player_availability.availability
         else:
-            return 0
+            return -1
+        
+    def get_player_availability_dict(self, player):
+        a = {}
+        for t in self.timeslots:
+            a[t.id] = self.get_player_availability(player, t)
+        return a
 
-    @transaction
-    def get_existing_game_event(self, player, facility, timeslot):
-        """
-        Get an existing game event that matches the specified player, facility, and timeslot.
-
-        :param player: The player associated with the game event.
-        :param facility: The facility associated with the game event.
-        :param timeslot: The timeslot associated with the game event.
-        :return: The existing game event or None if not found.
-        """
-        for game_event in self.game_events:
-            if (
-                game_event.player == player
-                and game_event.facility == facility
-                and game_event.timeslot == timeslot
-            ):
-                return game_event
-        return None
-
-    @transaction
-    def add_game_event(self, player, facility, timeslot):
-        """
-        Add a new game event to the league if one with the same player, facility, and timeslot doesn't already exist.
-
-        Parameters:
-        - player (Player): The player associated with the game event.
-        - facility (Facility): The facility associated with the game event.
-        - timeslot (Timeslot): The timeslot associated with the game event.
-
-        Returns:
-        - LeagueGameEvent: The newly created or existing game event.
-        """
-        # Check if a game event with the specified player, facility, and timeslot exists
-        existing_game_event = self.get_existing_game_event(player, facility, timeslot)
-
-        if existing_game_event:
-            # An existing game event was found, so we won't add a new one
-            return existing_game_event
-        else:
-            # Create and add a new game event
-            new_game_event = ModelProxy.clubs.LeagueGameEvent(
-                player=player, facility=facility, timeslot=timeslot
-            )
-            self.game_events.append(new_game_event)
-            db.session.add(new_game_event)
-            db.session.commit()
-            return new_game_event
 
     def delete_game_event(self, game_event):
         """
@@ -378,27 +337,6 @@ class League(Model):
 
         return association
 
-    # def remove_player(self, player, commit=False):
-    #     # Remove player association from the league
-    #     league_association = next(
-    #         (association for association in self.player_associations if association.player == player),
-    #         None
-    #     )
-    #     if league_association:
-    #         self.player_associations.remove(league_association)
-
-    #     # Remove player association from each flight
-    #     for flight in self.flights:
-    #         flight_association = next(
-    #             (association for association in flight.player_associations if association.player == player),
-    #             None
-    #         )
-    #         if flight_association:
-    #             flight.player_associations.remove(flight_association)
-
-    #     if commit:
-    #         db.session.commit()
-
     def remove_player(self, player, commit=False):
         # Remove player association from the league
         """
@@ -517,7 +455,7 @@ class League(Model):
         )
 
     def create_game_event(
-        self, players, facility, timeslot, captain=False, add=True, commit=False
+        self, players, facility, timeslot, flight, captain=False, add=True, commit=False
     ):
         """
         Create a new game event for the league.
@@ -536,14 +474,17 @@ class League(Model):
         if existing_game_event:
             return existing_game_event
 
+        if captain is False:
+            captain = players[0]
+
         # Create a new game event
         game_event = ModelProxy.clubs.LeagueGameEvent(
             captain=captain,
             league=self,
+            flight=flight,
             facility=facility,
             timeslot=timeslot,
         )
-        print("done")
 
         # Associate players with the game event
         for player in players:
@@ -556,7 +497,7 @@ class League(Model):
             db.session.commit()
         return game_event
 
-    def get_game_event(self, players=None, facility=None, timeslot=None):
+    def get_game_event(self, players=None, facility=None, timeslot=None, flight=None):
         """
         Get game events in the league based on optional filters.
 
@@ -584,12 +525,29 @@ class League(Model):
         if timeslot and not facility:
             game_events = [ge for ge in self.game_events if ge.timeslot == timeslot]
 
-        if facility and timeslot:
+        if facility and timeslot and flight:
             game_events = [
                 ge
                 for ge in self.game_events
-                if ge.facility == facility and ge.timeslot == timeslot
+                if ge.facility == facility
+                and ge.timeslot == timeslot
+                and ge.flight == flight
             ]
-        print(game_events)
 
         return game_events
+
+    def get_league_rules_dict(self):
+        """
+        This method returns the league rules associated with this league as a dictionary.
+
+        Returns:
+            dict: A dictionary representation of the league rules.
+        """
+        # Ensure that the league has an associated rules object
+        if self.rules:
+            return {
+                column.name: getattr(self.rules, column.name)
+                for column in self.rules.__table__.columns
+            }
+        else:
+            return None

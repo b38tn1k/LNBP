@@ -1,5 +1,5 @@
 from app.models import db, Model
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 class Timeslot(Model):
     __tablename__ = 'timeslot'
@@ -28,6 +28,37 @@ class Timeslot(Model):
 
         """
         return f'<Timeslot - {self.human_readable_hhmm_dayname_mdy()}>'
+    
+    @property
+    def since_y2k(self):
+        """
+        This property returns a dictionary containing the number of days and weeks since Y2K (January 1, 2000),
+        calculated from the start time of the timeslot.
+
+        Returns:
+            dict: A dictionary with keys 'days' and 'weeks', representing the number of days and weeks since Y2K.
+        """
+        y2k = datetime(2000, 1, 1)
+        delta = self.start_time - y2k  # Calculate the timedelta from Y2K to the start_time
+        days = delta.days  # Number of days since Y2K
+        weeks = days // 7  # Number of weeks since Y2K
+
+        return {'days': days, 'weeks': weeks}
+    
+    def check_overlap(self, other_timeslot):
+        """
+        Checks if there is any overlap between this timeslot and another timeslot.
+
+        Args:
+            other_timeslot (Timeslot): Another Timeslot object to check for overlap.
+
+        Returns:
+            bool: True if there is overlap, False otherwise.
+        """
+        # Check if one timeslot starts during the other
+        return (self.start_time < other_timeslot.end_time and self.end_time > other_timeslot.start_time) \
+            or (other_timeslot.start_time < self.end_time and other_timeslot.end_time > self.start_time)
+
 
     def human_readable_hhmm_mdy(self):
         """

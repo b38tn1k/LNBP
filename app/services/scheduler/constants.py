@@ -1,0 +1,6 @@
+AVAILABLE = 1
+AVAILABLE_LP = 2
+UNAVAILABLE = 3
+UNK = -1
+POOL_ITERATIONS = 1000 # is a modifier based on player count
+ATTEMPTS = 20
