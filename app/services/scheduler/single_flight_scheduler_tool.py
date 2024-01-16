@@ -352,6 +352,15 @@ class SingleFlightScheduleTool:
                         gs.force_player_to_match(p)
 
     def second_force_assign(self, third_iteration):
+        """
+        This function assigns players to game sessions (gs) based on their overlap
+        and availability.
+
+        Args:
+            third_iteration (dict): The `third_iteration` input parameter is used
+                to loop over a list of matches and for each match.
+
+        """
         for match in third_iteration:
             selected_gs = None
             for gs in match["overlap"]:
