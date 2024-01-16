@@ -1401,16 +1401,16 @@ function step4ServerResp(data) {
  * it contains undefined statements and the function does not have a return statement.
  */
 function stepIndex4Prep() {
-    // const data = parseCellGroups();
-    // sendToServer(data);
+    const data = parseCellGroups();
+    sendToServer(data, step4ServerResp);
 
     // test
-    fetch("/static/csv_league_import_example.json")
-        .then((response) => response.json())
-        .then((data) => {
-            sendToServer(data, step4ServerResp);
-        })
-        .catch((error) => console.log("Error loading JSON: ", error));
+    // fetch("/static/csv_league_import_example.json")
+    //     .then((response) => response.json())
+    //     .then((data) => {
+    //         sendToServer(data, step4ServerResp);
+    //     })
+    //     .catch((error) => console.log("Error loading JSON: ", error));
 }
 
 /**

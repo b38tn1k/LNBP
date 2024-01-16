@@ -852,8 +852,7 @@ def create_gameslot_objects(league, rules):
     for t in league.timeslots:
         for f in league.facility_associations:
             if f.facility.is_available(t):
-                y2k_counter = t.since_y2k
-                gs = GameSlot(t.id, f.id, y2k_counter, rules)
+                gs = GameSlot(t.id, f.facility.id, t.since_y2k, rules)
                 gameslots.append(gs)
     return gameslots
 

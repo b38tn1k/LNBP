@@ -505,9 +505,7 @@ class SingleFlightScheduleTool:
                             if not p.id in assigned:
                                 g.captain = p
                                 p.captain_count += 1
-                                print(p.id)
                                 assigned.add(p.id)
-                                print(assigned)
                                 break
                         if g.captain is None:
                             good = False

@@ -148,6 +148,8 @@ def schedule_league(id):
             elif data['contents'] == 'schedule':
                 schedule_wizard(league, data['data']['flight_id'])
                 db.session.commit()
+                for g in league.game_events:
+                    print(g)
             return jsonify({"status": "success"})
         except Exception as e:
             return jsonify({"status": "failure", "error": str(e)})
