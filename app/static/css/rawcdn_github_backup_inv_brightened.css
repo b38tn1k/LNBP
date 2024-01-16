@@ -13607,7 +13607,7 @@ Card alert
 } */
 
 .avatar-placeholder {
-  background-image: url("../public/leagueninja/leagueninja-icon.png");
+  background-image: url("../leagueninja/leagueninja-icon.png");
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;

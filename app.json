@@ -8,7 +8,7 @@
   ],
   "website": "https://github.com/b38tn1k/",
   "repository": "https://github.com/b38tn1k/LNBP",
-  "logo": "app/static/public/leagueninja/leagueninja-icon.png",
+  "logo": "app/static/leagueninja/leagueninja-icon.png",
   "success_url": "/",
   "scripts": {
     "predeploy": "flask assets build",
