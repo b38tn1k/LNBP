@@ -110,6 +110,16 @@ function doScheduleLegend(p, f) {
     });
 }
 
+/**
+* @description The function takes an array of cells and returns a new array with
+* only those cells that do not have the class "subs".
+* 
+* @param { object } cells - The `cells` input parameter is an array of HTML cells
+* that the function processes to exclude those with the 'subs' class.
+* 
+* @returns { array } The output returned by this function is an array of cells that
+* do not have the 'subs' class.
+*/
 function filterOutSubsCells(cells) {
     // Filter cells to exclude those with the 'subs' class
     return Array.from(cells).filter((cell) => !cell.classList.contains("subs"));
