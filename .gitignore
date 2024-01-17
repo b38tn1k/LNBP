@@ -55,3 +55,4 @@ app/static/public/*
 !app/static/public/ignite/*
 !app/static/public/fonts/*
 ignite-code.txt
+dev.sh

@@ -4,6 +4,7 @@ from app.forms import SimpleForm
 from app.forms.club_forms import ClubSetup, FacilitySetup
 from app.models import db
 from app.models.clubs import Club, Facility
+from app.models.teams import TeamMember, Team
 
 blueprint = Blueprint('club', __name__)
 
@@ -41,6 +42,7 @@ def index():
         setup_form = ClubSetup()
         if setup_form.validate_on_submit():
             if setup_form.name.data is not None:
+                current_user.memberships[0].team.name = setup_form.name.data
                 current_user.club.name = setup_form.name.data
 
             if setup_form.email.data is not None:
@@ -70,7 +72,7 @@ def index():
             return redirect(url_for('.index'))
 
         
-        setup_form.name.data = current_user.club.name
+        setup_form.name.data = current_user.memberships[0].team.name
         setup_form.email.data = current_user.email
         setup_form.contact_number.data = current_user.club.contact_number
         street_address = current_user.club.street_address

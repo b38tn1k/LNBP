@@ -10,6 +10,7 @@ from app.models.user import User
 from app.models.teams import TeamMember
 from app.mailers.auth import ConfirmEmail, ResetPassword
 from app.extensions import login_manager, token, limiter
+from app.email import send_basic_welcome_message
 
 auth = Blueprint('auth', __name__)
 
@@ -35,8 +36,8 @@ def login():
         user = User.query.filter_by(email=form.email.data).one()
         session['current_team_membership_id'] = user.primary_membership_id
         login_user(user)
-
-        flash("Logged in successfully.", "success")
+        # send_basic_welcome_message(user.email)
+        # flash("Logged in successfully.", "success")
         return redirect(request.args.get("next") or url_for("main.home"))
 
     return render_template("auth/login.html", form=form)

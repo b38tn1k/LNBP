@@ -1295,7 +1295,7 @@ function handleFlightTableClick(event) {
         target.setAttribute("availability", availability);
 
         // Remove all bg- classes
-        target.classList.remove("bg-free", "bg-busy", "bg-unavailable");
+        target.classList.remove("bg-free", "bg-busy", "bg-unavailable", "bg-populated");
 
         // Add the new bg- class based on the updated availability
         switch (availability) {

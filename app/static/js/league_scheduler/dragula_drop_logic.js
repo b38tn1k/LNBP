@@ -36,7 +36,7 @@ function checkAvailabilityBeforeDrop(p, target) {
 */
 function checkFreeSpaceBeforeDrop(el, target) {
     let items = target.querySelectorAll(".draggable-item");
-    return items.length <= info.leagueRulesPlayersPerMatch;
+    return items.length <= info.leagueRulesPlayersPerMatch || target.classList.contains('subs');
 }
 
 /**
@@ -63,8 +63,10 @@ function checkForNoDuplicates(p, target) {
     let c = getFullColumn(target);
     let count = 0;
     c.forEach((cell) => {
-        let items = cell.querySelectorAll(`.draggable-item[player-id="${p}"]`);
-        count += items.length;
+        if (!cell.classList.contains('subs')) {
+            let items = cell.querySelectorAll(`.draggable-item[player-id="${p}"]`);
+            count += items.length;
+        }
     });
     return count <= 1;
 }

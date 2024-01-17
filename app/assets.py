@@ -28,16 +28,16 @@ common_js = Bundle(
 #     output='public/css/common-1.css'
 # )
 
-# common_js = Bundle(
-#     'https://code.jquery.com/jquery-3.2.1.slim.min.js',
-#     'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js',
-#     'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js',
-#     Bundle(
-#         'js/main.js',
-#         filters='jsmin'
-#     ),
-#     output='public/js/common-2.js'
-# )
+common_js = Bundle(
+    'https://code.jquery.com/jquery-3.2.1.slim.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js',
+    'https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js',
+    Bundle(
+        'js/main.js',
+        filters='jsmin'
+    ),
+    output='public/js/common-2.js'
+)
 
 store_css = Bundle(
     'css/store.css',
@@ -63,7 +63,7 @@ tabler_css = Bundle(
 
 tabler_js = Bundle(
     'tabler/js/vendors/jquery-3.2.1.min.js',
-    # 'tabler/js/vendors/bootstrap.bundle.min.js',
+    'tabler/js/vendors/bootstrap.bundle.min.js',
     'https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js',
     'tabler/js/vendors/circle-progress.min.js',
     'tabler/js/vendors/selectize.min.js',
