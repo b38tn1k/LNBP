@@ -216,6 +216,11 @@
         addImagesToTableData();
         revealHidden();
         setupDragula();
+        let urlHash = window.location.hash;
+        if (urlHash.startsWith("#target_flight=")) {
+            let flightId = urlHash.split('=')[1];
+            selectTab(flightId)
+        }
 
         for (let id of info.flightIds) {
             updatePlayerCards(id);

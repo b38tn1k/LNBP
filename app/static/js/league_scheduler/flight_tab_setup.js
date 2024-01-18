@@ -21,6 +21,7 @@ function selectTab(flightId) {
     // Add the 'active' class to the selected tab
     const selectedTab = document.getElementById(`flight-tab-${flightId}`);
     selectedTab.classList.add("active");
+    window.location.href = window.location.pathname + '#target_flight=' + flightId;
 
     const content = document.querySelectorAll(".tab-content");
     content.forEach((c) => {
