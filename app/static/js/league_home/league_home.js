@@ -9,6 +9,21 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+/**
+* @description This function sends a POST request to the current URL with the given
+* data and triggers a callback function for either success or failure based on the
+* response status.
+* 
+* @param { object } data - The `data` input parameter is the data that is being sent
+* to the server via POST request.
+* 
+* @param {  } success - The `success` input parameter is a callback function that
+* will be called with the response data from the server when the request is successful
+* (i.e., has a status of "success").
+* 
+* @param {  } failure - The `failure` parameter is a callback function that is called
+* if the API request fails (i.e., if the `response.json()` promise is rejected).
+*/
 function doFetch(data, success, failure) {
     const csrf_token = document.querySelector('#hidden-form input[name="csrf_token"]').value;
     fetch(window.location.href, {

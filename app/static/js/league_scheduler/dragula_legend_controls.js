@@ -111,6 +111,25 @@ function doScheduleLegend(p, f) {
     });
 }
 
+/**
+* @description This function takes an array of cells and a class name as input and
+* returns an array of cells that do not have the given class name.
+* 
+* @param { object } cells - The `cells` input parameter is an array of HTML cells
+* (probably `td` or `th`) that the function should filter based on the `class` attribute.
+* 
+* @param { string } cclass - The `cclass` input parameter is a string that specifies
+* the class name to filter out.
+* 
+* @returns { array } The function takes two arguments: `cells` which is an HTML
+* collection of cells and `cclass` a string representing the class name of cells to
+* filter out.
+* The function returns an array of cells that do not have the `cclass` class.
+* 
+* In other words the function uses the `filter()` method and the `!...contains()`
+* method to filter out all elements that do not have the specified class and returns
+* an array of those elements.
+*/
 function filterOutCellsByClass(cells, cclass) {
     return Array.from(cells).filter((cell) => !cell.classList.contains(cclass));
 }
