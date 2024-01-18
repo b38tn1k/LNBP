@@ -40,6 +40,7 @@ def check_for_membership(*args, **kwargs):
     if not current_user.is_authenticated or current_user.primary_membership_id is None:
         flash("You currently do not have accesss to app", "warning")
         return redirect(url_for("main.home"))
+    
 
 @blueprint.route("/<int:id>", methods=["GET", "POST"])
 @login_required
@@ -67,6 +68,18 @@ def league_home(id):
     league = current_user.club.get_league_by_id(id)
     if league is None:
         return redirect(url_for("main.home"))
+    
+    if request.method == "POST":
+        try:
+            data = request.json
+            if data['msg'] == 'schedule-all':
+                for flight in league.flights:
+                    schedule_wizard(league, flight.id)
+                    db.session.commit()
+            return jsonify({"status": "success"})
+        except Exception as e:
+            return jsonify({"status": "failure", "error": str(e)})
+        
     return render_template(
         "league/league_home.html",
         simple_form=SimpleForm(),

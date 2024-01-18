@@ -21,7 +21,7 @@ function selectTab(flightId) {
     // Add the 'active' class to the selected tab
     const selectedTab = document.getElementById(`flight-tab-${flightId}`);
     selectedTab.classList.add("active");
-    window.location.href = window.location.pathname + '#target_flight=' + flightId;
+    window.location.href = window.location.pathname + "#target_flight=" + flightId;
 
     const content = document.querySelectorAll(".tab-content");
     content.forEach((c) => {
@@ -106,18 +106,18 @@ function setupPlayerDraggableOrigins() {
 }
 
 /**
-* @description This function makes all the players draggable on the games canvas and
-* renames the radios for each player based on their id.
-* 
-* @returns { any } Based on the code provided:
-* 
-* The output returned by this function is not defined.
-* 
-* Explanation: The function does not have a return statement and instead modifies
-* the HTML elements on the page. It creates draggable tiles for each player and
-* renames the radios associated with those tiles. It also toggleCaptain functionality
-* based on if the player is the captain or not.
-*/
+ * @description This function makes all the players draggable on the games canvas and
+ * renames the radios for each player based on their id.
+ *
+ * @returns { any } Based on the code provided:
+ *
+ * The output returned by this function is not defined.
+ *
+ * Explanation: The function does not have a return statement and instead modifies
+ * the HTML elements on the page. It creates draggable tiles for each player and
+ * renames the radios associated with those tiles. It also toggleCaptain functionality
+ * based on if the player is the captain or not.
+ */
 function setupPlayerDraggableInGames() {
     for (let i = 0; i < info.games.length; i++) {
         let target = info.games[i]["target"];
@@ -128,7 +128,7 @@ function setupPlayerDraggableInGames() {
             target.append(tile);
             renameRadio(tile, target);
             if (p["captain"] == 1) {
-                toggleCaptain(tile.querySelector('[type="radio"]'))
+                toggleCaptain(tile.querySelector('[type="radio"]'));
             }
 
             tile.style.backgroundColor = info.playerColors[parseInt(p["id"])];
@@ -192,27 +192,27 @@ function createCaptainRadioInput(id, flightID) {
 }
 
 /**
-* @description This function is a callback function for a click event on a radio button.
-* 
-* @param { object } event - In the provided JavaScript function `captainRadioClickCallback`,
-* the `event` parameter represents the Event Object that is triggered when a radio
-* button is clicked.
-* 
-* @returns { any } This function takes an event object as an argument and performs
-* the following actions:
-* 
-* 1/ It sets the checked attribute of all radio buttons with the same name as the
-* input element that triggered the event to false.
-* 2/ It hides the "checked" image and shows the "unchecked" image for each radio
-* button with the same name.
-* 3/ It calls the `toggleCaptain()` function and passes the input element as an argument.
-* 4/ It calls the `updatePlayerCards()` function with the value of the `flight`
-* attribute of the input element.
-* 
-* The output returned by this function is not explicitly defined as it is meant to
-* be a callback function that operates on other elements based on the input element
-* that triggered the event.
-*/
+ * @description This function is a callback function for a click event on a radio button.
+ *
+ * @param { object } event - In the provided JavaScript function `captainRadioClickCallback`,
+ * the `event` parameter represents the Event Object that is triggered when a radio
+ * button is clicked.
+ *
+ * @returns { any } This function takes an event object as an argument and performs
+ * the following actions:
+ *
+ * 1/ It sets the checked attribute of all radio buttons with the same name as the
+ * input element that triggered the event to false.
+ * 2/ It hides the "checked" image and shows the "unchecked" image for each radio
+ * button with the same name.
+ * 3/ It calls the `toggleCaptain()` function and passes the input element as an argument.
+ * 4/ It calls the `updatePlayerCards()` function with the value of the `flight`
+ * attribute of the input element.
+ *
+ * The output returned by this function is not explicitly defined as it is meant to
+ * be a callback function that operates on other elements based on the input element
+ * that triggered the event.
+ */
 function captainRadioClickCallback(event) {
     let radioInput = event.target;
     const parentNode = radioInput.parentNode.parentNode;
@@ -226,17 +226,17 @@ function captainRadioClickCallback(event) {
 }
 
 /**
-* @description The function `toggleCaptain` takes a `radioInput` element as an
-* argument and sets its `checked` property to `true`, displays the "checked" image
-* for that label using CSS (`style.display = "inline"`), and hides the "unchecked"
-* image (`style.display = "none"`).
-* 
-* @param {  } radioInput - The `radioInput` input parameter is the reference to the
-* radio button element that triggers the function.
-* 
-* @returns { any } The function takes a `radioInput` element as an argument and sets
-* its `checked` property to `true`.
-*/
+ * @description The function `toggleCaptain` takes a `radioInput` element as an
+ * argument and sets its `checked` property to `true`, displays the "checked" image
+ * for that label using CSS (`style.display = "inline"`), and hides the "unchecked"
+ * image (`style.display = "none"`).
+ *
+ * @param {  } radioInput - The `radioInput` input parameter is the reference to the
+ * radio button element that triggers the function.
+ *
+ * @returns { any } The function takes a `radioInput` element as an argument and sets
+ * its `checked` property to `true`.
+ */
 function toggleCaptain(radioInput) {
     radioInput.checked = true;
     radioInput.labels[0].querySelector(".checked-img").style.display = "inline";
@@ -532,12 +532,76 @@ function getAllGames() {
             // console.log(game["players"].length, info.leagueRulesPlayersPerMatch);
             if (game["players"].length == info.leagueRulesPlayersPerMatch) {
                 flight["games"].push(game);
-            } else if  (game["players"].length != 0) {
-                flight["to-remove"].push(game)
+            } else if (game["players"].length != 0) {
+                flight["to-remove"].push(game);
             }
         });
         flights.push(flight);
     }
-    console.log(flights)
+    console.log(flights);
     return flights;
+}
+
+function getPlayerInfoFromID(id) {
+    let res = {};
+    document.querySelectorAll(".player-card").forEach((i) => {
+        if (parseInt(i.getAttribute("player-id")) == id) {
+            res["name"] = i.getAttribute("player-name");
+            res["fullname"] = i.getAttribute("player-full-name");
+            res["id"] = id;
+        }
+    });
+    return res;
+}
+
+function getPlayerAvailabilitiesForTimeslot(flightID, timeslotID) {
+    let table = getFlightTable(flightID);
+    let timeslotHeader = table.querySelector(`.timeslot_header[ts="${timeslotID}"]`);
+    let playerAvailability = {};
+
+    if (timeslotHeader) {
+        for (let attribute of timeslotHeader.attributes) {
+            if (attribute.name.startsWith("player-")) {
+                let playerId = attribute.name.split("-")[1];
+                playerAvailability[playerId] = parseInt(attribute.value);
+            }
+        }
+    }
+
+    return playerAvailability;
+}
+
+function organiseAndDisplaySubs(flightID) {
+    let table = getFlightTable(flightID);
+    let subs = table.querySelectorAll(".subs");
+
+    subs.forEach((c) => {
+        c.querySelectorAll(".draggable-item").forEach((di) => {
+            di.remove();
+        });
+        let timeslotID = parseInt(c.getAttribute("timeslot"));
+        let playerAvailability = getPlayerAvailabilitiesForTimeslot(flightID, timeslotID);
+        let availablePlayerInfos = [];
+        for (let id in playerAvailability) {
+            if (playerAvailability[id] == AVAILABLE || playerAvailability[id] == AVAILABLE_LP) {
+                let res = getPlayerInfoFromID(parseInt(id));
+                availablePlayerInfos.push(res);
+            }
+        }
+        cic = getCellsInColumn(c);
+        cic.forEach((cc) => {
+            cc.querySelectorAll(".draggable-item").forEach((ccp) => {
+                let id = parseInt(ccp.getAttribute("player-id"));
+                availablePlayerInfos = availablePlayerInfos.filter((playerInfo) => playerInfo.id !== id);
+            });
+        });
+        for (let i = 0; i < availablePlayerInfos.length; i++) {
+            let p = availablePlayerInfos[i]
+            let tile = makeDraggablePlayerTile(p.id, p.name, p.fullname, flightID)
+            tile.style.backgroundColor = info.playerColors[p.id];
+            c.appendChild(tile);
+
+        }
+
+    });
 }

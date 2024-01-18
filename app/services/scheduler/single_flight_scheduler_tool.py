@@ -487,8 +487,7 @@ class SingleFlightScheduleTool:
 
         """
         counter = 0
-        while counter < 5:
-            counter += 1
+        while counter < 50:
             good = True
             assigned = set()
             self.recalculate_players()
@@ -509,6 +508,8 @@ class SingleFlightScheduleTool:
                                 break
                         if g.captain is None:
                             good = False
+                            counter += 1
+            print(good)
             if good is True:
                     break
 

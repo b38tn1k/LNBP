@@ -10,7 +10,7 @@ function setupDragula() {
         accepts: canAcceptDrop,
         removeOnSpill: true,
         slideFactorX: 5,
-        slideFactorY: 5, 
+        slideFactorY: 5,
     });
 
     drake.on("drag", handleDrag);
@@ -163,6 +163,7 @@ function handleDragEnd(event) {
     resetScheduleLegend();
     let flight = parseInt(event.getAttribute("flight-id"));
     updatePlayerCards(flight);
+    organiseAndDisplaySubs(flight);
 }
 
 /**

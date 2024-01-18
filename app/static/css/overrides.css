@@ -103,3 +103,7 @@ table.tiny-table {
 .fg-failure {
     color: red !important; /* Pastel Red */
 }
+
+tr.double-top-border {
+     border-top: 5px double #4d4a47;
+}

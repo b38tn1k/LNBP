@@ -75,9 +75,9 @@ function doScheduleLegend(p, f) {
             let columnCells = getCellsInColumn(ts);
             columnCells.forEach((cell) => {
                 if (!cell.classList.contains("subs")) {
-                    if (availability == FREE) {
+                    if (availability == AVAILABLE) {
                         cell.classList.add("bg-free");
-                    } else if (availability == BUSY) {
+                    } else if (availability == AVAILABLE_LP) {
                         cell.classList.add("bg-busy");
                     } else {
                         cell.classList.add("bg-unavailable");
@@ -88,7 +88,8 @@ function doScheduleLegend(p, f) {
     });
 
     let cells = table.querySelectorAll(".draggable-target");
-    cells = filterOutSubsCells(cells);
+    cells = filterOutCellsByClass(cells, 'subs');
+    cells = filterOutCellsByClass(cells, 'unavailable');
     // function that takes cells and filters out cells with 'subs' also in class list
     cells.forEach((c) => {
         let ps = c.querySelectorAll(".draggable-item");
@@ -110,19 +111,8 @@ function doScheduleLegend(p, f) {
     });
 }
 
-/**
-* @description The function takes an array of cells and returns a new array with
-* only those cells that do not have the class "subs".
-* 
-* @param { object } cells - The `cells` input parameter is an array of HTML cells
-* that the function processes to exclude those with the 'subs' class.
-* 
-* @returns { array } The output returned by this function is an array of cells that
-* do not have the 'subs' class.
-*/
-function filterOutSubsCells(cells) {
-    // Filter cells to exclude those with the 'subs' class
-    return Array.from(cells).filter((cell) => !cell.classList.contains("subs"));
+function filterOutCellsByClass(cells, cclass) {
+    return Array.from(cells).filter((cell) => !cell.classList.contains(cclass));
 }
 
 /**

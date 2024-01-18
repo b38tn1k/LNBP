@@ -46,7 +46,7 @@ function updatePlayerCards(flight) {
     let timeslots = table.querySelectorAll(".timeslot_header");
     timeslots.forEach((ts, i) => {
         for (let p of players) {
-            p.busy_count += parseInt(ts.getAttribute(`player-${p.id}`)) == BUSY;
+            p.busy_count += parseInt(ts.getAttribute(`player-${p.id}`)) == AVAILABLE_LP;
         }
     });
     let possible_game = table.querySelectorAll(".facility-timeslot");
@@ -58,7 +58,7 @@ function updatePlayerCards(flight) {
             let targetPlayer = players.find((player) => player.id === pid);
             targetPlayer.game_count += 1;
             let avail = getPlayerAvailabilityForCell(pid, pg);
-            targetPlayer.busy_scheduled_count += avail == BUSY;
+            targetPlayer.busy_scheduled_count += avail == AVAILABLE_LP;
             let radio = pi.querySelector('[type="radio"]');
             targetPlayer.captain_count += radio.checked;
         });

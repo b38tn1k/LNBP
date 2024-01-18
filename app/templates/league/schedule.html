@@ -40,7 +40,14 @@
                 <h1 class="page-title">{{ league.name }} Scheduler</h1>
             </div>
             <div>
-                <button style="margin-right: 10px;" type="button" id="generate-button" class="btn btn-lg" title="Schedule" aria-label="Schedule">
+                <button
+                    style="margin-right: 10px"
+                    type="button"
+                    id="generate-button"
+                    class="btn btn-lg"
+                    title="Schedule"
+                    aria-label="Schedule"
+                >
                     <i class="fe fe-star" style="font-size: 1.5em"></i>
                 </button>
                 <button type="button" id="save-button" class="btn btn-lg" title="Save" aria-label="Save">
@@ -110,7 +117,8 @@
                                         <tr>
                                             {% if league.facility_in_league(facility) %}
                                             <th>{{ facility.name }}</th>
-                                            {% for ts in league.timeslots %}
+                                            {% for ts in league.timeslots %} {% set available, game_event =
+                                            facility.is_available(ts) %} {% if available or game_event.flight.id == flight.id%}
                                             <td
                                                 class="draggable-target facility-timeslot"
                                                 facility="{{ facility.id }}"
@@ -131,18 +139,20 @@
                                                     ></div>
                                                     {% endfor %}
                                                 </div>
-
                                                 {%endif%}
                                             </td>
-                                            {% endfor %} {%endif%}
+                                            {% else %}
+                                            <td class="unavailable">{{game_event.league.name}}<br>{{game_event.flight.name}}</td>
+
+                                            {%endif%} {% endfor %} {%endif%}
                                         </tr>
                                         {% endfor %}
 
-                                        <tr>
+                                        <tr class="double-top-border">
                                             <th>SUB</th>
                                             {% for ts in league.timeslots %}
                                             <td
-                                                class="draggable-target subs"
+                                                class="draggable-target draggable-source subs"
                                                 facility="-1"
                                                 timeslot="{{ ts.id }}"
                                                 flight="{{ flight.id }}"
@@ -204,8 +214,8 @@
 
 <script>
     var info;
-    const FREE = 1;
-    const BUSY = 2;
+    const AVAILABLE = 1;
+    const AVAILABLE_LP = 2;
     const UNAVAILABLE = 3;
 
     document.addEventListener("DOMContentLoaded", function () {
@@ -218,19 +228,19 @@
         setupDragula();
         let urlHash = window.location.hash;
         if (urlHash.startsWith("#target_flight=")) {
-            let flightId = urlHash.split('=')[1];
-            selectTab(flightId)
+            let flightId = urlHash.split("=")[1];
+            selectTab(flightId);
         }
 
         for (let id of info.flightIds) {
             updatePlayerCards(id);
+            organiseAndDisplaySubs(id);
         }
         saveButton = document.getElementById("save-button");
         saveButton.addEventListener("click", saveButtonCallback);
 
         generateButton = document.getElementById("generate-button");
         generateButton.addEventListener("click", generateButtonCallback);
-        
     });
 </script>
 {% endblock %}

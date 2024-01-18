@@ -77,6 +77,6 @@ class Facility(Model):
         for g in self.game_events:
             if day_number == g.timeslot.since_y2k['days']:
                 if t.check_overlap(g.timeslot):
-                    return False
-        return True
+                    return False, g
+        return True, None
 
