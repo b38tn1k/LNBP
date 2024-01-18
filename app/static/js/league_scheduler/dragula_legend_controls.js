@@ -73,6 +73,8 @@ function doScheduleLegend(p, f) {
         if (colorColumns) {
             // Apply the same class to the entire column
             let columnCells = getCellsInColumn(ts);
+            columnCells = filterOutCellsByClass(columnCells, 'subs');
+            columnCells = filterOutCellsByClass(columnCells, 'unavailable');
             columnCells.forEach((cell) => {
                 if (!cell.classList.contains("subs")) {
                     if (availability == AVAILABLE) {
@@ -88,8 +90,11 @@ function doScheduleLegend(p, f) {
     });
 
     let cells = table.querySelectorAll(".draggable-target");
+    console.log(cells.length)
     cells = filterOutCellsByClass(cells, 'subs');
-    cells = filterOutCellsByClass(cells, 'unavailable');
+    console.log(cells.length)
+    console.log()
+    // cells = filterOutCellsByClass(cells, 'unavailable');
     // function that takes cells and filters out cells with 'subs' also in class list
     cells.forEach((c) => {
         let ps = c.querySelectorAll(".draggable-item");

@@ -24,6 +24,8 @@ import json
 
 blueprint = Blueprint("league", __name__)
 
+from app.mailers.notification import NotificationMailer
+
 
 @blueprint.before_request
 def check_for_membership(*args, **kwargs):
@@ -72,6 +74,10 @@ def league_home(id):
     if request.method == "POST":
         try:
             data = request.json
+            if data['msg'] == 'test-email':
+                email = 'jamesrobertcarthew@gmail.com'
+                print(email)
+
             if data['msg'] == 'schedule-all':
                 for flight in league.flights:
                     schedule_wizard(league, flight.id)

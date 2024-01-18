@@ -12,13 +12,11 @@ league.name }} Settings{% endblock %} {% block body %}
             <div class="col-6 col-sm-6 col-lg-6">
                 <div class="card" style="flex: 1">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h3 class="card-title">League Calendar</h3>
+                        <h3 class="card-title">League Timeline</h3>
                     </div>
                     <div class="card-body" style="max-height: 500px !important; overflow: auto">
-                    CSV download
-                    Export to... 
-                    Scorecards
-
+                        <li>Signup Cutoff Date</li>
+                        <li>Availability Cutoff Date</li>
                     </div>
                 </div>
             </div>
@@ -28,7 +26,8 @@ league.name }} Settings{% endblock %} {% block body %}
                         <h3 class="card-title">Schedule Tools</h3>
                     </div>
                     <div class="card-body" style="max-height: 500px !important; overflow: auto">
-                        <button type="button" class="btn btn-primary btn-block" id="runScheduleWizard" aria-label="Auto Schedule Wizard" title="Run Schedule Wizard">Run Schedule Wizard</button>
+                        <button type="button" class="btn btn-primary btn-block" id="run-schedule-wizard" aria-label="Auto Schedule Wizard" title="Run Schedule Wizard">Run Schedule Wizard</button>
+                        <button type="button" class="btn btn-primary btn-block" id="test-email">Test Email</button>
                         <a href="{{ url_for('league.schedule_league', id=league['id']) }}" class="btn btn-primary btn-block" aria-label="Flight Schedule Editor" title="Flight Schedule Editor">
                             Flight Schedule Editor
                         </a>

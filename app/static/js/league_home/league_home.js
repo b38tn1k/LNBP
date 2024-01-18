@@ -1,7 +1,12 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const button = document.getElementById("runScheduleWizard");
+    document.getElementById("run-schedule-wizard").addEventListener("click", function () {
+        const data = {
+            msg: "test-email",
+        };
+        doFetch(data, null, null);
+    });
 
-    button.addEventListener("click", function () {
+    document.getElementById("test-email").addEventListener("click", function () {
         const data = {
             msg: "schedule-all",
         };
