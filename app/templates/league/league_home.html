@@ -27,7 +27,7 @@ league.name }} Settings{% endblock %} {% block body %}
                     </div>
                     <div class="card-body" style="max-height: 500px !important; overflow: auto">
                         <button type="button" class="btn btn-primary btn-block" id="run-schedule-wizard" aria-label="Auto Schedule Wizard" title="Run Schedule Wizard">Run Schedule Wizard</button>
-                        <button type="button" class="btn btn-primary btn-block" id="test-email">Test Email</button>
+                        <!-- <button type="button" class="btn btn-primary btn-block" id="test-email">Test Email</button> -->
                         <a href="{{ url_for('league.schedule_league', id=league['id']) }}" class="btn btn-primary btn-block" aria-label="Flight Schedule Editor" title="Flight Schedule Editor">
                             Flight Schedule Editor
                         </a>

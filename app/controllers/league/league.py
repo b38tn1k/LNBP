@@ -18,8 +18,8 @@ from app.services.league_services import (
     build_league_from_json,
     apply_edits,
     create_games_from_request,
-    schedule_wizard,
 )
+from app.services.scheduler import Scheduler
 import json
 
 blueprint = Blueprint("league", __name__)
@@ -76,11 +76,14 @@ def league_home(id):
             data = request.json
             if data['msg'] == 'test-email':
                 email = 'jamesrobertcarthew@gmail.com'
-                print(email)
+                print(email) # to do
 
             if data['msg'] == 'schedule-all':
+                league.delete_all_game_events()
+                db.session.commit()
                 for flight in league.flights:
-                    schedule_wizard(league, flight.id)
+                    s = Scheduler(league, Scheduler.SINGLE_FLIGHT, flight_id=flight.id)
+                    s.run()
                     db.session.commit()
             return jsonify({"status": "success"})
         except Exception as e:
@@ -165,10 +168,11 @@ def schedule_league(id):
                 create_games_from_request(league, data['data'])
                 db.session.commit()
             elif data['contents'] == 'schedule':
-                schedule_wizard(league, data['data']['flight_id'])
+                s = Scheduler(league, Scheduler.SINGLE_FLIGHT, flight_id=data['data']['flight_id'])
+                s.run()
                 db.session.commit()
-                for g in league.game_events:
-                    print(g)
+                # for g in league.game_events:
+                #     print(g)
             return jsonify({"status": "success"})
         except Exception as e:
             return jsonify({"status": "failure", "error": str(e)})

@@ -24,7 +24,7 @@ class Flight(Model):
             "<Flight - whatever_name_i_have>"
 
         """
-        return f'<Flight {self.id} - {self.name}>'
+        return f'<Flight ID {self.id} - {self.name}>'
     
     def add_player(self, player, add=True, commit=False):
         """
@@ -39,6 +39,12 @@ class Flight(Model):
         if commit is True:
             db.session.commit()
         return association
+    
+    def player_in_flight(self, player):
+        for ass in self.player_associations:
+            if ass.player == player:
+                return True
+        return False
     
     def delete_all_game_events(self):
         """

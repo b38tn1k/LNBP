@@ -565,3 +565,19 @@ class League(Model):
             }
         else:
             return None
+        
+    def get_flight_for_player(self, player):
+        """
+        Get the flight that contains the specified player.
+
+        Args:
+            player (Player): The player for whom to find the containing flight.
+
+        Returns:
+            Flight or None: The Flight object containing the player or None if not found.
+        """
+        for flight in self.flights:
+            if flight.player_in_flight(player):
+                return flight
+        print("fail")
+        return None

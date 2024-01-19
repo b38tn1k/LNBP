@@ -7,7 +7,14 @@ from dateutil import parser
 import dateutil
 import re
 import csv
-from app.services.scheduler import Player, GameSlot, SingleFlightScheduleTool, generateGameSlotAvailabilityScores
+from app.services.scheduler import (
+    SingleFlightScheduleTool,
+    generateGameSlotAvailabilityScores,
+    create_game_from_scheduler,
+    create_player_objects,
+    create_gameslot_objects,
+    Scheduler,
+)
 
 
 def is_date_like(s):
@@ -766,97 +773,6 @@ def create_games_from_request(league, data):
                 players, facility, timeslot, flight, captain=captain
             )
 
-def create_game_from_scheduler(league, flight, game):
-    """
-    This function creates a new game event for a given league using the information
-    provided.
-
-    Args:
-        league (int): The `league` input parameter provides access to the league
-            object which contains information such as clubs and their facilities.
-        flight (int): The `flight` input parameter specifies the flight number of
-            the game event.
-        game (dict): The `game` input parameter is a dictionary containing information
-            about the game to be created.
-
-    """
-    print('create ', game)
-    timeslot = league.get_timeslot_by_id(game["timeslot"])
-    facility = league.club.get_facility_by_id(game["facility"])
-    if game["captain"] is not None:
-        captain = league.club.get_player_by_id(game["captain"])
-    else:
-        captain = league.club.get_player_by_id(game["players"][0])
-    players = []
-    for p in game["players"]:
-        players.append(league.club.get_player_by_id(p))
-    league.create_game_event(
-        players, facility, timeslot, flight, captain=captain
-    )
-
-
-def create_player_objects(flight, league, rules):
-    """
-    This function creates a list of `Player` objects from a flight's player
-    associations and computes the mean availability score for the players based
-    on league availability data.
-
-    Args:
-        flight (): The `flight` input parameter is a list of player associations
-            from which the function creates players.
-        league (dict): The `league` input parameter is used to retrieve player
-            availability information for each player association.
-        rules (dict): The `rules` input parameter defines the ruleset for player
-            creation; it is used to initialise the player object's attributes like
-            avg.
-
-    Returns:
-        list: The output returned by the `create_player_objects` function is a
-        list of `Player` objects. Each `Player` object has an `id`, `rules`, and
-        an `availability_score` attribute set based on the player's availability
-        according to the `league` object's `get_player_availability_dict`. The
-        `mean_availability_score` variable is computed as the average availability
-        score of all players and each player's `availability_score` attribute is
-        set relative to this mean.
-
-    """
-    players = []
-    mean_availability_score = 0
-    for a in flight.player_associations:
-        avail = league.get_player_availability_dict(a.player)
-        p = Player(a.player.id, rules, avail)
-        mean_availability_score += p.availability_score
-        players.append(p)
-    mean_availability_score /= len(players)
-    for p in players:
-        p.set_availability_score_relation(mean_availability_score)
-    return players
-
-def create_gameslot_objects(league, rules):
-    """
-    This function creates a list of `GameSlot` objects based on the availability
-    of facilities and timeslots for a given league.
-
-    Args:
-        league (): The `league` input parameter is a League object that provides
-            information about the available timeslots and facility associations
-            for scheduling games.
-        rules (): The `rules` input parameter defines the game slot object's
-            parameters and restrictions such as scoring format or duration constraints.
-
-    Returns:
-        list: The output returned by this function is a list of `GameSlot` objects.
-
-    """
-    gameslots = []
-    for t in league.timeslots:
-        for f in league.facility_associations:
-            facility_is_available, _ = f.facility.is_available(t)
-            if facility_is_available:
-                gs = GameSlot(t.id, f.facility.id, t.since_y2k, rules)
-                gameslots.append(gs)
-    return gameslots
-
 
 def schedule_wizard(league, flight_id):
     """
@@ -869,21 +785,4 @@ def schedule_wizard(league, flight_id):
             identifier of the flight for which to schedule games.
 
     """
-    print("Schedule", league, flight_id)
-    rules = league.get_league_rules_dict()
-    flight = league.get_flight_by_id(flight_id)
-    flight.delete_all_game_events()
-    players = create_player_objects(flight, league, rules)
-    gameslots = create_gameslot_objects(league, rules)
-    generateGameSlotAvailabilityScores(gameslots, players)
-    print('Create Scheduler')
-    scheduler = SingleFlightScheduleTool(flight.id, rules, players, gameslots)
-    print('Run Scheduler')
-    scheduler.runCA()
-    print('Assign Captains')
-    scheduler.assign_captains()
-    print('Build New Schedule')
-    events = scheduler.return_events()
-    # print('GAMES:', events)
-    for e in events:
-        create_game_from_scheduler(league, flight, e)
+    

@@ -137,8 +137,60 @@ def all_players_satisfied(potential_game):
     return all_satisfied or over_scheduled
 
 
+def shift_blocks(arr, mutate):
+    if not arr or mutate <= 0:
+        return arr
+    mutate += 1
+
+    # Grouping items by availability_score
+    score_groups = {}
+    for item in arr:
+        score = item.availability_score
+        score_groups.setdefault(score, []).append(item)
+
+    # Sorting the dictionary keys (availability scores)
+    sorted_scores = sorted(score_groups.keys())
+
+    # Determine the number of groups to reverse
+    num_groups = len(sorted_scores)
+    mutate %= num_groups
+    if mutate == 0:
+        return arr
+
+    # Reversing the order of the first 'mutate' groups
+    reversed_scores = list(reversed(sorted_scores[:mutate])) + sorted_scores[mutate:]
+
+    # Building the new array
+    new_arr = []
+    for score in reversed_scores:
+        new_arr.extend(score_groups[score])
+
+    return new_arr
+
+def interlace_and_rotate(arr, mutate):
+    if not arr:
+        return arr
+
+    length = len(arr)
+    # Step 1: Rearranging the array
+    # Split the array into two halves
+    first_half = arr[:length // 2]
+    second_half = arr[length // 2:]
+    if length % 2:
+        second_half.append(None)  # Append None if the array has odd length
+
+    # Interleave elements from the second half into the first half
+    rearranged = [val for pair in zip(first_half, reversed(second_half)) for val in pair if val is not None]
+
+    # Step 2: Rotating the array
+    mutate %= length  # Handle cases where mutate is larger than the array length
+    rotated = rearranged[-mutate:] + rearranged[:-mutate]
+
+    return rotated
+
+
 class SingleFlightScheduleTool:
-    def __init__(self, flight_id, rules, players, gameslots):
+    def __init__(self, flight_id, rules, players, gameslots, mutate):
         """
         This function initalizes an object of the class "Flight" by setting its
         instance variables "flight_id", "rules", "gameslots" and "players" with
@@ -159,12 +211,20 @@ class SingleFlightScheduleTool:
         """
         self.flight_id = flight_id
         self.rules = rules
+        self.gameslots = gameslots
+        self.mutate = mutate
 
-        shuffle(gameslots)
-        self.gameslots = sorted(gameslots, key=lambda gs: gs.facility_id, reverse=True)
-        self.gameslots = sorted(self.gameslots, key=lambda gs: gs.availability_score)
-        print ([g.availability_score for g in self.gameslots])
+        # shuffle(gameslots)
+        # self.gameslots = sorted(gameslots, key=lambda gs: gs.facility_id, reverse=True)
+        # self.gameslots = sorted(self.gameslots, key=lambda gs: gs.availability_score)
+        # self.gameslots = shift_blocks(self.gameslots, mutate)
+
+        # print([g.availability_score for g in self.gameslots])
+        # print()
+        # print([g.timeslot_id for g in self.gameslots])
+        # print()
         self.players = sorted(players, key=lambda player: player.availability_score)
+        self.players = shift_blocks(self.players, mutate)
 
     def generate_timeslot_player_pool(self):
         """
@@ -209,7 +269,7 @@ class SingleFlightScheduleTool:
     
     def initCA(self):
         """
-        This function initializes the combat agent's player pool and histories
+        This function initializes the player pool and histories
         using the `generate_timeslot_player_pool` and `init_histories` methods.
         It then shuffles the timeslot list to assign random positions to players.
 
@@ -222,8 +282,17 @@ class SingleFlightScheduleTool:
         """
         init_histories(self.players)
         tpp, ts = self.generate_timeslot_player_pool()
-        ts_list = list(ts)
-        # shuffle(ts_list)
+        self.gameslots = sorted(self.gameslots, key=lambda gs: gs.availability_score)
+        if self.mutate < len(ts):
+            self.gameslots = shift_blocks(self.gameslots, self.mutate)
+        else:
+            self.gameslots = interlace_and_rotate(self.gameslots, self.mutate - len(ts))
+        ts_list = []
+        seen = set()
+        for item in self.gameslots:
+            if item.timeslot_id not in seen:
+                seen.add(item.timeslot_id)
+                ts_list.append(item.timeslot_id)
         return tpp, ts_list
     
     def schedule_games_for_timeslot(self, tpp, ts_list, all_scheduled_games):
@@ -351,27 +420,7 @@ class SingleFlightScheduleTool:
                     for p in sg:
                         gs.force_player_to_match(p)
 
-    def second_force_assign(self, third_iteration):
-        """
-        This function assigns players to game sessions (gs) based on their overlap
-        and availability.
-
-        Args:
-            third_iteration (dict): The `third_iteration` input parameter is used
-                to loop over a list of matches and for each match.
-
-        """
-        for match in third_iteration:
-            selected_gs = None
-            for gs in match["overlap"]:
-                if gs.full is False:
-                    selected_gs = gs
-            if selected_gs:
-                for p in match["players"]:
-                    selected_gs.force_player_to_match(p)
-                    self.recalculate_players()
-
-    def runCA(self):
+    def run(self):
         """
         This function is trying to resolve scheduling conflicts between players
         by matching them with games that are scheduled at the same time. It does
@@ -379,15 +428,15 @@ class SingleFlightScheduleTool:
         the overlap of their preferences and existing game assignments.
 
         """
-        print("Run CA")
+        # print("Run CA")
         tpp, ts_list = self.initCA()
         all_scheduled_games = []
-        print("schedule games")
+        # print("schedule games")
         self.schedule_games_for_timeslot(tpp, ts_list, all_scheduled_games)
         self.recalculate_players()
-        print("force assign")
+        # print("force assign")
         self.force_assign(tpp, ts_list)
-        self.recalculate_players()
+        self.assign_captains()
 
     def recalculate_players(self):
         """
@@ -431,6 +480,7 @@ class SingleFlightScheduleTool:
             happening at each time slot and facility.
 
         """
+        self.recalculate_players()
         events = []
         for gameslot in self.gameslots:
             if gameslot.full is True:
@@ -509,7 +559,6 @@ class SingleFlightScheduleTool:
                         if g.captain is None:
                             good = False
                             counter += 1
-            print(good)
             if good is True:
                     break
 
