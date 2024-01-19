@@ -139,22 +139,8 @@ function toggleButtonDisabled(button) {
     button.disabled = !button.disabled;
 }
 
-/**
-* @description This function sends JSON-formatted data to the server using `fetch`,
-* with the option to perform an HTTP POST request and specify a CSRF token for validation.
-* 
-* @param { object } data - The `data` input parameter is the JSON payload that will
-* be sent to the server.
-* 
-* @param {  } after - The `after` parameter is a callback function that is called
-* after the asynchronous request to the server has been made and the response has
-* been processed.
-* 
-* @returns { Promise } The output of the `sendToServer` function is a Promise that
-* resolves with the response from the server (either success or failure) after sending
-* data to the server using fetch API.
-*/
-function sendToServer(data, after) {
+
+function sendToServer(data, success, failure) {
     const currentUrl = window.location.href;
     const csrf_token = document.querySelector('#hidden-form input[name="csrf_token"]').value;
 
@@ -175,11 +161,11 @@ function sendToServer(data, after) {
         .then((data) => {
             if (data.status === "success") {
                 console.log("Data successfully ingested by server.");
-                after();
+                success();
                 // window.location.reload();
             } else {
                 console.log("Failure: ", data.error);
-                after();
+                failure();
             }
         })
         .catch((error) => console.log("Fetch error: ", error));

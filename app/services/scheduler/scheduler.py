@@ -79,37 +79,91 @@ class Scheduler:
             create_game_from_scheduler(self.league, e, flight=self.flight)
 
     def evaluate(self, scheduler):
-        """
-        This function evaluates the given scheduler's compliance with two tiers
-        of rules. It returns a dictionary of rule violations (i.e., "fails")
-        counting the number of times each rule was broken.
+        tiers = {}
+        tiers["min_games_total"] = "tier1"
+        tiers["max_games_total"] = "tier2"
+        tiers["game_count"] = "tier1"
 
-        Args:
-            scheduler (dict): The `scheduler` input parameter is a Python scheduler
-                object that contains information about which players have satisfied
-                their roles and when.
+        tiers["min_captained"] = "tier2"
+        tiers["max_captained"] = "tier2"
+        tiers["captain_count"] = "tier2"
 
-        Returns:
-            dict: The output returned by this function is a dictionary with two
-            keys: "tier1" and "tier2".
+        tiers["overscheduled_lp"] = "tier2"
 
-        """
+        tiers["max_week_gap"] = "tier2"
+        tiers["max_games_week"] = "tier1"
+
+        tiers["max_games_day"] = "tier1"
+
+        tiers["max_repeat_compete"] = "tier2"
+        max_repeat_compete = 0.5 # * game_count
+        
+        # tiers["players_per_match"] = "tier1"
+        # tiers["minimum_subs_per_game"] = "tier1"
+
+        
+
         player_check = summarize_schedule(scheduler)
-        fails = {"tier1": 0, "tier2": 0}  # rules broken counter
+        fails = {"tier1": 0, "tier2": 0, "details": []}  # rules broken counter
 
         for player in player_check:
             p = player_check[player]
-            # print(p)
-            # print()
+            rules = p["rules"]
             # player satisfied
-            fails["tier1"] += int(not p["satisfied"])
-            # captainship
-            captainhood_ok = (
-                p["captain_count"] <= p["rules"]["max_captained"]
-                and p["captain_count"] >= p["rules"]["min_captained"]
-            )
-            fails["tier2"] += not captainhood_ok
+            if not p["satisfied"]:
+                record_broken_rules(player, tiers, fails, "game_count")
+            # player min game count
+            if p['game_count'] < rules['min_games_total']:
+                record_broken_rules(player, tiers, fails, "min_games_total")
+            # player max game count
+            if p['game_count'] > rules['max_games_total']:
+                record_broken_rules(player, tiers, fails, "max_games_total")
+            # captainhood
+            captainhood_under = p["captain_count"] < rules["min_captained"] # true is bad
+            captainhood_over = p["captain_count"] >= rules["max_captained"]
+            captainhood_ok = (not captainhood_under) and (not captainhood_over) # false and false is good
 
+            if not captainhood_ok:
+                record_broken_rules(player, tiers, fails, "captain_count")
+
+            if captainhood_under:
+                record_broken_rules(player, tiers, fails, "min_captained")
+            
+            if captainhood_over:
+                record_broken_rules(player, tiers, fails, "min_captained")
+            
+            # player mostly scheduled low preference
+            over_scheduled_lp = (p[AVAILABLE_LP] * 2) > p["game_count"]
+            if over_scheduled_lp:
+                record_broken_rules(player, tiers, fails, "overscheduled_lp")
+
+            # player week numbers
+            last_week = None
+            week_nums = p["week_numbers"]
+            week_nums = {k: p["week_numbers"][k] for k in sorted(p["week_numbers"])}
+            for n in week_nums:
+                if week_nums[n] > rules["max_games_week"]:
+                    record_broken_rules(player, tiers, fails, "max_games_week")
+                if last_week is None:
+                    last_week = n
+                else:
+                    gap = abs(n - last_week)
+                    if gap > rules["max_week_gap"]:
+                        record_broken_rules(player, tiers, fails, "max_week_gap")
+                    last_week = n
+            
+            # player day numbers
+            days = p["day_numbers"]
+            for d in days:
+                if days[d] > rules["max_games_day"]:
+                    record_broken_rules(player, tiers, fails, "max_games_day")
+
+            # player playing other player too many times
+            collisions = p['collisions']
+            thresh = round(p["game_count"] * max_repeat_compete)
+            for c in collisions:
+                if collisions[c] > thresh and c != player:
+                    record_broken_rules(player, tiers, fails, "max_repeat_compete", notes=str(c))
         return fails
 
     def run(self):
@@ -128,11 +182,26 @@ class Scheduler:
                 i += 1
                 scheduler.run()
                 res = self.evaluate(scheduler)
+                # print(res)
+                # print()
                 candidates.append({"scheduler": scheduler, "res": res})
-        best_candidate = min(candidates, key=lambda x: (x['res']['tier1'], x['res']['tier2']))
-        print(best_candidate)
-        self.build(best_candidate['scheduler'])
+        best_candidate = min(
+            candidates, key=lambda x: (x["res"]["tier1"], x["res"]["tier2"])
+        )
+        print()
+        # print(best_candidate)
+        for d in best_candidate['res']['details']:
+            print(d)
+        print()
+        self.build(best_candidate["scheduler"])
 
+def record_broken_rules(player, tiers, record, rule, notes=None):
+        record[tiers[rule]] += 1
+        if notes is not None:
+            rule += ': ' + notes
+        record["details"].append(
+            {"player": player, "broken_rule": rule}
+        )
 
 def summarize_schedule(scheduler):
     """
@@ -155,6 +224,7 @@ def summarize_schedule(scheduler):
         player_check[player.id] = {
             "collisions": {},
             "captain_count": player.captain_count,
+            "game_count": player.game_count,
             "satisfied": player.satisfied,
             "rules": player.rules,
             "day_numbers": {},

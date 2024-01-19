@@ -1,14 +1,12 @@
 {% extends "league/league_base.html" %} {% from "helpers/_formhelpers.html" import render_field %} {% block title %}{{
 league.name }} Settings{% endblock %} {% block body %}
-<form id="hidden-form" style="display: none">
-    {{ simple_form.hidden_tag() }}
-</form>
+<form id="hidden-form" style="display: none">{{ simple_form.hidden_tag() }}</form>
 <div class="my-3 my-md-5">
     <div class="container">
         <div class="page-header">
             <h1 class="page-title">{{ league.name }}</h1>
         </div>
-        <div class="row">
+        <div class="row row-cards">
             <div class="col-6 col-sm-6 col-lg-6">
                 <div class="card" style="flex: 1">
                     <div class="card-header d-flex justify-content-between align-items-center">
@@ -26,12 +24,44 @@ league.name }} Settings{% endblock %} {% block body %}
                         <h3 class="card-title">Schedule Tools</h3>
                     </div>
                     <div class="card-body" style="max-height: 500px !important; overflow: auto">
-                        <button type="button" class="btn btn-primary btn-block" id="run-schedule-wizard" aria-label="Auto Schedule Wizard" title="Run Schedule Wizard">Run Schedule Wizard</button>
-                        <!-- <button type="button" class="btn btn-primary btn-block" id="test-email">Test Email</button> -->
-                        <a href="{{ url_for('league.schedule_league', id=league['id']) }}" class="btn btn-primary btn-block" aria-label="Flight Schedule Editor" title="Flight Schedule Editor">
-                            Flight Schedule Editor
-                        </a>
-                    Quality report for each flight - call out issues
+                        <div class="row">
+                            <div class="col-6 col-sm-6 col-lg-6">
+                                <button
+                                    type="button"
+                                    class="btn btn-block"
+                                    id="run-schedule-wizard"
+                                    onclick="scheduleWizardButtonCallback()"
+                                    aria-label="Auto Schedule Wizard"
+                                    title="Run Schedule Wizard"
+                                >
+                                    <i class="fe fe-star"></i> Run Schedule Wizard
+                                </button>
+                            </div>
+                            <!-- <button type="button" class="btn btn-primary btn-block" id="test-email">Test Email</button> -->
+                            <div class="col-6 col-sm-6 col-lg-6">
+                                <a
+                                    href="{{ url_for('league.schedule_league', id=league['id']) }}"
+                                    class="btn btn-primary btn-block"
+                                    aria-label="Flight Schedule Editor"
+                                    title="Flight Schedule Editor"
+                                >
+                                    Flight Schedule Editor
+                                </a>
+                            </div>
+                        </div>
+                        <li>Quality report for each flight</li>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 col-sm-12 col-lg-12">
+                <div class="card" style="flex: 1">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3 class="card-title">League Schedule</h3>
+                    </div>
+                    <div class="card-body" style="max-height: 500px !important; overflow: auto">
+                        <li>Calendar of Game Events w/ Export Options</li>
                     </div>
                 </div>
             </div>

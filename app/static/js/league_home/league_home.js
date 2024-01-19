@@ -1,11 +1,10 @@
 document.addEventListener("DOMContentLoaded", function () {
-    document.getElementById("run-schedule-wizard").addEventListener("click", function () {
-        const data = {
-            msg: "schedule-all",
-        };
-        doFetch(data, null, null);
-    });
-
+    // document.getElementById("run-schedule-wizard").addEventListener("click", function () {
+    //     const data = {
+    //         msg: "schedule-all",
+    //     };
+    //     doFetch(data, null, null);
+    // });
     // document.getElementById("test-email").addEventListener("click", function () {
     //     const data = {
     //         msg: "test-email",
@@ -14,24 +13,29 @@ document.addEventListener("DOMContentLoaded", function () {
     // });
 });
 
-/**
- * @description This function sends a POST request to the current URL with the given
- * data and triggers a callback function for either success or failure based on the
- * response status.
- *
- * @param { object } data - The `data` input parameter is the data that is being sent
- * to the server via POST request.
- *
- * @param {  } success - The `success` input parameter is a callback function that
- * will be called with the response data from the server when the request is successful
- * (i.e., has a status of "success").
- *
- * @param {  } failure - The `failure` parameter is a callback function that is called
- * if the API request fails (i.e., if the `response.json()` promise is rejected).
- */
-function doFetch(data, success, failure) {
+function scheduleWizardButtonCallback() {
+    let button = document.getElementById("run-schedule-wizard");
+    let loaderClass = setButtonLoading(button, "fe-star")
+
+    const data = {
+        msg: "schedule-all",
+    };
+
+    function success() {
+        flashButtonResult(button, "fe-check-circle", "fg-success", loaderClass, "fe-star");
+    }
+
+    function failure() {
+        flashButtonResult(button, "fe-x-circle", "fg-failure", loaderClass, "fe-star");
+    }
+    sendToServer(data, success, failure);
+}
+
+function sendToServer(data, success, failure) {
+    const currentUrl = window.location.href;
     const csrf_token = document.querySelector('#hidden-form input[name="csrf_token"]').value;
-    fetch(window.location.href, {
+
+    fetch(currentUrl, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -39,16 +43,38 @@ function doFetch(data, success, failure) {
         },
         body: JSON.stringify(data),
     })
-        .then((response) => response.json())
-        .then((res) => {
-            console.log(res);
-            if (res.status === "success") {
-                // success();
+        .then((response) => {
+            if (!response.ok) {
+                return Promise.reject("Fetch failed; Server responded with " + response.status);
+            }
+            return response.json();
+        })
+        .then((data) => {
+            if (data.status === "success") {
+                console.log("Data successfully ingested by server.");
+                success();
+                // window.location.reload();
             } else {
-                // failure();
+                console.log("Failure: ", data.error);
+                failure();
             }
         })
-        .catch((error) => {
-            console.error("Error:", error);
-        });
+        .catch((error) => console.log("Fetch error: ", error));
+}
+
+function setButtonLoading(button, defaultClass) {
+    let r = button.querySelector("i");
+    r.classList.remove(defaultClass);
+    r.classList.add("fe-loader");
+    return "fe-loader";
+}
+
+function flashButtonResult(button, c1, c2, removableClass, defaultClass) {
+    let r = button.querySelector("i");
+    r.classList.remove(removableClass);
+    r.classList.add(c1, c2);
+    setTimeout(function () {
+        r.classList.remove(c1, c2);
+        r.classList.add(defaultClass);
+    }, 1000);
 }
