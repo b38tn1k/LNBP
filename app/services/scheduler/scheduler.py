@@ -8,6 +8,20 @@ class Scheduler:
     SINGLE_FLIGHT = 0
 
     def __init__(self, league, mode, flight_id=None):
+        """
+        This function defines a class's constructor and sets some of its attributes
+        and method pointers based on the value of the "mode" argument passed to
+        the constructor.
+
+        Args:
+            league (dict): The `league` input parameter is used to set the current
+                league being played.
+            mode (int): The `mode` input parameter specifies the type of flights
+                to be executed.
+            flight_id (str): The `flight_id` input parameter specifies which
+                particular flight the object should be configured for.
+
+        """
         self.league = league
         self.rules = league.get_league_rules_dict()
         self.flight_id = flight_id
@@ -19,10 +33,28 @@ class Scheduler:
             self.build = self.sf_build
 
     def sf_prepare(self):
+        """
+        This function prepares a flight object for use by deleting all game events
+        associated with it.
+
+        """
         self.flight = self.league.get_flight_by_id(self.flight_id)
         self.flight.delete_all_game_events()
 
     def sf_setup(self, mutate):
+        """
+        This function creates a scheduling tool (a `SingleFlightScheduleTool`) for
+        a fantasy football league using the given flight data and rules.
+
+        Args:
+            mutate (bool): The `mutate` parameter is used to determine whether the
+                created schedule should be modified to intentionally introduce
+                bias into the matchups.
+
+        Returns:
+            : The function returns a `SingleFlightScheduleTool` object.
+
+        """
         players = create_player_objects(self.flight, self.league, self.rules)
         gameslots = create_gameslot_objects(self.league, self.rules)
         generateGameSlotAvailabilityScores(gameslots, players)
@@ -32,10 +64,36 @@ class Scheduler:
         return scheduler
 
     def sf_build(self, scheduler):
+        """
+        This function takes a scheduler and iterates through its returned events
+        (i.e., games) and creates a game for each one using the `create_game_from_scheduler`
+        function.
+
+        Args:
+            scheduler (): The `scheduler` input parameter is passed as an iterable
+                of events that should be used to create games using the
+                `create_game_from_scheduler` method.
+
+        """
         for e in scheduler.return_events():
             create_game_from_scheduler(self.league, e, flight=self.flight)
 
     def evaluate(self, scheduler):
+        """
+        This function evaluates the given scheduler's compliance with two tiers
+        of rules. It returns a dictionary of rule violations (i.e., "fails")
+        counting the number of times each rule was broken.
+
+        Args:
+            scheduler (dict): The `scheduler` input parameter is a Python scheduler
+                object that contains information about which players have satisfied
+                their roles and when.
+
+        Returns:
+            dict: The output returned by this function is a dictionary with two
+            keys: "tier1" and "tier2".
+
+        """
         player_check = summarize_schedule(scheduler)
         fails = {"tier1": 0, "tier2": 0}  # rules broken counter
 
@@ -55,6 +113,12 @@ class Scheduler:
         return fails
 
     def run(self):
+        """
+        This function is a candidate scheduler for an undeteremined Python class
+        `League`. It iterates over the timeslots of the league and finds the best
+        scheduling plan based on two tiers of evaluation metrics.
+
+        """
         self.prepare()
         i = 0
         candidates = []
@@ -71,6 +135,21 @@ class Scheduler:
 
 
 def summarize_schedule(scheduler):
+    """
+    This function takes a schedule (a list of game slots and their players) and
+    returns a dictionary of each player's availability across different days and
+    weeks. It calculates the number of games each player is available for and
+    records any collisions between players (i.e.
+
+    Args:
+        scheduler (dict): The `scheduler` input parameter is used to pass the
+            schedule data for which the function should calculate the availability
+            and collisions of players for each game slot.
+
+    Returns:
+        dict: The function `summarize_schedule` returns a dictionary of player checks.
+
+    """
     player_check = {}
     for player in scheduler.players:
         player_check[player.id] = {

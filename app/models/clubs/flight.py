@@ -41,6 +41,24 @@ class Flight(Model):
         return association
     
     def player_in_flight(self, player):
+        """
+        This function checks whether a given `player` is associated with the
+        `PlayerManager` object. It does this by iterating through the list of
+        `player associations` stored on the `PlayerManager` and checking if any
+        of them match the given `player`. If such an association is found (i.e.,
+        one of the associations has the same `player` as the argument passed to
+        the function), the function returns `True`, indicating that the player is
+        associated with the `PlayerManager`.
+
+        Args:
+            player (): The `player` input parameter is passed to the function and
+                is used within the loop to compare it with the `player` attribute
+                of each associated entity.
+
+        Returns:
+            bool: The output returned by this function is `False`.
+
+        """
         for ass in self.player_associations:
             if ass.player == player:
                 return True

@@ -138,6 +138,22 @@ def all_players_satisfied(potential_game):
 
 
 def shift_blocks(arr, mutate):
+    """
+    This function shifts the items of an array by a specified number of groups
+    based on their availability score.
+
+    Args:
+        arr (list): The `arr` input parameter is the original array that needs to
+            be reordered based on the availability scores.
+        mutate (int): The `mutate` input parameter specifies the number of groups
+            to reverse at the end of the function.
+
+    Returns:
+        list: The output returned by this function is a new array that is created
+        by reverseing the order of the first 'mutate' groups based on the availability
+        score and extending it with the rest of the items.
+
+    """
     if not arr or mutate <= 0:
         return arr
     mutate += 1
@@ -168,6 +184,26 @@ def shift_blocks(arr, mutate):
     return new_arr
 
 def interlace_and_rotate(arr, mutate):
+    """
+    This function takes an input array and a mutation number (%), and returns a
+    new rotated version of the array by:
+    1/ Splitting the input array into two halves.
+    2/ Interleaving elements from the second half into the first half.
+    3/ Rotating the rearranged array by the mutation number (%).
+
+    Args:
+        arr (list): The `arr` input parameter is the main input array that is to
+            be interlaced and rotated.
+        mutate (int): The `mutate` parameter modifies the final result of the
+            function by rotating the interleaved array by a certain number of
+            elements (limited by the length of the array).
+
+    Returns:
+        list: The output returned by this function is a rotation and interleaving
+        of the input array `arr`, where the length of the rotation is specified
+        by the parameter `mutate`.
+
+    """
     if not arr:
         return arr
 
