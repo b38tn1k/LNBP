@@ -36,6 +36,11 @@ def server():
 
 @app.cli.command()
 def testcli():
+    """
+    The `testcli()` function defines a Click command-line handler that prints the
+    string "Hello" to the console.
+
+    """
     click.echo('Hello')
 
 
@@ -103,6 +108,10 @@ def generate_session_key():
 
 @app.cli.command()
 def create_seeds():
+    """
+    This function doesn't do anything as "seed_data" is not defined.
+
+    """
     seed_data()
 
 @app.cli.command()

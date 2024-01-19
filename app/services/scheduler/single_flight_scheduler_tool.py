@@ -137,6 +137,27 @@ def all_players_satisfied(potential_game):
     return all_satisfied or over_scheduled
 
 def all_players_above_average(potential_game, games, players):
+    """
+    The function `all_players_above_average` checks if all players In the
+    'potential_game' list have more games than the average number of games played
+    by all players In the 'games' list.
+
+    Args:
+        potential_game (dict): The `potential_game` input parameter is not used
+            at all by the function `all_players_above_average`. It is passed as
+            an argument to the function but never references or acted upon inside
+            the function's body.
+        games (list): The `games` input parameter is the list of games that are
+            being analyzed for the above-average players.
+        players (list): The `players` input parameter is a list of players and its
+            purpose is to pass it as an argument to the `for player` loop inside
+            the function.
+
+    Returns:
+        bool: Based on the given function code and input data (i.e., `potential_game`
+        and `players`), the output returned by the function is `True`.
+
+    """
     print("games", len(games))
     print("players", len(players))
     avg_games = len(games)/len(players) + 0.5
@@ -612,6 +633,11 @@ class SingleFlightScheduleTool:
                     break
             
     def optimise(self):
+        """
+        The function `optimise` does nothing because it prints "TODODODO" and does
+        not return any value.
+
+        """
         print("TODODODO")
 
 

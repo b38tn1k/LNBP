@@ -229,6 +229,23 @@ class Scheduler:
         flight.report = report
         
 def parse_violation_human_readable(league, violation):
+    """
+    This function takes a league object and a violation object as inputs and returns
+    a human-readable string indicating the nature of the violation.
+
+    Args:
+        league (): The `league` input parameter passes a reference to the Fantasy
+            Premier League object that contains all the teams and players' data
+            for the given league.
+        violation (dict): The `violation` input parameter represents a dict
+            containing various key-value pairs representing different league
+            violations found during the scheduling process.
+
+    Returns:
+        str: The output returned by this function is a human-readable string
+        indicating the violation of a league's rules.
+
+    """
     messages = {}
     messages["min_games_total"] = "does not have enough games."
     messages["max_games_total"] = "is playing more games than required."
@@ -253,6 +270,25 @@ def parse_violation_human_readable(league, violation):
     return my_string
 
 def record_broken_rules(player, tiers, record, rule, notes=None):
+        """
+        This function records instances of a player breaking specific rules
+        (represented by a string `rule`) within designated tiers (`tiers`), and
+        keeps track of the number of times each rule is broken at each tier.
+
+        Args:
+            player (str): The `player` input parameter passes on the player object
+                related to a multiplayer game as an identifier that distinguishes
+                different players' actions or behaviors.
+            tiers (dict): The `tiers` input parameter is a dictionary that maps
+                each rule to its corresponding tier (a value between 1 and 5).
+            record (dict): The `record` input parameter is a dictionary that is
+                updated with the current values of broken rules and their tiers.
+            rule (str): The `rule` parameter specifies the specific broken rule
+                being recorded.
+            notes (str): The `notes` input parameter appends a colon and the given
+                string to the end of the `rule` string when it is not None.
+
+        """
         t = tiers[rule]
         record[t] += 1
         if notes is not None:
