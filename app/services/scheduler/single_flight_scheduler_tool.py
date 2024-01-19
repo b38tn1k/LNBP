@@ -136,6 +136,17 @@ def all_players_satisfied(potential_game):
             over_scheduled = True
     return all_satisfied or over_scheduled
 
+def all_players_above_average(potential_game, games, players):
+    print("games", len(games))
+    print("players", len(players))
+    avg_games = len(games)/len(players) + 0.5
+    print(avg_games)
+    for player in potential_game:
+        if player.game_count < avg_games:
+            return False
+    return True
+
+
 
 def shift_blocks(arr, mutate):
     """
@@ -351,6 +362,7 @@ class SingleFlightScheduleTool:
                 each iteration.
 
         """
+        allowable_skips = 10
         while True:
             game_added = 0
             timeslot_count = 0
@@ -431,6 +443,8 @@ class SingleFlightScheduleTool:
                     if already_added:
                         continue
             if game_added == 0:
+                allowable_skips -= 1
+            if allowable_skips == 0:
                 break
 
     def force_assign(self, tpp, ts_list):
@@ -472,7 +486,6 @@ class SingleFlightScheduleTool:
         self.recalculate_players()
         # print("force assign")
         self.force_assign(tpp, ts_list)
-        self.assign_captains()
 
     def recalculate_players(self):
         """
@@ -597,6 +610,9 @@ class SingleFlightScheduleTool:
                             counter += 1
             if good is True:
                     break
+            
+    def optimise(self):
+        print("TODODODO")
 
 
 

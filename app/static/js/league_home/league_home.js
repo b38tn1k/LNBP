@@ -39,6 +39,8 @@ function scheduleWizardButtonCallback() {
 */
     function success() {
         flashButtonResult(button, "fe-check-circle", "fg-success", loaderClass, "fe-star");
+        window.location.reload();
+
     }
 
 /**
@@ -52,6 +54,8 @@ function scheduleWizardButtonCallback() {
 */
     function failure() {
         flashButtonResult(button, "fe-x-circle", "fg-failure", loaderClass, "fe-star");
+        window.location.reload();
+
     }
     sendToServer(data, success, failure);
 }

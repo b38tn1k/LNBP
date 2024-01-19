@@ -76,7 +76,8 @@ class Scheduler:
 
         """
         for e in scheduler.return_events():
-            create_game_from_scheduler(self.league, e, flight=self.flight)
+            flight = create_game_from_scheduler(self.league, e, flight=self.flight)
+        return flight
 
     def evaluate(self, scheduler):
         """
@@ -208,6 +209,8 @@ class Scheduler:
                 scheduler = self.setup(i)
                 i += 1
                 scheduler.run()
+                scheduler.optimise()
+                scheduler.assign_captains()
                 res = self.evaluate(scheduler)
                 # print(res)
                 # print()
@@ -215,37 +218,47 @@ class Scheduler:
         best_candidate = min(
             candidates, key=lambda x: (x["res"]["tier1"], x["res"]["tier2"])
         )
-        print()
+        # print()
         # print(best_candidate)
-        for d in best_candidate['res']['details']:
-            print(d)
-        print()
-        self.build(best_candidate["scheduler"])
+        report = []
+        for d in sorted(best_candidate['res']['details'], key=lambda x: x['tier']):
+            r = parse_violation_human_readable(self.league, d)
+            if r is not None:
+                report.append(r)
+        flight = self.build(best_candidate["scheduler"])
+        flight.report = report
+        
+def parse_violation_human_readable(league, violation):
+    messages = {}
+    messages["min_games_total"] = "does not have enough games."
+    messages["max_games_total"] = "is playing more games than required."
+    # messages["game_count"] = "tier1"
+    messages["min_captained"] = "does not captain enough games."
+    messages["max_captained"] = "captains more games than required"
+    # messages["captain_count"] = "tier2"
+    messages["overscheduled_lp"] = "has more than half their schedule in low preference timeslots"
+    messages["max_week_gap"] = "has a large gap in weeks played."
+    messages["max_games_week"] = "plays too many times in a week."
+    messages["max_games_day"] = "plays too many times in a day."
+
+    player = league.club.get_player_by_id(violation['player'])
+    my_string = None
+    if violation['broken_rule'] in messages:
+        my_string = player.full_name + ' ' + messages[violation['broken_rule']]
+    if 'max_repeat_compete' in violation['broken_rule']:
+        other_player_id = int(violation['broken_rule'].split(":")[-1])
+        other_player = league.club.get_player_by_id(other_player_id)
+        my_string = player.full_name + " is matched with " + other_player.full_name + " for more than half their games."
+
+    return my_string
 
 def record_broken_rules(player, tiers, record, rule, notes=None):
-        """
-        This function records a broken rule for a player with specified details
-        (player name and the broken rule with any notes).
-
-        Args:
-            player (str): The `player` input parameter stores the username of the
-                player who broke the rule.
-            tiers (dict): The `tiers` input parameter is a dictionary of predefined
-                values that correspond to each broken rule.
-            record (dict): The `record` input parameter is a dictionary that is
-                used to store the number of times each rule has been broken for a
-                given player.
-            rule (str): The `rule` parameter is a string that represents the
-                specific rule that was broken by the player.
-            notes (str): The `notes` input parameter is an optional dict or str
-                that adds a notes message to the broken rule.
-
-        """
-        record[tiers[rule]] += 1
+        t = tiers[rule]
+        record[t] += 1
         if notes is not None:
-            rule += ': ' + notes
+            rule += ':' + notes 
         record["details"].append(
-            {"player": player, "broken_rule": rule}
+            {"player": player, "broken_rule": rule, "tier":t}
         )
 
 def summarize_schedule(scheduler):
@@ -343,6 +356,7 @@ def create_game_from_scheduler(league, game, flight=None):
     for p in game["players"]:
         players.append(league.club.get_player_by_id(p))
     league.create_game_event(players, facility, timeslot, flight, captain=captain)
+    return flight
 
 
 def create_player_objects(flight, league, rules):

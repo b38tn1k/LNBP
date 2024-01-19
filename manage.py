@@ -6,7 +6,7 @@ import binascii
 import click
 import pytest
 
-from flask_migrate import Migrate
+from flask_migrate import Migrate, upgrade
 
 from app import create_app
 from app.models import db
@@ -33,6 +33,10 @@ def server():
     """
     # return app.run(debug=True)
     return app.run(host='0.0.0.0', port=8000, debug=True)
+
+@app.cli.command()
+def testcli():
+    click.echo('Hello')
 
 
 @app.cli.command()
@@ -99,10 +103,6 @@ def generate_session_key():
 
 @app.cli.command()
 def create_seeds():
-    """
-    This function `create_seeds` does not exist as `seed_data` is undefined.
-
-    """
     seed_data()
 
 @app.cli.command()

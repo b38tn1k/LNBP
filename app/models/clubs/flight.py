@@ -1,4 +1,5 @@
 from app.models import db, Model, ModelProxy
+from sqlalchemy.dialects.postgresql import ARRAY
 
 class Flight(Model):
     __tablename__ = 'flight'
@@ -11,6 +12,7 @@ class Flight(Model):
 
     # Relationship with cascade delete
     league = db.relationship('League', backref=db.backref('flights', lazy=True, cascade='all, delete-orphan'))
+    report = db.Column(db.JSON, default=lambda: [])
 
     GDPR_EXPORT_COLUMNS = {}
 
