@@ -140,6 +140,30 @@ function toggleButtonDisabled(button) {
 }
 
 
+/**
+* @description This function sends a POST request to the server with the given `data`
+* and calls either `success` or `failure` callbacks depending on the server's response
+* status.
+* 
+* @param { object } data - The `data` input parameter is used to send data to the
+* server as a JSON-formatted string.
+* 
+* @param {  } success - The `success` input parameter is a callback function that
+* is called when the data is successfully ingested by the server.
+* 
+* @param {  } failure - The `failure` parameter is a callback function that is
+* executed if the server response indicates failure (i.e., data.status === "error").
+* 
+* @returns { object } This function takes three arguments: `data`, `success`, and
+* `failure`. It makes a POST request to the current URL with the data provided and
+* appends an `X-CSRFToken` header with the value of a hidden input on the page.
+* 
+* If the fetch is successful (200 status), it parses the JSON response data and
+* checks if it has a "status" key. If "status" is "success", it logs a success message
+* and calls the `success` function. If "status" is anything else or there is no
+* "status" key present at all (400+ status), it logs an error message and calls the
+* `failure` function.
+*/
 function sendToServer(data, success, failure) {
     const currentUrl = window.location.href;
     const csrf_token = document.querySelector('#hidden-form input[name="csrf_token"]').value;

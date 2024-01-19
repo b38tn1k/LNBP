@@ -79,6 +79,33 @@ class Scheduler:
             create_game_from_scheduler(self.league, e, flight=self.flight)
 
     def evaluate(self, scheduler):
+        """
+        This function evaluates a given esports schedule and checks if each player
+        violates any of the rules specified by the "tiers" dictionary. The rules
+        are:
+        	- Minimum game count for each tier (e.g., at least 5 games for Tier 1)
+        	- Maximum game count for each tier (e.g., no more than 10 games for Tier
+        2)
+        	- Captainhood requirements (at least 2 or at most 5 games as captain)
+        	- Preferred game scheduling (minimizing low-preference games)
+        	- Maximum number of games per week and day
+        	- Minimum gap between games (at least 1 day)
+        	- Limit on repeated competitions against other players (no more than 2
+        games against the same player).
+        If a player violates any of these rules at any tier level with which they
+        are associated.
+
+        Args:
+            scheduler (dict): The `scheduler` input parameter is used to evaluate
+                the player availability and scheduling constraints for each player.
+                It provides the number of games each player can play during a given
+                week and their preferred days to play those games.
+
+        Returns:
+            dict: The `evaluate` function returns a dictionary of broken rules
+            counters and details for each player.
+
+        """
         tiers = {}
         tiers["min_games_total"] = "tier1"
         tiers["max_games_total"] = "tier2"
@@ -196,6 +223,24 @@ class Scheduler:
         self.build(best_candidate["scheduler"])
 
 def record_broken_rules(player, tiers, record, rule, notes=None):
+        """
+        This function records a broken rule for a player with specified details
+        (player name and the broken rule with any notes).
+
+        Args:
+            player (str): The `player` input parameter stores the username of the
+                player who broke the rule.
+            tiers (dict): The `tiers` input parameter is a dictionary of predefined
+                values that correspond to each broken rule.
+            record (dict): The `record` input parameter is a dictionary that is
+                used to store the number of times each rule has been broken for a
+                given player.
+            rule (str): The `rule` parameter is a string that represents the
+                specific rule that was broken by the player.
+            notes (str): The `notes` input parameter is an optional dict or str
+                that adds a notes message to the broken rule.
+
+        """
         record[tiers[rule]] += 1
         if notes is not None:
             rule += ': ' + notes
