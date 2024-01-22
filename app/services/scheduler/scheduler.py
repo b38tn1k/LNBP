@@ -202,6 +202,12 @@ class Scheduler:
         return fails
 
     def report(self):
+        """
+        This function generates a schedule for a fantasy league game week by
+        resolving conflicts and finding the optimal games slots for each player
+        based on their preferences and restrictions.
+
+        """
         print("GENERATE REPORT")
         for flight in self.league.flights:
             # flight = self.league.get_flight_by_id(self.flight_id)
@@ -490,6 +496,24 @@ def create_player_objects(flight, league, rules):
 
 
 def create_gameslot_objects(league, rules, check=True):
+    """
+    This function creates a list of GameSlot objects for all possible combinations
+    of time slots and facilities available for the given league.
+
+    Args:
+        league (): The `league` input parameter is passed a `League` object
+            containing information about the league such as its name and time slots
+            available.
+        rules (dict): The `rules` input parameter specifies the game rules to be
+            used when creating game slots.
+        check (bool): The `check` input parameter allows the creation of GameSlots
+            only if a facility is available. If `check=True`, the function checks
+            for facility availability before creating a GameSlot.
+
+    Returns:
+        list: The output of this function is a list of GameSlot objects.
+
+    """
     gameslots = []
     for t in league.timeslots:
         for f in league.facility_associations:
