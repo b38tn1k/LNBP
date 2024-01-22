@@ -15,7 +15,7 @@ function saveButtonCallback(event) {
 * 
 * @returns { any } The function `success` takes no arguments and returns nothing (void).
 */
-    function success() {
+    function success(data) {
         toggleButtonDisabled(button);
         flashButtonResult(button, "fe-check-circle", "fg-success", "fe-save");
     }
@@ -29,7 +29,7 @@ function saveButtonCallback(event) {
 * button and displays an error icon and message on the button using `toggleButtonDisabled()`
 * and `flashButtonResult()`.
 */
-    function failure() {
+    function failure(data) {
         toggleButtonDisabled(button);
         flashButtonResult(button, "fe-x-circle", "fg-failure", "fe-save");
     }
@@ -70,7 +70,7 @@ function generateButtonCallback(event) {
 * @returns { any } The function `success` returns nothing (undefined) because it is
 * an anonymous function and does not have a return statement.
 */
-    function success() {
+    function success(data) {
         toggleButtonDisabled(button);
         flashButtonResult(button, "fe-check-circle", "fg-success", "fe-star");
         window.location.reload();
@@ -82,7 +82,7 @@ function generateButtonCallback(event) {
 * @returns {  } The output of the `failure()` function is not defined because the
 * function contains statements that do not return any value.
 */
-    function failure() {
+    function failure(data) {
         toggleButtonDisabled(button);
         flashButtonResult(button, "fe-x-circle", "fg-failure", "fe-star");
         window.location.reload();
@@ -184,7 +184,7 @@ function sendToServer(data, success, failure) {
         })
         .then((data) => {
             if (data.status === "success") {
-                console.log("Data successfully ingested by server.");
+                console.log("Data successfully ingested by server.", data);
                 success();
                 // window.location.reload();
             } else {

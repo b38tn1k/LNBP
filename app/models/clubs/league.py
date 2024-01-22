@@ -413,13 +413,18 @@ class League(Model):
 
         :param facility: The facility to be associated with the league.
         """
-        association = ModelProxy.clubs.LeagueFacilityAssociation(
-            league=self, facility=facility
-        )
-        if add is True:
-            db.session.add(association)
-        if commit is True:
-            db.session.commit()
+        already_in = False
+        for facility_assoc in self.facility_associations:
+            if facility_assoc.facility.id == facility.id:
+                already_in = True
+        if already_in is False:
+            association = ModelProxy.clubs.LeagueFacilityAssociation(
+                league=self, facility=facility
+            )
+            if add is True:
+                db.session.add(association)
+            if commit is True:
+                db.session.commit()
 
     def remove_facility_by_id(self, id, commit=False):
         # Find the association with the given facility ID
@@ -565,6 +570,14 @@ class League(Model):
             }
         else:
             return None
+        
+    def clean(self):
+        already_seen = set()
+        for facility_assoc in self.facility_associations:
+            if facility_assoc.facility.id in already_seen:
+                db.session.delete(facility_assoc)
+            else:
+                already_seen.add(facility_assoc.facility.id)
         
     def get_flight_for_player(self, player):
         """

@@ -116,3 +116,10 @@ tr.double-top-border {
     vertical-align: middle;
     color: #837f75;
 }
+
+.flight-report-button {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%; /* Adjust width as needed */
+}

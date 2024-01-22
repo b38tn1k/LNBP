@@ -1,0 +1,86 @@
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">{{flight.name}}: Schedule</h3></div>
+    <div class="card-body" style="overflow-x: auto; overflow-y: hidden; margin-right: 16px">
+        <fieldset>
+            <table
+                id="flight-{{ flightCounter }}"
+                flight="{{ flight.id }}"
+                flight-number="{{ flightCounter }}"
+                class="schedule-table csv-table flight-sub-table table table-bordered table-hover table-sm"
+            >
+                <thead>
+                    <tr>
+                        <th>Facilities</th>
+                        {% if league.timeslots %} {% for ts in league.timeslots %}
+                        <th
+                            ts="{{ts.id}}"
+                            startTime="{{ ts.start_time }}"
+                            class="timeslot_header"
+                            {%
+                            if
+                            league.players
+                            %}
+                            {%
+                            if
+                            league.players|length
+                        >
+                            0 %} {% for p in league.players %} {% if p.in_flight(flight) %}
+                            player-{{p.id}}={{league.get_player_availability(p, ts)}} {% endif %} {% endfor %} {% endif
+                            %} {% endif %}> {{ ts.human_readable_mmdd_hhmm() }}
+                        </th>
+                        {% endfor %} {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for facility in club.facilities %}
+                    <tr>
+                        {% if league.facility_in_league(facility) %}
+                        <th>{{ facility.name }}</th>
+                        {% for ts in league.timeslots %} {% set available, game_event = facility.is_available(ts) %} {%
+                        if available or game_event.flight.id == flight.id%}
+                        <td
+                            class="draggable-target facility-timeslot"
+                            facility="{{ facility.id }}"
+                            timeslot="{{ ts.id }}"
+                            flight="{{ flight.id }}"
+                        >
+                            {% set games = league.get_game_event(facility=facility, timeslot=ts, flight=flight) %} {% if
+                            games %}
+
+                            <div class="served_game_info_div" flight-id="{{flight.id}}">
+                                {% for p in games[0].players %}
+                                <div
+                                    class="player_in_sg"
+                                    player-id="{{p.id}}"
+                                    player-fullname="{{p.full_name}}"
+                                    player-name="{{ p.first_name[0] }} {{ p.last_name[:8] }}"
+                                    captain="{{ 1 if p.id == games[0].captain.id else 0 }}"
+                                ></div>
+                                {% endfor %}
+                            </div>
+                            {%endif%}
+                        </td>
+                        {% else %}
+                        <td class="unavailable">{{game_event.league.name}}<br />{{game_event.flight.name}}</td>
+
+                        {%endif%} {% endfor %} {%endif%}
+                    </tr>
+                    {% endfor %}
+
+                    <tr class="double-top-border">
+                        <th>SUB</th>
+                        {% for ts in league.timeslots %}
+                        <td
+                            class="draggable-target draggable-source subs"
+                            facility="-1"
+                            timeslot="{{ ts.id }}"
+                            flight="{{ flight.id }}"
+                        ></td>
+                        {% endfor %}
+                    </tr>
+                </tbody>
+            </table>
+        </fieldset>
+    </div>
+</div>

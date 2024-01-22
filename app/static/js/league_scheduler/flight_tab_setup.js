@@ -528,40 +528,41 @@ function getAllGames() {
         flight["to-remove"] = [];
         let f = t.querySelector("tbody");
         f.querySelectorAll("td").forEach((pg) => {
-            let game = getGameInfoFromCell(pg);
-            // console.log(game["players"].length, info.leagueRulesPlayersPerMatch);
-            if (game["players"].length == info.leagueRulesPlayersPerMatch) {
-                flight["games"].push(game);
-            } else if (game["players"].length != 0) {
-                flight["to-remove"].push(game);
+            if (pg.classList.contains("subs") == false) {
+                let game = getGameInfoFromCell(pg);
+                // console.log(game["players"].length, info.leagueRulesPlayersPerMatch);
+                if (game["players"].length == info.leagueRulesPlayersPerMatch) {
+                    flight["games"].push(game);
+                } else if (game["players"].length != 0) {
+                    flight["to-remove"].push(game);
+                }
             }
         });
         flights.push(flight);
     }
-    console.log(flights);
     return flights;
 }
 
 /**
-* @description This function takes an ID as input and returns a object with the
-* following properties:
-* 
-* 	- name
-* 	- fullname
-* 	- id
-* 
-* It does this by querying all elements with the class "player-card" and finding the
-* one with the matched ID.
-* 
-* @param { number } id - The `id` input parameter is used to pass a specific player
-* ID to the function and retrieve information about that particular player.
-* 
-* @returns { object } The output returned by this function is an object containing
-* the name and full name of a player with the given ID. The function uses
-* `querySelectorAll` to select all elements with a certain class ("player-card"),
-* and then loops through each element to find one with a `player-id` attribute equal
-* to the input ID.
-*/
+ * @description This function takes an ID as input and returns a object with the
+ * following properties:
+ *
+ * 	- name
+ * 	- fullname
+ * 	- id
+ *
+ * It does this by querying all elements with the class "player-card" and finding the
+ * one with the matched ID.
+ *
+ * @param { number } id - The `id` input parameter is used to pass a specific player
+ * ID to the function and retrieve information about that particular player.
+ *
+ * @returns { object } The output returned by this function is an object containing
+ * the name and full name of a player with the given ID. The function uses
+ * `querySelectorAll` to select all elements with a certain class ("player-card"),
+ * and then loops through each element to find one with a `player-id` attribute equal
+ * to the input ID.
+ */
 function getPlayerInfoFromID(id) {
     let res = {};
     document.querySelectorAll(".player-card").forEach((i) => {
@@ -575,20 +576,20 @@ function getPlayerInfoFromID(id) {
 }
 
 /**
-* @description This function gets the availabilities of players for a given timeslot
-* of a flight.
-* 
-* @param { string } flightID - The `flightID` input parameter specifies which flight
-* the availabilities for are being requested.
-* 
-* @param { string } timeslotID - The `timeslotID` input parameter identifies which
-* specific timeslot within a flight's schedule the function is retrieving availabilities
-* for.
-* 
-* @returns { object } This function takes a flight ID and a timeslot ID as input and
-* returns an object containing the availabilities of players for that timeslot. The
-* output is an object with player IDs as keys and their available seats as values.
-*/
+ * @description This function gets the availabilities of players for a given timeslot
+ * of a flight.
+ *
+ * @param { string } flightID - The `flightID` input parameter specifies which flight
+ * the availabilities for are being requested.
+ *
+ * @param { string } timeslotID - The `timeslotID` input parameter identifies which
+ * specific timeslot within a flight's schedule the function is retrieving availabilities
+ * for.
+ *
+ * @returns { object } This function takes a flight ID and a timeslot ID as input and
+ * returns an object containing the availabilities of players for that timeslot. The
+ * output is an object with player IDs as keys and their available seats as values.
+ */
 function getPlayerAvailabilitiesForTimeslot(flightID, timeslotID) {
     let table = getFlightTable(flightID);
     let timeslotHeader = table.querySelector(`.timeslot_header[ts="${timeslotID}"]`);
@@ -607,20 +608,20 @@ function getPlayerAvailabilitiesForTimeslot(flightID, timeslotID) {
 }
 
 /**
-* @description This function takes a flight ID as an argument and organizes and
-* displays the available players for that flight based on their timeslot availability.
-* 
-* @param { string } flightID - The `flightID` input parameter retrieves the specific
-* flight table associated with that ID within the getFlightTable() method prior to
-* organizing and displaying its substitutes.
-* 
-* @returns { array } The output returned by this function is an array of draggable
-* player tiles that can be dropped into specific cells of a table for a flight. The
-* function takes a flight ID and an HTML table as input and iterates over each row
-* of the table to create a tile for each available player. Each tile has information
-* such as the player's name and fullname along with their color. The function also
-* removes any existing draggable items from the row before appending the new tiles.
-*/
+ * @description This function takes a flight ID as an argument and organizes and
+ * displays the available players for that flight based on their timeslot availability.
+ *
+ * @param { string } flightID - The `flightID` input parameter retrieves the specific
+ * flight table associated with that ID within the getFlightTable() method prior to
+ * organizing and displaying its substitutes.
+ *
+ * @returns { array } The output returned by this function is an array of draggable
+ * player tiles that can be dropped into specific cells of a table for a flight. The
+ * function takes a flight ID and an HTML table as input and iterates over each row
+ * of the table to create a tile for each available player. Each tile has information
+ * such as the player's name and fullname along with their color. The function also
+ * removes any existing draggable items from the row before appending the new tiles.
+ */
 function organiseAndDisplaySubs(flightID) {
     let table = getFlightTable(flightID);
     let subs = table.querySelectorAll(".subs");
@@ -646,12 +647,10 @@ function organiseAndDisplaySubs(flightID) {
             });
         });
         for (let i = 0; i < availablePlayerInfos.length; i++) {
-            let p = availablePlayerInfos[i]
-            let tile = makeDraggablePlayerTile(p.id, p.name, p.fullname, flightID)
+            let p = availablePlayerInfos[i];
+            let tile = makeDraggablePlayerTile(p.id, p.name, p.fullname, flightID);
             tile.style.backgroundColor = info.playerColors[p.id];
             c.appendChild(tile);
-
         }
-
     });
 }

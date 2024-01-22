@@ -158,10 +158,7 @@ def all_players_above_average(potential_game, games, players):
         and `players`), the output returned by the function is `True`.
 
     """
-    print("games", len(games))
-    print("players", len(players))
     avg_games = len(games)/len(players) + 0.5
-    print(avg_games)
     for player in potential_game:
         if player.game_count < avg_games:
             return False
@@ -363,6 +360,9 @@ class SingleFlightScheduleTool:
                 ts_list.append(item.timeslot_id)
         return tpp, ts_list
     
+    def finalize(self):
+        self.recalculate_players()
+    
     def schedule_games_for_timeslot(self, tpp, ts_list, all_scheduled_games):
         """
         This function schedules games for a given timeslot while ensuring that
@@ -523,8 +523,10 @@ class SingleFlightScheduleTool:
             p.game_count = 0
             for k in p.other_player_history:
                 p.other_player_history[k] = 0
+        i = 0
         for game in self.gameslots:
             if game.full:
+                i += 1
                 for p in game.game_event:
                     p.days.append(game.day_number)
                     p.weeks.append(game.week_number)

@@ -42,7 +42,7 @@ def check_for_membership(*args, **kwargs):
     if not current_user.is_authenticated or current_user.primary_membership_id is None:
         flash("You currently do not have accesss to app", "warning")
         return redirect(url_for("main.home"))
-    
+
 
 @blueprint.route("/<int:id>", methods=["GET", "POST"])
 @login_required
@@ -60,7 +60,7 @@ def league_home(id):
 
     Returns:
         str: Based on the code provided:
-        
+
         The output returned by `league_home(id)` is a HTML page with the name "league/league_home.html"
 
     """
@@ -70,15 +70,14 @@ def league_home(id):
     league = current_user.club.get_league_by_id(id)
     if league is None:
         return redirect(url_for("main.home"))
-    
+
     if request.method == "POST":
         try:
             data = request.json
-            if data['msg'] == 'test-email':
-                email = 'jamesrobertcarthew@gmail.com'
-                print(email) # to do
-
-            if data['msg'] == 'schedule-all':
+            if data["msg"] == "test-email":
+                email = "Test Email"
+                print(email)  # to do
+            if data["msg"] == "schedule-all":
                 league.delete_all_game_events()
                 db.session.commit()
                 for flight in league.flights:
@@ -88,13 +87,14 @@ def league_home(id):
             return jsonify({"status": "success"})
         except Exception as e:
             return jsonify({"status": "failure", "error": str(e)})
-        
+
     return render_template(
         "league/league_home.html",
         simple_form=SimpleForm(),
         league=league,
         club=current_user.club,
     )
+
 
 @blueprint.route("/edit/<int:id>", methods=["GET", "POST"])
 @login_required
@@ -123,7 +123,7 @@ def edit_league(id):
         try:
             apply_edits(league, json.loads(request.json))
             db.session.commit()
-            flash('League updated successfully.', 'success')
+            flash("League updated successfully.", "success")
             return jsonify({"status": "success"})
         except Exception as e:
             return jsonify({"status": "failure", "error": str(e)})
@@ -139,22 +139,6 @@ def edit_league(id):
 @blueprint.route("/schedule/<int:id>", methods=["GET", "POST"])
 @login_required
 def schedule_league(id):
-    """
-    This function checks if the user is authenticated and if they have a primary
-    membership ID. If they don't meet these conditions it redirects them to the
-    home page with a warning message.
-
-    Args:
-        id (int): The `id` input parameter is used to identify the specific league
-            for which the user wants to view the schedule.
-
-    Returns:
-        : Based on the code provided:
-
-        The output returned by the function `schedule_league(id)` is a rendered
-        template `schedule.html`.
-
-    """
     if not current_user.is_authenticated or current_user.primary_membership_id is None:
         flash("You currently do not have accesss to app", "warning")
         return redirect(url_for("main.home"))
@@ -164,20 +148,36 @@ def schedule_league(id):
     if request.method == "POST":
         try:
             data = request.json
-            if data['contents'] == 'games':
-                create_games_from_request(league, data['data'])
+            if data["contents"] == "games":
+                create_games_from_request(league, data["data"])
+                # league.clean()
                 db.session.commit()
-            elif data['contents'] == 'schedule':
-                s = Scheduler(league, Scheduler.SINGLE_FLIGHT, flight_id=data['data']['flight_id'])
+                s = Scheduler(league, Scheduler.GENERATE_REPORT)
+                s.report()
+                db.session.commit()
+                return jsonify(
+                    {
+                        "status": "success",
+                        "data": [
+                            {"id": flight.id, "report": flight.report}
+                            for flight in league.flights
+                        ],
+                    }
+                )
+            elif data["contents"] == "schedule":
+                s = Scheduler(
+                    league, Scheduler.SINGLE_FLIGHT, flight_id=data["data"]["flight_id"]
+                )
                 s.run()
                 db.session.commit()
-                # for g in league.game_events:
-                #     print(g)
-            return jsonify({"status": "success"})
+                return jsonify({"status": "success"})
         except Exception as e:
             return jsonify({"status": "failure", "error": str(e)})
     return render_template(
-        "league/schedule.html", simple_form=SimpleForm(), league=league, club=current_user.club
+        "league/schedule.html",
+        simple_form=SimpleForm(),
+        league=league,
+        club=current_user.club,
     )
 
 
