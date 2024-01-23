@@ -56,3 +56,4 @@ app/static/public/*
 !app/static/public/fonts/*
 ignite-code.txt
 dev.sh
+broken_database.db

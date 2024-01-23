@@ -1,0 +1,35 @@
+<div class="accordion" id="flight-report-accordian">
+    {% for flight in league.flights %}
+    <div class="accordion-item">
+        <div class="accordion-header card-title" id="{{ flight.name }}">
+            <button
+                class="accordion-button collapsed btn-block btn-lg btn-secondary"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#collapse{{ flight.id }}"
+                aria-expanded="false"
+                aria-controls="collapse{{ flight.id }}"
+                style="text-align: left"
+            >
+                <div class="flight-report-button">
+                    <div><strong>{{ flight.name }}</strong></div>
+                    <div><span style="font-weight: 50">{{ flight.report|length }} ISSUES</span></div>
+                </div>
+            </button>
+        </div>
+
+        <div
+            id="collapse{{ flight.id }}"
+            class="accordion-collapse collapse"
+            aria-labelledby="headingOne"
+            data-bs-parent="#flight-report-accordian"
+        >
+            <div class="accordion-body">
+                {% for item in flight.report %} {{ item }}<br />
+                {% endfor %}
+                <br />
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>

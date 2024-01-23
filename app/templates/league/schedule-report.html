@@ -1,0 +1,16 @@
+<div class="card flight-report" style="flex: 1" flight-id="{{flight.id}}">
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center">
+        <h3 class="card-title">{{flight.name}}: Report</h3>
+        <div>Save to update</div>
+    </div>
+    <div class="card-body d-flex flex-wrap justify-content-start">
+        {% if flight.report %}
+        <ul
+            >{% for item in flight.report %}
+            <li>
+                {{ item }}
+            </li>
+            {% endfor %} </ul
+        >{% endif %}
+    </div>
+</div>

@@ -79,25 +79,10 @@
             <div class="row row-cards reveal-after" style="display: none">
                 <div class="col-12">{% include 'league/schedule-scheduletool.html' %}</div>
             </div>
-
             <div class="row row-cards reveal-after" style="display: none">
-                <div class="col-12">{% include 'league/schedule-players.html' %}</div>
-            </div>
-
-            <div class="row row-cards reveal-after" style="display: none">
-                <div class="col-12">
-                    <div class="card flight-report" flight-id="{{flight.id}}">
-                        <div class="card-header"
-                        style="display: flex;justify-content: space-between; align-items: center;">
-                            <h3 class="card-title">{{flight.name}}: Report</h3>
-                            <div>Save to update</div>
-                        </div>
-                        <div class="card-body d-flex flex-wrap justify-content-start">
-                            {% if flight.report %} {% for item in flight.report %} {{ item }}<br />
-                            {% endfor %} {% endif %}
-                        </div>
-                    </div>
-                </div>
+            <!-- <div class="row row-cards"> -->
+                <div class="col-10">{% include 'league/schedule-players.html' %}</div>
+                <div class="col-2">{% include 'league/schedule-report.html' %}</div>
             </div>
         </div>
         {% endfor %} {% endif %}
@@ -117,6 +102,7 @@
         setupShowActiveFlight();
         addImagesToTableData();
         revealHidden();
+        toggleSubs();
         setupDragula();
         let urlHash = window.location.hash;
         if (urlHash.startsWith("#target_flight=")) {

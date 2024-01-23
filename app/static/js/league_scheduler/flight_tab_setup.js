@@ -297,7 +297,7 @@ function makeDraggablePlayerTile(id, name, fullname, flightID) {
  */
 function revealHidden() {
     document.querySelectorAll(".reveal-after").forEach(function (item) {
-        item.style.display = "block";
+        item.style.display = "";
     });
 }
 
@@ -651,6 +651,22 @@ function organiseAndDisplaySubs(flightID) {
             let tile = makeDraggablePlayerTile(p.id, p.name, p.fullname, flightID);
             tile.style.backgroundColor = info.playerColors[p.id];
             c.appendChild(tile);
+        }
+    });
+}
+
+function toggleSubs() {
+    // Select all elements with class "subs"
+    const subsElements = document.querySelectorAll(".sub-row");
+
+    // Iterate through each element and toggle its visibility
+    subsElements.forEach((element) => {
+        if (element.style.display === "none") {
+            // If the element is hidden or has no style defined, show it
+            element.style.display = ""; // You can use "inline" or "inline-block" as well
+        } else {
+            // If the element is visible, hide it
+            element.style.display = "none";
         }
     });
 }

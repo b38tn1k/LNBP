@@ -18,6 +18,7 @@ function saveButtonCallback(event) {
     function success(data) {
         toggleButtonDisabled(button);
         flashButtonResult(button, "fe-check-circle", "fg-success", "fe-save");
+        window.location.reload();
     }
 
 /**
@@ -32,6 +33,7 @@ function saveButtonCallback(event) {
     function failure(data) {
         toggleButtonDisabled(button);
         flashButtonResult(button, "fe-x-circle", "fg-failure", "fe-save");
+        window.location.reload();
     }
 
     sendToServer(data, success, failure);
