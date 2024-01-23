@@ -144,6 +144,32 @@ def edit_league(id):
 @blueprint.route("/schedule/<int:id>", methods=["GET", "POST"])
 @login_required
 def schedule_league(id):
+    """
+    This function handles requests to schedule a league and updates the league's
+    schedules accordingly.
+
+    Args:
+        id (int): The `id` input parameter is passed as an argument to the
+            `get_league_by_id` method of the current user's club object.
+
+    Returns:
+        dict: The output returned by this function is a JSON object with the
+        following structure:
+        
+        {
+        "status": "success",
+        "data": [
+        {
+        "id": flight.id,
+        "report": flight.report
+        } for flight в league.flights
+        ]
+        }
+        
+        This means that the function successfully scheduled games and generated a
+        report for the specified league.
+
+    """
     if not current_user.is_authenticated or current_user.primary_membership_id is None:
         flash("You currently do not have accesss to app", "warning")
         return redirect(url_for("main.home"))

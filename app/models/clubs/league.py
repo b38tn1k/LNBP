@@ -247,6 +247,12 @@ class League(Model):
         db.session.commit()
 
     def log(self):
+        """
+        The given function `log()` is a method of an object that contains a list
+        of flights (`self.flights`). It loops through each flight and prints the
+        name of the flight and the player associations for that flight.
+
+        """
         for f in self.flights:
             print (f.name)
             print()
@@ -258,6 +264,18 @@ class League(Model):
             print()
 
     def get_player_association(self, player):
+        """
+        This function `get_player_association` takes a `player` argument and returns
+        the associated league for that player from a list of `player_associations`.
+
+        Args:
+            player (str): The `player` input parameter specifies the player for
+                whom to retrieve the associated league.
+
+        Returns:
+            list: The output of this function is `None`.
+
+        """
         league_association = next(
             (
                 association

@@ -547,6 +547,22 @@ class GameSlot:
         return history_delta
     
     def player_in_game(self, player):
+        """
+        This function checks whether the given `player` object is present inside
+        the list of game events stored within the instance (i.e., whether it's
+        currently participating or playing the game).
+
+        Args:
+            player (): The `player` input parameter is passed as an object of the
+                `Player` class and it is used to search for the player with the
+                same ID as the `player` object inside the list of game events.
+
+        Returns:
+            bool: Based on the code provided:
+            
+            The output returned by this function is `False`.
+
+        """
         res = False
         for p in self.game_event:
             if p.id == player.id:
@@ -554,6 +570,18 @@ class GameSlot:
         return res
     
     def swap_with_best_candidate(self, out_player, swap_candidates):
+        """
+        This function swaps two players between two games if it's beneficial to
+        the current game and both players are not already on the same team.
+
+        Args:
+            out_player (str): The `out_player` parameter is the player that should
+                be swapped with a player from the other game.
+            swap_candidates (dict): The `swap_candidates` parameter is a list of
+                tuples containing two players: the player to swap with and the
+                player's game object.
+
+        """
         if swap_candidates:
             in_player = swap_candidates[0]['p']
             if in_player in self.game_event:

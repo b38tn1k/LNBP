@@ -645,6 +645,12 @@ class SingleFlightScheduleTool:
 
     def fix_unscheduled_players(self):
         # find unsatisfied players
+        """
+        This function "fix_unscheduled_players" takes a list of players and resolves
+        the unsatisfied player problem by grouping under- or over-scheduled players
+        together and matching them with other available players based on common timeslots.
+
+        """
         self.recalculate_players()
         underscheduled = []
         overscheduled = []
@@ -674,6 +680,16 @@ class SingleFlightScheduleTool:
 
     def fix_double_players(self):
         # find double day players
+        """
+        This function attempts to resolve double header conflicts for a list of
+        players by finding potential games for each conflicted player to swap with
+        and then swapping the games if possible.
+
+        Returns:
+            None: The output of this function is `True` if it successfully swapped
+            games for any double-headed players and `False` otherwise.
+
+        """
         self.recalculate_players()
         double_headed_players = []
 
@@ -758,6 +774,11 @@ class SingleFlightScheduleTool:
         return True
 
     def optimise(self):
+        """
+        This function optimises the game schedule by recalculating players and
+        fixing unscheduled players.
+
+        """
         self.recalculate_players()
         self.fix_unscheduled_players()
         keep_trying = self.fix_double_players()
