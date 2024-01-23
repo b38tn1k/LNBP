@@ -80,7 +80,12 @@ def league_home(id):
             if data["msg"] == "schedule-all":
                 league.delete_all_game_events()
                 db.session.commit()
+                print("Schedule All")
                 for flight in league.flights:
+                    s = Scheduler(league, Scheduler.SINGLE_FLIGHT, flight_id=flight.id)
+                    s.run()
+                    db.session.commit()
+                for flight in league.flights: #runs better the second time after some prepopulation :-/
                     s = Scheduler(league, Scheduler.SINGLE_FLIGHT, flight_id=flight.id)
                     s.run()
                     db.session.commit()
@@ -139,27 +144,6 @@ def edit_league(id):
 @blueprint.route("/schedule/<int:id>", methods=["GET", "POST"])
 @login_required
 def schedule_league(id):
-    """
-    This function takes an ID as input and returns the schedule of games for that
-    particular league. It checks if the user is authenticated and has access to
-    the league before generating the schedule. If the schedule cannot be generated
-    due to invalid data or other errors the function returns a failure message
-    with the appropriate error message.
-
-    Args:
-        id (int): The `id` input parameter is used to specify the ID of the league
-            that the user wants to schedule.
-
-    Returns:
-        dict: The output returned by this function is a JSON object with the
-        following properties:
-        
-        	- status (string): "success" or "failure" depending on whether the schedule
-        was generated successfully or not.
-        	- data (list of dictionaries): a list of dictionaries containing information
-        about each flight.
-
-    """
     if not current_user.is_authenticated or current_user.primary_membership_id is None:
         flash("You currently do not have accesss to app", "warning")
         return redirect(url_for("main.home"))
@@ -186,6 +170,7 @@ def schedule_league(id):
                     }
                 )
             elif data["contents"] == "schedule":
+                print("Hey")
                 s = Scheduler(
                     league, Scheduler.SINGLE_FLIGHT, flight_id=data["data"]["flight_id"]
                 )
@@ -264,6 +249,7 @@ def create_league():
                 print("Data contains the field 'cleaned'.")
 
                 league = build_league_from_json(my_club, data)
+                league.log()
                 db.session.commit()
                 return jsonify(
                     {

@@ -671,8 +671,10 @@ def update_availability(league, d):
     """
     ts = league.get_timeslot_by_id(d["ids"]["timeslot"])
     player = league.club.get_player_by_id(d["ids"]["player"])
+    print(player)
     a = d["values"]
     availability = league.get_player_availability_object(player, ts)
+    print(availability)
     availability.availability = a
 
 
@@ -744,8 +746,7 @@ def apply_edits(league, updates):
 
 def create_games_from_request(league, data):
     """
-    This function creates a new game event for each game included within a PandaX
-    data flight.
+    This function creates a new game event for each game included within a flight.
 
     Args:
         league (): The `league` input parameter is used to access other functions
@@ -758,6 +759,7 @@ def create_games_from_request(league, data):
     """
     league.delete_all_game_events()
     for flight in data:
+        print(flight)
         for game in flight["games"]:
             flight = league.get_flight_by_id(game["flight"])
             timeslot = league.get_timeslot_by_id(game["timeslot"])

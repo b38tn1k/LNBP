@@ -89,6 +89,9 @@ class Player:
         self.days = []
         self.weeks = []
         self.potentials = []
+        self.days_available = set()
+        self.weeks_available = set()
+        self.max_possible_games = 0
         self.satisfied = False
         self.captain_count = 0
         self.availability_score_greater_than_mean = False

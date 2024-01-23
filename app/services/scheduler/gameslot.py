@@ -503,71 +503,6 @@ class GameSlot:
             scores.append(stay_or_go)
         return scores
 
-    def try_exchange(self, other_match, try_hard=False):
-        """
-        This function tries to find a player that is currently unused by both
-        matches and move them between the two matches to improve the overall quality
-        of the matches. It first checks if there are any players that can be swapped
-        and then compares the history scores of the players on both matches to
-        determine which player to move.
-
-        Args:
-            other_match (): The `other_match` parameter is an instance of the same
-                class as `self`, representing the other match that the player can
-                be swapped into.
-            try_hard (bool): The `try_hard` parameter is used to override the
-                history-based decision and always prioritize swapping players even
-                if it leads to a worse team historically.
-
-        Returns:
-            bool: The output returned by the function is a boolean value indicating
-            whether player exchange was successful (True) or not (False).
-
-        """
-        owned_players_can_go = self.get_players_available_to_swap(other_match)
-        other_players_can_go = other_match.get_players_available_to_swap(self)
-        if len(owned_players_can_go) > 0 and len(other_players_can_go) > 0:
-            owned_players_must_stay = self.get_inverse_players(owned_players_can_go)
-            other_players_must_stay = other_match.get_inverse_players(
-                other_players_can_go
-            )
-            own_players_swap_scores = self.compare_histories_stay(
-                owned_players_can_go, owned_players_must_stay, other_players_must_stay
-            )
-            other_players_swap_scores = other_match.compare_histories_stay(
-                other_players_can_go, other_players_must_stay, owned_players_must_stay
-            )
-            best_own_player = max(
-                own_players_swap_scores, key=lambda x: x["stay_score"]
-            )["player"]
-            best_other_player = min(
-                other_players_swap_scores, key=lambda x: x["go_score"]
-            )["player"]
-            # double check
-            new_possible_own = self.get_inverse_players([best_own_player])
-            new_possible_other = other_match.get_inverse_players([best_other_player])
-            good_for_own = (
-                best_own_player.get_sum_history(new_possible_own)
-                > best_own_player.get_sum_history(new_possible_other)
-                or try_hard
-            )
-            good_for_other = (
-                best_other_player.get_sum_history(new_possible_other)
-                > best_other_player.get_sum_history(new_possible_own)
-                or try_hard
-            )
-            if good_for_own and good_for_other:
-                other_match.remove_player_from_match(best_other_player)
-                self.remove_player_from_match(best_own_player)
-                other_match.add_player_to_match(best_own_player)
-                self.add_player_to_match(best_other_player)
-                return True
-        return False
-        # check if players are available for the other match
-        # check if other match players are available for this match
-        # check if other match contains players in history greater than players in history in current match
-        # do the same for this one
-        # swap
 
     def get_sad_players_and_self(self):
         """
@@ -610,3 +545,23 @@ class GameSlot:
             if p != ignore_player:
                 history_delta += other_player.check_history_score(p)
         return history_delta
+    
+    def player_in_game(self, player):
+        res = False
+        for p in self.game_event:
+            if p.id == player.id:
+                res = True
+        return res
+    
+    def swap_with_best_candidate(self, out_player, swap_candidates):
+        if swap_candidates:
+            in_player = swap_candidates[0]['p']
+            if in_player in self.game_event:
+                print("ALREADY HERE")
+            if in_player == out_player:
+                print('same team')
+            o_game = swap_candidates[0]['g']
+            # self.remove_player_from_match(out_player)
+            # o_game.remove_player_from_match(in_player)
+            # self.force_player_to_match(in_player)
+            # o_game.force_player_to_match(out_player)

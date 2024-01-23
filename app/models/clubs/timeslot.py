@@ -134,7 +134,7 @@ class Timeslot(Model):
             format: e.g.
 
         """
-        return self.start_time.strftime('%m/%d %H:%M')
+        return self.start_time.strftime('%a %m/%d %H:%M')
     
     def get_duration(self):
         """

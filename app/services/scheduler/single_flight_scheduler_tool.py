@@ -136,6 +136,7 @@ def all_players_satisfied(potential_game):
             over_scheduled = True
     return all_satisfied or over_scheduled
 
+
 def all_players_above_average(potential_game, games, players):
     """
     The function `all_players_above_average` checks if all players In the
@@ -158,12 +159,11 @@ def all_players_above_average(potential_game, games, players):
         and `players`), the output returned by the function is `True`.
 
     """
-    avg_games = len(games)/len(players) + 0.5
+    avg_games = len(games) / len(players) + 0.5
     for player in potential_game:
         if player.game_count < avg_games:
             return False
     return True
-
 
 
 def shift_blocks(arr, mutate):
@@ -212,6 +212,7 @@ def shift_blocks(arr, mutate):
 
     return new_arr
 
+
 def interlace_and_rotate(arr, mutate):
     """
     This function takes an input array and a mutation number (%), and returns a
@@ -239,13 +240,18 @@ def interlace_and_rotate(arr, mutate):
     length = len(arr)
     # Step 1: Rearranging the array
     # Split the array into two halves
-    first_half = arr[:length // 2]
-    second_half = arr[length // 2:]
+    first_half = arr[: length // 2]
+    second_half = arr[length // 2 :]
     if length % 2:
         second_half.append(None)  # Append None if the array has odd length
 
     # Interleave elements from the second half into the first half
-    rearranged = [val for pair in zip(first_half, reversed(second_half)) for val in pair if val is not None]
+    rearranged = [
+        val
+        for pair in zip(first_half, reversed(second_half))
+        for val in pair
+        if val is not None
+    ]
 
     # Step 2: Rotating the array
     mutate %= length  # Handle cases where mutate is larger than the array length
@@ -331,7 +337,7 @@ class SingleFlightScheduleTool:
                 for g in combinations(tpp[t]["all"], self.rules["players_per_match"]):
                     tpp[t]["pgames"].append(g)
         return tpp, ts
-    
+
     def initCA(self):
         """
         This function initializes the player pool and histories
@@ -340,7 +346,7 @@ class SingleFlightScheduleTool:
 
         Returns:
             list: The function `initCA` returns two items:
-            
+
             1/ A tuple of player objects `tpd` containing all the player objects.
             2/ A list `ts_list` of timeslot objects randomly shuffled.
 
@@ -359,14 +365,14 @@ class SingleFlightScheduleTool:
                 seen.add(item.timeslot_id)
                 ts_list.append(item.timeslot_id)
         return tpp, ts_list
-    
+
     def finalize(self):
         """
         The `finalize()` function recalculates the players' values.
 
         """
         self.recalculate_players()
-    
+
     def schedule_games_for_timeslot(self, tpp, ts_list, all_scheduled_games):
         """
         This function schedules games for a given timeslot while ensuring that
@@ -567,10 +573,10 @@ class SingleFlightScheduleTool:
                     captain = gameslot.captain.id
                 events.append(
                     {
-                        'timeslot': gameslot.timeslot_id,
-                        'facility': gameslot.facility_id,
-                        'captain': captain,
-                        'players': [p.id for p in gameslot.game_event],
+                        "timeslot": gameslot.timeslot_id,
+                        "facility": gameslot.facility_id,
+                        "captain": captain,
+                        "players": [p.id for p in gameslot.game_event],
                     }
                 )
         return events
@@ -605,7 +611,6 @@ class SingleFlightScheduleTool:
         """
         return sum([p.game_count for p in self.players]) / len(self.players)
 
-
     def assign_captains(self):
         """
         This function assigns a captain to each game slot that has a full team and
@@ -636,15 +641,130 @@ class SingleFlightScheduleTool:
                             good = False
                             counter += 1
             if good is True:
-                    break
-            
+                break
+
+    def fix_unscheduled_players(self):
+        # find unsatisfied players
+        self.recalculate_players()
+        underscheduled = []
+        overscheduled = []
+        for p in self.players:
+            if p.game_count < p.rules["min_games_total"]:
+                underscheduled.append(p)
+            if p.game_count > p.rules["max_games_total"]:
+                overscheduled.append(p)
+        common_timeslots = {}
+        for p in underscheduled:
+            for timeslot_id, availability in p.availability.items():
+                if availability in [AVAILABLE, AVAILABLE_LP]:
+                    if timeslot_id in common_timeslots:
+                        common_timeslots[timeslot_id].append(p)
+                    else:
+                        common_timeslots[timeslot_id] = [p]
+        for id in common_timeslots:
+            if len(common_timeslots[id]) >= self.rules["players_per_match"]:
+                gs = [
+                    g for g in self.gameslots if g.timeslot_id == id and g.full == False
+                ]
+                if gs:
+                    for p in common_timeslots[id]:
+                        if gs[0].full is False:
+                            gs[0].force_player_to_match(p)
+
+
+    def fix_double_players(self):
+        # find double day players
+        self.recalculate_players()
+        double_headed_players = []
+
+        # collect trouble makers
+        for p in self.players:
+            if len(p.days) != len(set(p.days)):
+                double_headed_players.append(p)
+
+        if (
+            len(double_headed_players) > len(self.players) / 2
+        ):  # if it is going to be too much work, just give up
+            return False
+
+        c = {}  # candidate ts and data collector, days first cause it might fix weeks
+
+        for p in double_headed_players:
+            c[p.id] = {
+                "candidates": [],
+                "already_scheduled": set(),
+                "duplicates": [],
+                "player": p,
+            }
+            counter = {}
+            for day in p.days:
+                c[p.id]["already_scheduled"].add(day)
+                if day in counter:
+                    counter[day] += 1
+                else:
+                    counter[day] = 1
+            for week in p.weeks:
+                c[p.id]["already_scheduled"].add(week)
+
+            c[p.id]["duplicates"] = [
+                item for item in counter if counter[item] > p.rules["max_games_day"]
+            ]  # finding the day we need to reduce games in
+
+        day_number_lookup = {}
+        for g in self.gameslots:
+            if g.full is True:
+                # organise games by day and week number
+                if g.day_number in day_number_lookup:
+                    day_number_lookup[g.day_number].append(g)
+                else:
+                    day_number_lookup[g.day_number] = [g]
+                # is it a candidate for swapping?
+                for p in double_headed_players:
+                    pa = p.availability[g.timeslot_id]
+                    pas = g.day_number in c[p.id]["already_scheduled"]
+                    pasw = g.week_number in c[p.id]["already_scheduled"]
+                    pig = p in g.game_event
+                    if (
+                        pa != UNAVAILABLE and not pas and not pasw and not pig
+                    ):
+                        c[p.id]["candidates"].append(g)
+
+        # at this point, I have a dictionary c which includes
+        #   - all players with double header days,
+        #   - all other created games they could be in
+        #   - the game slot day number for which they have a duplicate
+        for p in double_headed_players:
+            # 1. find a game slot in the duplicate
+            for dp in c[p.id]["duplicates"]:
+                source = None
+                for g in day_number_lookup[dp]:
+                    if g.player_in_game(p):
+                        source = g
+                        break
+                if source:  # 2. find other players that could make a game swap
+                    swap_candidates = []
+                    for gc in c[p.id]["candidates"]:  # game candidates
+                        for op in gc.game_event:  # other players
+                            if (
+                                op.availability[source.timeslot_id] != UNAVAILABLE
+                                and op not in double_headed_players
+                                and source.week_number not in op.weeks
+                            ):
+                                swap_candidates.append(
+                                    {"p": op, "g": gc}
+                                )  # other players and the candidate game they woudl swap from
+                    source.swap_with_best_candidate(p, swap_candidates)
+
+        return True
+
     def optimise(self):
-        """
-        The function `optimise` does nothing because it prints "TODODODO" and does
-        not return any value.
-
-        """
-        print("TODODODO")
-
-
-
+        self.recalculate_players()
+        self.fix_unscheduled_players()
+        keep_trying = self.fix_double_players()
+        # if keep_trying:
+        #     minor_conflicts = []
+        #     for g in self.gameslots:
+        #         if g.full is True:
+        #             for p in g.game_event:
+        #                 if p.availability[g.timeslot_id] == AVAILABLE_LP:
+        #                     minor_conflicts.append({"player": p, "game": g})

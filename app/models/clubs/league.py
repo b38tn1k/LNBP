@@ -59,19 +59,21 @@ class League(Model):
         :param timeslot: The time slot for which availability is being updated.
         :param availability: The availability status (e.g., 0 for unavailable, 1 for available).
         """
+        association = self.get_player_association(player)
         # Check if the player is associated with this league
-        if force or self.player_associations.filter_by(player_id=player.id).first():
+        if force or association:
             # Create or update the PlayerAvailability entry
             player_availability = ModelProxy.clubs.PlayerAvailability.query.filter_by(
-                association_id=player.id, timeslot_id=timeslot.id
+                association_id=association.id, timeslot_id=timeslot.id
             ).first()
 
             if not player_availability:
                 player_availability = ModelProxy.clubs.PlayerAvailability(
-                    association_id=player.id,
-                    timeslot_id=timeslot.id,
+                    association=association,
+                    timeslot=timeslot,
                     availability=availability,
                 )
+                # print("made new availability for " + player.full_name + " with value " + str(availability))
 
             else:
                 player_availability.availability = availability
@@ -239,8 +241,34 @@ class League(Model):
         """
         for game_event in self.game_events:
             db.session.delete(game_event)
+        for flight in self.flights:
+            flight.report = []
         self.game_events = []
         db.session.commit()
+
+    def log(self):
+        for f in self.flights:
+            print (f.name)
+            print()
+            for fpa in f.player_associations:
+                player = fpa.player
+                my_string = player.full_name + '\t'
+                my_string += str(self.get_player_availability_dict(player))      
+                print(my_string)           
+            print()
+
+    def get_player_association(self, player):
+        league_association = next(
+            (
+                association
+                for association in self.player_associations
+                if association.player == player
+            ),
+            None,
+        )
+        return league_association
+        
+            
 
     def create_timeslot(self, start_time, end_time, add=True, commit=False):
         """

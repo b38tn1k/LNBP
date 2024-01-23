@@ -43,6 +43,7 @@ class Scheduler:
         """
         self.flight = self.league.get_flight_by_id(self.flight_id)
         self.flight.delete_all_game_events()
+        
 
     def sf_setup(self, mutate):
         """
@@ -60,7 +61,7 @@ class Scheduler:
         """
         players = create_player_objects(self.flight, self.league, self.rules)
         gameslots = create_gameslot_objects(self.league, self.rules)
-        generateGameSlotAvailabilityScores(gameslots, players)
+        generateGameSlotAvailabilityScores(gameslots, players, self.rules)
         scheduler = SingleFlightScheduleTool(
             self.flight.id, self.rules, players, gameslots, mutate
         )
@@ -122,7 +123,7 @@ class Scheduler:
         tiers["overscheduled_lp"] = "tier2"
 
         tiers["max_week_gap"] = "tier2"
-        tiers["max_games_week"] = "tier1"
+        tiers["max_games_week"] = "tier2"
 
         tiers["max_games_day"] = "tier1"
 
@@ -172,7 +173,6 @@ class Scheduler:
 
             # player week numbers
             last_week = None
-            week_nums = p["week_numbers"]
             week_nums = {k: p["week_numbers"][k] for k in sorted(p["week_numbers"])}
             for n in week_nums:
                 if week_nums[n] > rules["max_games_week"]:
@@ -182,7 +182,11 @@ class Scheduler:
                 else:
                     gap = abs(n - last_week)
                     if gap > rules["max_week_gap"]:
-                        record_broken_rules(player, tiers, fails, "max_week_gap")
+                        record_failure = 0
+                        for w in range(last_week, n):
+                            record_failure += (int(w in p["weeks_available"]))
+                        if (gap - record_failure) > rules["max_week_gap"]:
+                            record_broken_rules(player, tiers, fails, "max_week_gap")
                     last_week = n
 
             # player day numbers
@@ -213,7 +217,7 @@ class Scheduler:
             # flight = self.league.get_flight_by_id(self.flight_id)
             gameslots = create_gameslot_objects(self.league, self.rules, check=False)
             players = create_player_objects(flight, self.league, self.rules)
-            generateGameSlotAvailabilityScores(gameslots, players)
+            generateGameSlotAvailabilityScores(gameslots, players, self.rules)
             player_dict = {}
             for p in players:
                 player_dict[p.id] = p
@@ -226,6 +230,7 @@ class Scheduler:
                     gameslots_dict[gs.facility_id][gs.timeslot_id] = gs
 
             for event in flight.game_events:
+                print(event)
                 fid = event.facility_id
                 tid = event.timeslot_id
                 if fid in gameslots_dict:
@@ -237,16 +242,15 @@ class Scheduler:
                         gs.captain.captain_count += 1
             scheduler = SingleFlightScheduleTool(flight.id, self.rules, players, gameslots, 0)
             scheduler.finalize()
-            # print('new')
             res = self.evaluate(scheduler)
             report = []
+            flight.report = []
             for d in sorted(res["details"], key=lambda x: x["tier"]):
                 r = parse_violation_human_readable(self.league, d)
-                print(r)
                 if r is not None:
                     report.append(r)
             flight.report = report
-            print("DONE")
+        print("DONE")
 
     def run(self):
         """
@@ -255,6 +259,7 @@ class Scheduler:
         scheduling plan based on two tiers of evaluation metrics.
         """
         self.prepare()
+        print("Scheduling " + self.flight.name)
         i = 0
         candidates = []
         for _ in self.league.timeslots:
@@ -266,21 +271,21 @@ class Scheduler:
                 scheduler.assign_captains()
                 scheduler.finalize()
                 res = self.evaluate(scheduler)
-                # print(res)
-                # print()
                 candidates.append({"scheduler": scheduler, "res": res})
         best_candidate = min(
             candidates, key=lambda x: (x["res"]["tier1"], x["res"]["tier2"])
         )
-        # print()
-        # print(best_candidate)
         report = []
         for d in sorted(best_candidate["res"]["details"], key=lambda x: x["tier"]):
             r = parse_violation_human_readable(self.league, d)
             if r is not None:
                 report.append(r)
-        flight = self.build(best_candidate["scheduler"])
-        flight.report = report
+                print(r)
+        for e in scheduler.return_events():
+            print(e['players'], len(e['players']) == len(set(e['players'])))
+        # flight = self.build(best_candidate["scheduler"])
+        # flight.report = report
+        print("Done")
 
 
 def parse_violation_human_readable(league, violation):
@@ -385,6 +390,7 @@ def summarize_schedule(scheduler):
             "rules": player.rules,
             "day_numbers": {},
             "week_numbers": {},
+            "weeks_available": player.weeks_available,
             AVAILABLE: 0,
             AVAILABLE_LP: 0,
             UNAVAILABLE: 0,
@@ -409,7 +415,7 @@ def summarize_schedule(scheduler):
     return player_check
 
 
-def generateGameSlotAvailabilityScores(gameslots, players):
+def generateGameSlotAvailabilityScores(gameslots, players, rules):
     """
     This function generates the availability score for each game slot (gs) based
     on the availability of players (p) during that timeslot.
@@ -425,6 +431,10 @@ def generateGameSlotAvailabilityScores(gameslots, players):
         for p in players:
             if p.availability[gs.timeslot_id] == AVAILABLE:
                 gs.availability_score += p.availability_score
+            if p.availability[gs.timeslot_id] == AVAILABLE or p.availability[gs.timeslot_id] == AVAILABLE_LP:
+                p.days_available.add(gs.day_number)
+                p.weeks_available.add(gs.week_number)
+        
 
 
 def create_game_from_scheduler(league, game, flight=None):

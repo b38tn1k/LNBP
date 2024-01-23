@@ -70,6 +70,7 @@ class Flight(Model):
         """
         Delete all game events associated with the league.
         """
+        self.report = []
         for game_event in self.game_events:
             db.session.delete(game_event)
         self.game_events = []
