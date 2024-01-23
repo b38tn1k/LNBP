@@ -361,6 +361,10 @@ class SingleFlightScheduleTool:
         return tpp, ts_list
     
     def finalize(self):
+        """
+        The `finalize()` function recalculates the players' values.
+
+        """
         self.recalculate_players()
     
     def schedule_games_for_timeslot(self, tpp, ts_list, all_scheduled_games):

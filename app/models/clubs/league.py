@@ -572,6 +572,12 @@ class League(Model):
             return None
         
     def clean(self):
+        """
+        This function 'clean' cleans up the list of facility associations by
+        deleting those that have already been seen and adding their facilities to
+        a set called 'already_seen'.
+
+        """
         already_seen = set()
         for facility_assoc in self.facility_associations:
             if facility_assoc.facility.id in already_seen:
