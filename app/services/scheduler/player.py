@@ -57,6 +57,28 @@ class Player:
         return self.id
 
     def potential_schedule_volume(self, game_dict, rules):
+        """
+        This function calculates the minimum number of games that can be schedule
+        for a given set of teams and rules.
+
+        Args:
+            game_dict (dict): The `game_dict` input parameter contains information
+                about available game slots for each day of the week.
+            rules (dict): The `rules` input parameter is a dictionary that defines
+                various limits and constraints on the scheduling of games. It
+                includes parameters such as `max_games_day` and `max_games_week`,
+                which limit the number of games that can be scheduled on any given
+                day or week.
+
+        Returns:
+            str: The output returned by this function is a minimum value of either
+            `count_by_weeks` or `count_by_days`, where `count_by_weeks` is the
+            product of `rules["max_games_week"]` and the number of weeks scheduled
+            for each game day that meets the rule's availability and assume_busy
+            parameters are true; and `count_by_days` is the total of the minimum
+            values of games allowed per day.
+
+        """
         schedule = {}
         ts_day_counter = {}
         for i in self.availability:

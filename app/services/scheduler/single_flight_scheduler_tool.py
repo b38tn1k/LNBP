@@ -649,6 +649,19 @@ class SingleFlightScheduleTool:
                 break
 
     def get_underover_scheduled_players(self):
+        """
+        This function returns two lists of players: "underscheduled" and "overscheduled".
+
+        Returns:
+            list: The output returned by this function is a tuple containing two
+            lists:
+            
+            	- `underscheduled`: a list of players who have played less than their
+            minimum number of games specified by their rules.
+            	- `overscheduled`: a list of players who have played more than their
+            maximum number of games specified by their rules.
+
+        """
         underscheduled = []
         overscheduled = []
         for p in self.players:

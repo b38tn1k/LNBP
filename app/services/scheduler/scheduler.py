@@ -560,6 +560,19 @@ def create_gameslot_objects(league, rules, check=True):
 
 
 def find_player_exceptions(players, gameslots, rules):
+    """
+    This function finds the minimum number of games a player must play based on
+    their availability and scheduling rules.
+
+    Args:
+        players (dict): The `players` input parameter is a list of players that
+            are being checked for potential scheduling exceptions.
+        gameslots (list): The `gameslots` parameter provides a list of `GameSlot`
+            objects representing available game slots for the players to play.
+        rules (dict): The `rules` input parameter is a dictionary of minimum game
+            requirements for each player.
+
+    """
     game_dict = {}
     for g in gameslots:
         game_dict[g.timeslot_id] = {'day': g.day_number, 'week': g.week_number}
