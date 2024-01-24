@@ -824,6 +824,22 @@ class SingleFlightScheduleTool:
         return True
 
     def get_available_games_for_player(self, player):
+        """
+        This function retrieves a list of available games for a given player by
+        filtering the game slots that satisfy the following conditions:
+        1/ The player has availability for the game slot.
+        2/ The game slot is not already full.
+        3/ The game slot does not have any other players playing on it.
+
+        Args:
+            player (): The `player` input parameter passes a GamePlayer object to
+                the get_available_games_for_player() function and supplies details
+                about availability and participation of a specific player.
+
+        Returns:
+            list: The function returns a list of available games for the given player.
+
+        """
         games = []
         for g in self.gameslots:
             pa = player.availability[g.timeslot_id] == AVAILABLE
@@ -833,6 +849,20 @@ class SingleFlightScheduleTool:
         return games
 
     def get_available_players_for_game(self, game):
+        """
+        This function retrieves a list of available players for a given game by
+        iterating through the list of all players and checking if they are available
+        during the specific time slot and not already playing the game.
+
+        Args:
+            game (): The `game` input parameter is used to specify the game for
+                which the available players are being requested.
+
+        Returns:
+            list: The output returned by the `get_available_players_for_game()`
+            function is a list of available players for a given game.
+
+        """
         players = []
         for p in self.players:
             pa = p.availability[game.timeslot_id] == AVAILABLE
@@ -842,6 +872,16 @@ class SingleFlightScheduleTool:
         return players
 
     def fix_lp_schedules(self):
+        """
+        This function `fix_lp_schedules` is trying to resolve minor conflicts
+        between player-game assignments by swapping players and games that have
+        minimal conflicts. It iterates over the available games for a given player
+        and checks if there are any conflicting games (i.e., same day or week) and
+        then checks if there are any conflicting players (i.e., same day or week).
+        If there are no conflicts found for both players and games and the two
+        entities can be matched successfully.
+
+        """
         minor_conflicts = []
         for g in self.gameslots:
             if g.full is True:
@@ -882,6 +922,15 @@ class SingleFlightScheduleTool:
                 game.swap_with_best_candidate(p, candidates)
 
     def balance_unscheduled_players(self):
+        """
+        This function balance_unscheduled_players() aims to distribute unscheduled
+        players evenly among the games. It first calculates the average number of
+        games played by each player and then identifies the under-scheduled players
+        who have fewer games than the average. It then finds potential swappers
+        (i.e., over-scheduled players) who can be matched with these under-scheduled
+        players to balance out their game count.
+
+        """
         self.recalculate_players()
         print("BALANCE UNDERSCHEDULED")
         underscheduled, overscheduled = self.get_underover_scheduled_players()

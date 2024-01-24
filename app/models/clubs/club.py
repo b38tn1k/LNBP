@@ -56,6 +56,21 @@ class Club(Model):
         return club
 
     def update_statistics(self, item):
+        """
+        This function updates the "background statistics" of an object (hence the
+        name "update_statistics") and prints out the current statistics. It takes
+        an item as an argument and adds one to the count of that item if it's
+        already present; otherwise ,it initializes the count for that item to one.
+        Finally; this function modifies the object's flags to indicate modifications
+        to the "bg_statistics" attribute.. The printing part then iterates through
+        the background statistics and prints out each key(an item) along with its
+        respective count (background statistics).
+
+        Args:
+            item (str): The `item` input parameter is used to update the statistics
+                of a specific item.
+
+        """
         if item in self.bg_statistics:
             self.bg_statistics[item] += 1
         else:

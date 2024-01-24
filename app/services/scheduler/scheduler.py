@@ -351,6 +351,31 @@ class Scheduler:
 
 
 def unpack_report(league, candidate):
+    """
+    This function takes a League and Candidate object as inputs and returns a
+    dictionary with counts of different types of issues found during a review of
+    the candidate's games. It checks for violations related to over/under-scheduling
+    of games per week or day; having large gaps between games played; repeated
+    competition against the same team; being under/over-captained and more.
+
+    Args:
+        league (): The `league` input parameter is used to retrieve player information
+            from the league database using the `get_player_by_id` method.
+        candidate (dict): The `candidate` parameter is an object that contains the
+            detailed information about the league player's schedule violation.
+
+    Returns:
+        dict: Based on the code provided above and assuming there are some data
+        stored into `candidate["res"]["details"]`, the output of this function
+        will be a dictionary `result` with two key-value pairs:
+        
+        1/ `count`: An integer that represents the total number of issues found.
+        2/ `issues`: A list of strings representing each issue found. Each string
+        is formed by concatenating the messages' titles (e.g., "Underscheduled:"
+        or "Over Captain'd:") with a list of player full names that have violated
+        that rule.
+
+    """
     messages = {}
     messages["min_games_total"] = "Underscheduled:"
     messages["max_games_total"] = "Overscheduled:"
@@ -694,6 +719,22 @@ def find_player_exceptions(players, gameslots, rules):
             p.rules["min_games_total"] = count
 
 def count_categories(my_dict):
+    """
+    This function counts the number of occurrences of each value of the "broken_rule"
+    key within a dict.
+
+    Args:
+        my_dict (dict): In this function `count_categories`, `my_dict` is a
+            dictionary that provides the keys for looking up the occurrences of
+            broken rules.
+
+    Returns:
+        dict: The output returned by this function is a dictionary with the same
+        keys as `my_dict`, but with the values adjusted based on the presence of
+        broken rules. If a key has no broken rules (i.e., its `broken_rule` attribute
+        is None), then the value of the corresponding key-value pair will be 1.
+
+    """
     counter = {}
     for key in my_dict:
         br = key['broken_rule']
