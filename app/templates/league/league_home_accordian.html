@@ -12,8 +12,14 @@
                 style="text-align: left"
             >
                 <div class="flight-report-button">
-                    <div><strong>{{ flight.name }}</strong></div>
-                    <div><span style="font-weight: 50">{{ flight.report|length }} ISSUES</span></div>
+                    <div><h3 class="card-title">{{ flight.name }}</h3></div>
+                    {% if flight.report %} {% if flight.report.count == 1 %}
+                    <div><span class="info">{{ flight.report.count }} Issue</span></div>
+                    {% else %}
+                    <div><span class="info">{{ flight.report.count }} Issues</span></div>
+                    {% endif %} {% else %}
+                    <div><span class="info">No Issues!</span></div>
+                    {% endif %}
                 </div>
             </button>
         </div>
@@ -25,7 +31,16 @@
             data-bs-parent="#flight-report-accordian"
         >
             <div class="accordion-body">
-                {% for item in flight.report %} {{ item }}<br />
+                {% for key in flight.report.issues %}
+                <div>
+                    <strong>{{ key }}</strong>
+                    <ul>
+                        {% for p in flight.report.issues[key] %}
+                        <li>{{ p }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
                 {% endfor %}
                 <br />
             </div>

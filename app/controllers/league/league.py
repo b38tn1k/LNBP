@@ -83,11 +83,13 @@ def league_home(id):
                 print("Schedule All")
                 for flight in league.flights:
                     s = Scheduler(league, Scheduler.SINGLE_FLIGHT, flight_id=flight.id)
-                    s.run()
+                    stats = s.run()
+                    current_user.club.update_statistics(stats)
                     db.session.commit()
                 for flight in league.flights: #runs better the second time after some prepopulation :-/
                     s = Scheduler(league, Scheduler.SINGLE_FLIGHT, flight_id=flight.id)
-                    s.run()
+                    stats = s.run()
+                    current_user.club.update_statistics(stats)
                     db.session.commit()
             return jsonify({"status": "success"})
         except Exception as e:
@@ -199,7 +201,8 @@ def schedule_league(id):
                 s = Scheduler(
                     league, Scheduler.SINGLE_FLIGHT, flight_id=data["data"]["flight_id"]
                 )
-                s.run()
+                stats = s.run()
+                current_user.club.update_statistics(stats)
                 db.session.commit()
                 return jsonify({"status": "success"})
         except Exception as e:

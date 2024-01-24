@@ -593,7 +593,6 @@ class GameSlot:
                 c1 = in_player in self.game_event
                 c2 = in_player == out_player
                 c3 = out_player in o_game.game_event
-                c4 = self.week_number 
                 if c1 or c2 or c3:
                     i += 1
                 else:

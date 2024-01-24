@@ -12,7 +12,8 @@ class Flight(Model):
 
     # Relationship with cascade delete
     league = db.relationship('League', backref=db.backref('flights', lazy=True, cascade='all, delete-orphan'))
-    report = db.Column(db.JSON, default=lambda: [])
+    # report = db.Column(db.JSON, default=lambda: []) 
+    report = db.Column(db.JSON) # untested
 
     GDPR_EXPORT_COLUMNS = {}
 

@@ -1,6 +1,7 @@
 from random import shuffle
 from itertools import combinations
 from .constants import *
+import math
 
 
 def init_histories(players):
@@ -284,6 +285,7 @@ class SingleFlightScheduleTool:
         self.rules = rules
         self.gameslots = gameslots
         self.mutate = mutate
+        self.mutate_mode = ""
 
         # shuffle(gameslots)
         # self.gameslots = sorted(gameslots, key=lambda gs: gs.facility_id, reverse=True)
@@ -356,12 +358,14 @@ class SingleFlightScheduleTool:
         self.gameslots = sorted(self.gameslots, key=lambda gs: gs.availability_score)
         if self.mutate < len(ts):
             self.gameslots = shift_blocks(self.gameslots, self.mutate)
+            self.mutate_mode = "Availability score ordered shift"
             # print("SHIFTER")
-        elif self.mutate > 2*len(ts):
+        elif self.mutate > 2 * len(ts):
             shuffle(self.gameslots)
+            self.mutate_mode = "Random shuffle"
             # print("SHUFFLER")
         else:
-            # print("CARD DECK")
+            self.mutate_mode = "Interlace and rotate"
             self.gameslots = interlace_and_rotate(self.gameslots, self.mutate - len(ts))
         ts_list = []
         seen = set()
@@ -655,10 +659,10 @@ class SingleFlightScheduleTool:
         Returns:
             list: The output returned by this function is a tuple containing two
             lists:
-            
-            	- `underscheduled`: a list of players who have played less than their
+
+                - `underscheduled`: a list of players who have played less than their
             minimum number of games specified by their rules.
-            	- `overscheduled`: a list of players who have played more than their
+                - `overscheduled`: a list of players who have played more than their
             maximum number of games specified by their rules.
 
         """
@@ -681,6 +685,8 @@ class SingleFlightScheduleTool:
         """
         self.recalculate_players()
         underscheduled, overscheduled = self.get_underover_scheduled_players()
+        if len(underscheduled) == 0:
+            return True
         common_timeslots = {}
         for p in underscheduled:
             for timeslot_id, availability in p.availability.items():
@@ -695,10 +701,34 @@ class SingleFlightScheduleTool:
                     g for g in self.gameslots if g.timeslot_id == id and g.full == False
                 ]
                 if gs:
-                    for p in common_timeslots[id]:
-                        if gs[0].full is False:
-                            gs[0].force_player_to_match(p)
-
+                    new_game = gs[0]
+                    best_game = []
+                    for g in gs:
+                        bad_score = 0
+                        candidates = []
+                        for p in common_timeslots[id]:
+                            if not g.day_number in p.days and not g.week_number in p.weeks:
+                                if p.availability[g.timeslot_id] == AVAILABLE:
+                                    candidates.append(p)
+                            if g.day_number in p.days:
+                                bad_score += 1
+                            if g.week_number in p.weeks:
+                                bad_score += 1
+                        best_game.append({'score': bad_score, 'game': g, 'candidates' : candidates})
+                    lowest_score_game = min(best_game, key=lambda x: x['score'])
+                    added = False
+                    for s in best_game:
+                        if len(s['candidates']) >= self.rules['players_per_match']:
+                            added = True
+                            for p in s['candidates']:
+                                s['game'].force_player_to_match(p)
+                            break
+                    if added is False and lowest_score_game['game']:
+                        for p in common_timeslots[id]:
+                            lowest_score_game['game'].force_player_to_match(p)
+        self.recalculate_players()
+        underscheduled, _ = self.get_underover_scheduled_players()
+        return len(underscheduled) == 0
 
     def fix_double_players(self):
         # find double day players
@@ -762,9 +792,7 @@ class SingleFlightScheduleTool:
                     pas = g.day_number in c[p.id]["already_scheduled"]
                     pasw = g.week_number in c[p.id]["already_scheduled"]
                     pig = p in g.game_event
-                    if (
-                        pa != UNAVAILABLE and not pas and not pasw and not pig
-                    ):
+                    if pa != UNAVAILABLE and not pas and not pasw and not pig:
                         c[p.id]["candidates"].append(g)
 
         # at this point, I have a dictionary c which includes
@@ -793,8 +821,115 @@ class SingleFlightScheduleTool:
                                 )  # other players and the candidate game they woudl swap from
                     source.swap_with_best_candidate(p, swap_candidates)
                     self.recalculate_players()
-
         return True
+
+    def get_available_games_for_player(self, player):
+        games = []
+        for g in self.gameslots:
+            pa = player.availability[g.timeslot_id] == AVAILABLE
+            pin = g.player_in_game(player)
+            if pa and g.full and not pin:
+                games.append(g)
+        return games
+
+    def get_available_players_for_game(self, game):
+        players = []
+        for p in self.players:
+            pa = p.availability[game.timeslot_id] == AVAILABLE
+            pin = game.player_in_game(p)
+            if pa and not pin:
+                players.append(p)
+        return players
+
+    def fix_lp_schedules(self):
+        minor_conflicts = []
+        for g in self.gameslots:
+            if g.full is True:
+                for p in g.game_event:
+                    if p.availability[g.timeslot_id] == AVAILABLE_LP:
+                        minor_conflicts.append({"player": p, "game": g})
+        for mc in minor_conflicts:
+            player = mc["player"]
+            game = mc["game"]
+            uf_games_for_player = self.get_available_games_for_player(player)
+            filtered_gfp = []
+            for g in uf_games_for_player:
+                day_collision = (
+                    g.day_number in player.days and g.day_number != game.day_number
+                )
+                week_collision = (
+                    g.week_number in player.weeks and g.week_number != game.week_number
+                )
+                if not day_collision and not week_collision:
+                    filtered_gfp.append(g)
+
+            filtered_pfg = []
+            if len(filtered_gfp) != 0:
+                uf_player_for_games = self.get_available_players_for_game(game)
+                for p in uf_player_for_games:
+                    day_collision = game.day_number in p.days
+                    week_collision = game.week_number in p.weeks
+                    if not day_collision and not week_collision:
+                        filtered_pfg.append(p)
+            candidates = []
+            if len(filtered_pfg) != 0:
+                # print(len(filtered_gfp), len(filtered_pfg))
+                for g in filtered_gfp:
+                    for p in filtered_pfg:
+                        if g.player_in_game(p):
+                            candidates.append({"p": p, "g": g})
+            if len(candidates) != 0:
+                game.swap_with_best_candidate(p, candidates)
+
+    def balance_unscheduled_players(self):
+        self.recalculate_players()
+        print("BALANCE UNDERSCHEDULED")
+        underscheduled, overscheduled = self.get_underover_scheduled_players()
+        gc = [p.game_count for p in underscheduled]
+        if len(gc) == 0:
+            return
+        average = math.ceil(sum(gc)/len(gc))
+        freebies = [p for p in underscheduled if p.game_count < average] #players who get a game at the expense of other scheduled players
+        print([p.game_count for p in underscheduled])
+        for p in freebies:
+            games = self.get_available_games_for_player(p)
+            ideas = []
+            for g in games:
+                added = False
+                if g.day_number not in p.days and g.week_number not in p.weeks:
+                    swapper = None
+                    cands = [p for p in g.game_event if p.game_count >= p.rules['max_games_total']]
+                    iovs = False
+                    for innocent in cands:
+                        if innocent.game_count > innocent.rules['max_games_total']:
+                            swapper = innocent
+                            iovs = True
+                    if swapper is None and cands:
+                        swapper = max(cands, key=lambda x: x.availability_score)
+                    if swapper:
+                        ideas.append({'player': swapper, 'overscheduled': iovs, 'target_game': g, 'availability_score': swapper.availability_score})
+            if ideas:
+                print('swapping')
+                ideas[0]['target_game'].remove_player_from_match(ideas[0]['player'])
+                ideas[0]['target_game'].force_player_to_match(p)
+
+            # final_candidate_swap = None
+            # g = None
+            # for idea in ideas:
+            #     if idea['overscheduled']:
+            #         final_candidate_swap = idea['player']
+            #         g = idea['target_game']
+            
+            # if final_candidate_swap is None and ideas:
+            #     idea = max(ideas, key=lambda x: x['availability_score'])
+            #     final_candidate_swap = idea['player']
+            #     g = idea['target_game']
+
+            # if final_candidate_swap:
+            #     g.remove_player_from_match(swapper)
+            #     g.force_player_to_match(p)
+        print([p.game_count for p in underscheduled])
+        print("BALANCE UNDERSCHEDULED - DONE")
 
     def optimise(self):
         """
@@ -803,12 +938,9 @@ class SingleFlightScheduleTool:
 
         """
         self.recalculate_players()
-        self.fix_unscheduled_players()
-        keep_trying = self.fix_double_players()
-        # if keep_trying:
-        #     minor_conflicts = []
-        #     for g in self.gameslots:
-        #         if g.full is True:
-        #             for p in g.game_event:
-        #                 if p.availability[g.timeslot_id] == AVAILABLE_LP:
-        #                     minor_conflicts.append({"player": p, "game": g})
+        self.balance_unscheduled_players()
+        keep_trying = self.fix_unscheduled_players()
+        if keep_trying:
+            self.fix_double_players()
+            self.fix_lp_schedules()
+            

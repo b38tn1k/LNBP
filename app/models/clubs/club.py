@@ -1,5 +1,6 @@
 from app.models import db, Model
 from app.models import ModelProxy, transaction
+from sqlalchemy.orm.attributes import flag_modified
 
 
 class Club(Model):
@@ -18,7 +19,8 @@ class Club(Model):
         db.String(15)
     )  # Adjust length based on the country's ZIP/Postal code format
     country = db.Column(db.String(100))
-    todos = db.relationship('Todo', back_populates='club', lazy='dynamic')
+    todos = db.relationship("Todo", back_populates="club", lazy="dynamic")
+    bg_statistics = db.Column(db.JSON)
 
     GDPR_EXPORT_COLUMNS = {
         "id": "ID of the club",
@@ -48,9 +50,30 @@ class Club(Model):
 
         """
         club = Club(name=name)
+        club.bg_statistics = {}
         db.session.add(club)
         db.session.commit()
         return club
+
+    def update_statistics(self, item):
+        if item in self.bg_statistics:
+            self.bg_statistics[item] += 1
+        else:
+            self.bg_statistics[item] = 1
+        flag_modified(self, "bg_statistics")
+
+        RED = "\033[91m"
+        GREEN = "\033[92m"
+        YELLOW = "\033[93m"
+        BLUE = "\033[94m"
+        MAGENTA = "\033[95m"
+        CYAN = "\033[96m"
+        WHITE = "\033[97m"
+        RESET = "\033[0m"
+
+        print(RED, "CLUB ALGO STATS", RESET)
+        for key in self.bg_statistics:
+            print("  ", MAGENTA, key, RESET , self.bg_statistics[key])
 
     # Relationships and other methods as required
     @transaction
@@ -106,10 +129,10 @@ class Club(Model):
             db.session.add(new_league)
         if commit is True:
             db.session.commit()
-            print('commit')
+            print("commit")
 
         return new_league
-    
+
     def get_facility_by_id(self, id):
         """
         This function retrieves the facility with the given ID from a list of
@@ -135,7 +158,7 @@ class Club(Model):
         """
         # Use the relationship 'leagues' to filter by league ID
         return next((league for league in self.leagues if league.id == league_id), None)
-    
+
     def find_or_create_player(self, full_name, add=True, commit=False):
         """
         Check if a player with a similar name is in the club, and return them if so.
@@ -149,20 +172,22 @@ class Club(Model):
 
         # Search for a player with a matching part in their first and last name in the club
         player = next(
-            (p for p in self.players 
-             if set(p.first_name.split()).intersection(name_parts) 
-             and set(p.last_name.split()).intersection(name_parts)),
-            None
+            (
+                p
+                for p in self.players
+                if set(p.first_name.split()).intersection(name_parts)
+                and set(p.last_name.split()).intersection(name_parts)
+            ),
+            None,
         )
 
         if player is None:
-            
             # If no player found, create a new one with the first part as first name and the rest as last name
             first_name = name_parts[0]
-            last_name = ' '.join(name_parts[1:]) if len(name_parts) > 1 else 'Unknown'
+            last_name = " ".join(name_parts[1:]) if len(name_parts) > 1 else "Unknown"
             player = self.new_player(first_name, last_name, add=add, commit=commit)
         return player
-    
+
     def new_player(self, first_name, last_name, add=True, commit=False):
         """
         This function creates a new instance of the `Player` model and optionally
@@ -187,23 +212,23 @@ class Club(Model):
 
         """
         player = ModelProxy.clubs.Player(
-                first_name=first_name,
-                last_name=last_name,
-                email='placeholder@example.com',
-                contact_number='000-000-0000',
-                communication_preference_mobile=False,
-                communication_preference_email=True,
-                gender='Unknown',
-                club_ranking=0,
-                club=self
-            )
+            first_name=first_name,
+            last_name=last_name,
+            email="placeholder@example.com",
+            contact_number="000-000-0000",
+            communication_preference_mobile=False,
+            communication_preference_email=True,
+            gender="Unknown",
+            club_ranking=0,
+            club=self,
+        )
         if add is True:
             db.session.add(player)
 
         if commit is True:
             db.session.commit()
         return player
-    
+
     def get_player_by_id(self, id):
         """
         The given function `get_player_by_id` takes an integer `id` as input and
@@ -223,7 +248,6 @@ class Club(Model):
                 return p
         return None
 
-    
     def add_todo(self, task, add=True, commit=False):
         """
         Create and add a new todo item to this club.
@@ -247,7 +271,6 @@ class Club(Model):
             db.session.commit()
 
         return todo
-    
 
     def __repr__(self):
         """

@@ -3,6 +3,15 @@ from .constants import *
 from .player import Player
 from .gameslot import GameSlot
 
+RED = "\033[91m"
+GREEN = "\033[92m"
+YELLOW = "\033[93m"
+BLUE = "\033[94m"
+MAGENTA = "\033[95m"
+CYAN = "\033[96m"
+WHITE = "\033[97m"
+RESET = "\033[0m"
+
 
 class Scheduler:
     SINGLE_FLIGHT = 0
@@ -26,6 +35,7 @@ class Scheduler:
         self.league = league
         self.rules = league.get_league_rules_dict()
         self.flight_id = flight_id
+        self.mode = mode
 
         if mode == self.GENERATE_REPORT:
             pass
@@ -43,7 +53,6 @@ class Scheduler:
         """
         self.flight = self.league.get_flight_by_id(self.flight_id)
         self.flight.delete_all_game_events()
-        
 
     def sf_setup(self, mutate):
         """
@@ -81,7 +90,7 @@ class Scheduler:
 
         """
         for e in scheduler.return_events():
-            if len(e['players']) == len(set(e['players'])):
+            if len(e["players"]) == len(set(e["players"])):
                 flight = create_game_from_scheduler(self.league, e, flight=self.flight)
         return flight
 
@@ -152,7 +161,7 @@ class Scheduler:
             if not p["satisfied"] and not underscheduled:
                 record_broken_rules(player, tiers, fails, "game_count")
             # player min game count
-            if p["game_count"] < rules["min_games_total"]  and not underscheduled:
+            if p["game_count"] < rules["min_games_total"] and not underscheduled:
                 record_broken_rules(player, tiers, fails, "min_games_total")
             # player max game count
             if p["game_count"] > rules["max_games_total"]:
@@ -193,7 +202,7 @@ class Scheduler:
                     if gap > rules["max_week_gap"]:
                         record_failure = 0
                         for w in range(last_week, n):
-                            record_failure += (int(w in p["weeks_available"]))
+                            record_failure += int(w in p["weeks_available"])
                         if (gap - record_failure) > rules["max_week_gap"]:
                             record_broken_rules(player, tiers, fails, "max_week_gap")
                     last_week = n
@@ -249,14 +258,13 @@ class Scheduler:
                             gs.force_player_to_match(player_dict[p.id])
                         gs.captain = player_dict[event.captain.id]
                         gs.captain.captain_count += 1
-            scheduler = SingleFlightScheduleTool(flight.id, self.rules, players, gameslots, 0)
+            scheduler = SingleFlightScheduleTool(
+                flight.id, self.rules, players, gameslots, 0
+            )
             scheduler.finalize()
             res = self.evaluate(scheduler)
-            report = []
-            for d in sorted(res["details"], key=lambda x: x["tier"]):
-                r = parse_violation_human_readable(self.league, d)
-                if r is not None:
-                    report.append(r)
+            report = unpack_report(self.league, {"scheduler": scheduler, "res": res})
+            print(report)
             flight.report = report
         print("DONE")
 
@@ -270,34 +278,134 @@ class Scheduler:
         print("Scheduling " + self.flight.name)
         i = 0
         candidates = []
+        optimiser_eval = {'tier1 better':0, 'tier1 worse':0, 'tier2 better':0, 'tier2 worse':0}
         for _ in self.league.timeslots:
-            for _ in range(3):
+            for _ in range(2):
+            # for _ in range(3):
                 # print('setup')
                 scheduler = self.setup(i)
                 i += 1
                 # print('run')
                 scheduler.run()
                 # print('optimise')
+                r1 = self.evaluate(scheduler)
                 scheduler.optimise()
+                r2 = self.evaluate(scheduler)
+                if r2["tier1"] < r1["tier1"]:
+                    print()
+                    optimiser_eval['tier1 better'] += 1
+                    print(
+                        MAGENTA,
+                        "tier 1 issues reduced",
+                        r1["tier1"],
+                        r2["tier1"],
+                        RESET,
+                    )
+                if r2["tier1"] > r1["tier1"]:
+                    optimiser_eval['tier1 worse'] += 1
+                    print()
+                    print(
+                        RED, "tier 1 issues increased!", r1["tier1"], r2["tier1"], RESET
+                    )
+                    print(count_categories(r1["details"]))
+                    print(count_categories(r2["details"]))
+                if r2["tier2"] < r1["tier2"]:
+                    optimiser_eval['tier2 better'] += 1
+                    print(
+                        MAGENTA,
+                        "tier 2 issues reduced",
+                        r1["tier2"],
+                        r2["tier2"],
+                        RESET,
+                    )
+                if r2["tier2"] > r1["tier2"]:
+                    optimiser_eval['tier2 worse'] += 1
+                    print(
+                        RED, "tier 2 issues increased!", r1["tier2"], r2["tier2"], RESET
+                    )
+
                 # print('captains')
                 scheduler.assign_captains()
                 # print('finalize')
                 scheduler.finalize()
                 # print('eval')
                 res = self.evaluate(scheduler)
-                candidates.append({"scheduler": scheduler, "res": res})
+                candidates.append(
+                    {
+                        "scheduler": scheduler,
+                        "res": res,
+                        "mutate_value": i,
+                        "mutate_mode": scheduler.mutate_mode,
+                        "scheduler_mode": self.mode,
+                    }
+                )
         best_candidate = min(
             candidates, key=lambda x: (x["res"]["tier1"], x["res"]["tier2"])
         )
-        report = []
-        for d in sorted(best_candidate["res"]["details"], key=lambda x: x["tier"]):
-            r = parse_violation_human_readable(self.league, d)
-            if r is not None:
-                report.append(r)
-                print(r)
+        report = unpack_report(self.league, best_candidate)
         flight = self.build(best_candidate["scheduler"])
         flight.report = report
-        print("Done")
+        stats = best_candidate["mutate_mode"]
+        print(optimiser_eval)
+        return stats
+
+
+def unpack_report(league, candidate):
+    messages = {}
+    messages["min_games_total"] = "Underscheduled:"
+    messages["max_games_total"] = "Overscheduled:"
+    messages["min_captained"] = "Under Captain'd:"
+    messages["max_captained"] = "Over Captain'd:"
+    messages["overscheduled_lp"] = "Mostly Scheduled in Low Priority:"
+    messages["max_week_gap"] = "Large Week Gaps:"
+    messages["max_games_week"] = "Weekly Game Limit Exceeded:"
+    messages["max_games_day"] = "Daily Game Limit Exceeded:"
+    messages["max_repeat_compete"] = "Frequent Team Pairings:"
+
+    messages["underscheduled_on_purpose"] = "Mostly Unavailable:"
+    report = {}
+    for d in candidate["res"]["details"]:
+        br = d["broken_rule"]
+        if "max_repeat_compete" in br:
+            p1 = league.club.get_player_by_id(int(d["broken_rule"].split(":")[-1]))
+            p2 = league.club.get_player_by_id(d["player"])
+            order = sorted([p1.full_name, p2.full_name])
+            my_string = order[0] + " & " + order[1]
+            title = messages["max_repeat_compete"]
+
+            if "max_repeat_compete" in report:
+                report[title].add(my_string)
+            else:
+                report[title] = set([my_string])
+        else:
+            if br in messages:
+                title = messages[br]
+                if title in report:
+                    player = league.club.get_player_by_id(d["player"])
+                    report[title].add(player.full_name)
+                else:
+                    player = league.club.get_player_by_id(d["player"])
+                    report[title] = set([player.full_name])
+
+    print()
+    issue_count = 0
+    for key in report:
+        print(key)
+        issue_count += len(report[key])
+        report[key] = list(report[key])
+        for p in report[key]:
+            print("\t", p)
+    print("ISSUE COUNT", issue_count)
+    result = {"count": issue_count, "issues": report}
+    return result
+
+    # report = []
+    # for d in sorted(candidate["res"]["details"], key=lambda x: x["tier"]):
+    #     r = parse_violation_human_readable(league, d)
+    #     if r is not None:
+    #         report.append(r)
+    #         # print(r)
+    # return report
 
 
 def parse_violation_human_readable(league, violation):
@@ -331,7 +439,9 @@ def parse_violation_human_readable(league, violation):
     messages["max_week_gap"] = "has a large gap in weeks played."
     messages["max_games_week"] = "plays too many times in a week."
     messages["max_games_day"] = "plays too many times in a day."
-    messages["underscheduled_on_purpose"] = "was underscheduled due to low availability."
+    messages[
+        "underscheduled_on_purpose"
+    ] = "was underscheduled due to low availability."
 
     player = league.club.get_player_by_id(violation["player"])
     my_string = None
@@ -444,10 +554,12 @@ def generate_gameslot_availability_scores(gameslots, players):
         for p in players:
             if p.availability[gs.timeslot_id] == AVAILABLE:
                 gs.availability_score += p.availability_score
-            if p.availability[gs.timeslot_id] == AVAILABLE or p.availability[gs.timeslot_id] == AVAILABLE_LP:
+            if (
+                p.availability[gs.timeslot_id] == AVAILABLE
+                or p.availability[gs.timeslot_id] == AVAILABLE_LP
+            ):
                 p.days_available.add(gs.day_number)
                 p.weeks_available.add(gs.week_number)
-        
 
 
 def create_game_from_scheduler(league, game, flight=None):
@@ -546,6 +658,7 @@ def create_gameslot_objects(league, rules, check=True):
                 gameslots.append(gs)
     return gameslots
 
+
 # exception_fixers["min_games_total"] = min_games_total_exception
 # exception_fixers["max_games_total"] = None
 # exception_fixers["min_games_day"] = None
@@ -556,7 +669,6 @@ def create_gameslot_objects(league, rules, check=True):
 # exception_fixers["min_captained"] = None
 # exception_fixers["max_captained"] = None
 # exception_fixers["max_week_gap"] = None
-
 
 
 def find_player_exceptions(players, gameslots, rules):
@@ -575,9 +687,18 @@ def find_player_exceptions(players, gameslots, rules):
     """
     game_dict = {}
     for g in gameslots:
-        game_dict[g.timeslot_id] = {'day': g.day_number, 'week': g.week_number}
+        game_dict[g.timeslot_id] = {"day": g.day_number, "week": g.week_number}
     for p in players:
         count = p.potential_schedule_volume(game_dict, rules)
         if count < rules["min_games_total"]:
             p.rules["min_games_total"] = count
-    
+
+def count_categories(my_dict):
+    counter = {}
+    for key in my_dict:
+        br = key['broken_rule']
+        if br in counter:
+            counter[br] += 1
+        else:
+            counter[br] = 1
+    return counter
