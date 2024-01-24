@@ -569,6 +569,8 @@ class GameSlot:
                 res = True
         return res
     
+
+    # FIGURE OUT HOW THIS IS DUPLICATING PLAYERS!
     def swap_with_best_candidate(self, out_player, swap_candidates):
         """
         This function swaps two players between two games if it's beneficial to
@@ -583,13 +585,22 @@ class GameSlot:
 
         """
         if swap_candidates:
-            in_player = swap_candidates[0]['p']
-            if in_player in self.game_event:
-                print("ALREADY HERE")
-            if in_player == out_player:
-                print('same team')
-            o_game = swap_candidates[0]['g']
-            # self.remove_player_from_match(out_player)
-            # o_game.remove_player_from_match(in_player)
-            # self.force_player_to_match(in_player)
-            # o_game.force_player_to_match(out_player)
+            i = 0
+            can_swap = False
+            while i < len(swap_candidates):
+                in_player = swap_candidates[i]['p']
+                o_game = swap_candidates[i]['g']
+                c1 = in_player in self.game_event
+                c2 = in_player == out_player
+                c3 = out_player in o_game.game_event
+                c4 = self.week_number 
+                if c1 or c2 or c3:
+                    i += 1
+                else:
+                    can_swap = True
+                    break
+            if can_swap:
+                self.remove_player_from_match(out_player)
+                o_game.remove_player_from_match(in_player)
+                self.force_player_to_match(in_player)
+                o_game.force_player_to_match(out_player)

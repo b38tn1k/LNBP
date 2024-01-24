@@ -61,7 +61,8 @@ class Scheduler:
         """
         players = create_player_objects(self.flight, self.league, self.rules)
         gameslots = create_gameslot_objects(self.league, self.rules)
-        generateGameSlotAvailabilityScores(gameslots, players, self.rules)
+        generate_gameslot_availability_scores(gameslots, players)
+        find_player_exceptions(players, gameslots, self.rules)
         scheduler = SingleFlightScheduleTool(
             self.flight.id, self.rules, players, gameslots, mutate
         )
@@ -80,7 +81,8 @@ class Scheduler:
 
         """
         for e in scheduler.return_events():
-            flight = create_game_from_scheduler(self.league, e, flight=self.flight)
+            if len(e['players']) == len(set(e['players'])):
+                flight = create_game_from_scheduler(self.league, e, flight=self.flight)
         return flight
 
     def evaluate(self, scheduler):
@@ -128,6 +130,8 @@ class Scheduler:
         tiers["max_games_day"] = "tier1"
 
         tiers["max_repeat_compete"] = "tier2"
+
+        tiers["underscheduled_on_purpose"] = "tier2"
         max_repeat_compete = 0.5  # * game_count
 
         # tiers["players_per_match"] = "tier1"
@@ -139,11 +143,16 @@ class Scheduler:
         for player in player_check:
             p = player_check[player]
             rules = p["rules"]
+            underscheduled = False
+            # underscheduling
+            if rules["min_games_total"] < self.rules["min_games_total"]:
+                underscheduled = True
+                record_broken_rules(player, tiers, fails, "underscheduled_on_purpose")
             # player satisfied
-            if not p["satisfied"]:
+            if not p["satisfied"] and not underscheduled:
                 record_broken_rules(player, tiers, fails, "game_count")
             # player min game count
-            if p["game_count"] < rules["min_games_total"]:
+            if p["game_count"] < rules["min_games_total"]  and not underscheduled:
                 record_broken_rules(player, tiers, fails, "min_games_total")
             # player max game count
             if p["game_count"] > rules["max_games_total"]:
@@ -214,10 +223,11 @@ class Scheduler:
         """
         print("GENERATE REPORT")
         for flight in self.league.flights:
-            # flight = self.league.get_flight_by_id(self.flight_id)
+            flight.report = []
             gameslots = create_gameslot_objects(self.league, self.rules, check=False)
             players = create_player_objects(flight, self.league, self.rules)
-            generateGameSlotAvailabilityScores(gameslots, players, self.rules)
+            generate_gameslot_availability_scores(gameslots, players)
+            find_player_exceptions(players, gameslots, self.rules)
             player_dict = {}
             for p in players:
                 player_dict[p.id] = p
@@ -230,7 +240,6 @@ class Scheduler:
                     gameslots_dict[gs.facility_id][gs.timeslot_id] = gs
 
             for event in flight.game_events:
-                print(event)
                 fid = event.facility_id
                 tid = event.timeslot_id
                 if fid in gameslots_dict:
@@ -244,7 +253,6 @@ class Scheduler:
             scheduler.finalize()
             res = self.evaluate(scheduler)
             report = []
-            flight.report = []
             for d in sorted(res["details"], key=lambda x: x["tier"]):
                 r = parse_violation_human_readable(self.league, d)
                 if r is not None:
@@ -263,13 +271,19 @@ class Scheduler:
         i = 0
         candidates = []
         for _ in self.league.timeslots:
-            for _ in range(2):
+            for _ in range(3):
+                # print('setup')
                 scheduler = self.setup(i)
                 i += 1
+                # print('run')
                 scheduler.run()
+                # print('optimise')
                 scheduler.optimise()
+                # print('captains')
                 scheduler.assign_captains()
+                # print('finalize')
                 scheduler.finalize()
+                # print('eval')
                 res = self.evaluate(scheduler)
                 candidates.append({"scheduler": scheduler, "res": res})
         best_candidate = min(
@@ -281,10 +295,8 @@ class Scheduler:
             if r is not None:
                 report.append(r)
                 print(r)
-        for e in scheduler.return_events():
-            print(e['players'], len(e['players']) == len(set(e['players'])))
-        # flight = self.build(best_candidate["scheduler"])
-        # flight.report = report
+        flight = self.build(best_candidate["scheduler"])
+        flight.report = report
         print("Done")
 
 
@@ -319,6 +331,7 @@ def parse_violation_human_readable(league, violation):
     messages["max_week_gap"] = "has a large gap in weeks played."
     messages["max_games_week"] = "plays too many times in a week."
     messages["max_games_day"] = "plays too many times in a day."
+    messages["underscheduled_on_purpose"] = "was underscheduled due to low availability."
 
     player = league.club.get_player_by_id(violation["player"])
     my_string = None
@@ -415,7 +428,7 @@ def summarize_schedule(scheduler):
     return player_check
 
 
-def generateGameSlotAvailabilityScores(gameslots, players, rules):
+def generate_gameslot_availability_scores(gameslots, players):
     """
     This function generates the availability score for each game slot (gs) based
     on the availability of players (p) during that timeslot.
@@ -532,3 +545,26 @@ def create_gameslot_objects(league, rules, check=True):
                 gs = GameSlot(t.id, f.facility.id, t.since_y2k, rules)
                 gameslots.append(gs)
     return gameslots
+
+# exception_fixers["min_games_total"] = min_games_total_exception
+# exception_fixers["max_games_total"] = None
+# exception_fixers["min_games_day"] = None
+# exception_fixers["max_games_day"] = maxDoubleHeadersDay_exception
+# exception_fixers["min_games_week"] = None
+# exception_fixers["max_concurrent_games"] = None
+# exception_fixers["max_games_week"] = maxDoubleHeadersWeek_exception
+# exception_fixers["min_captained"] = None
+# exception_fixers["max_captained"] = None
+# exception_fixers["max_week_gap"] = None
+
+
+
+def find_player_exceptions(players, gameslots, rules):
+    game_dict = {}
+    for g in gameslots:
+        game_dict[g.timeslot_id] = {'day': g.day_number, 'week': g.week_number}
+    for p in players:
+        count = p.potential_schedule_volume(game_dict, rules)
+        if count < rules["min_games_total"]:
+            p.rules["min_games_total"] = count
+    

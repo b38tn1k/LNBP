@@ -2,65 +2,6 @@ import copy
 from .constants import *
 
 
-def min_games_total_exception(player):
-    """
-    This function sets the `min_games_total` rule of the `player` object to 0.
-
-    Args:
-        player (dict): In the provided function `min_games_total_exception`, the
-            `player` input parameter is not used. The function simply sets the
-            `min_games_total` attribute of the `player` object to zero.
-
-    """
-    player.rules["min_games_total"] = 0
-
-
-def maxDoubleHeadersDay_exception(player):
-    """
-    This function sets the maximum number of games a player can play per day and
-    per week to 2.
-
-    Args:
-        player (dict): The `player` input parameter is used to modify the rules
-            of a player's game day and week.
-
-    """
-    player.rules["max_games_day"] = 2
-    player.rules["max_games_week"] = 2
-
-
-def maxDoubleHeadersWeek_exception(player):
-    """
-    This function sets the `maxGamesWeek` rule for a given `player` to 2.
-
-    Args:
-        player (dict): The `player` input parameter is not used inside the function
-            `maxDoubleHeadersWeek_exception`.
-
-    """
-    player.rules["max_games_week"] = 2
-
-
-exception_fixers = {}
-exception_fixers["created"] = None
-exception_fixers["deleted"] = None
-exception_fixers["id"] = None
-exception_fixers["assume_busy"] = None
-exception_fixers["min_games_total"] = min_games_total_exception
-exception_fixers["max_games_total"] = None
-exception_fixers["min_games_day"] = None
-exception_fixers["max_games_day"] = maxDoubleHeadersDay_exception
-exception_fixers["min_games_week"] = None
-exception_fixers["max_concurrent_games"] = None
-exception_fixers["max_games_week"] = maxDoubleHeadersWeek_exception
-exception_fixers["min_captained"] = None
-exception_fixers["max_captained"] = None
-exception_fixers["max_week_gap"] = None
-exception_fixers["players_per_match"] = None
-exception_fixers["minimum_subs_per_game"] = None
-exception_fixers["league_id"] = None
-
-
 class Player:
     def __init__(self, id, rules, availability):  # flight_id, availability_template):
         """
@@ -105,14 +46,6 @@ class Player:
             elif value == AVAILABLE_LP:
                 self.availability_score += 0.5
 
-        # exceptions = []
-        # for key in self.rules['except']:
-        #     if self.id in self.rules['except'][key]:
-        #         exceptions.append(key)
-        # for key in exceptions:
-        #     exception_fixers[key](self)
-        # del self.rules['except']
-
     def __hash__(self):
         """
         This function defines an __hash__ method for an object.
@@ -122,6 +55,32 @@ class Player:
 
         """
         return self.id
+
+    def potential_schedule_volume(self, game_dict, rules):
+        schedule = {}
+        ts_day_counter = {}
+        for i in self.availability:
+            if self.availability[i] == UNK:
+                if self.rules["assume_busy"] is True:
+                    self.availability[i] = AVAILABLE
+                else:
+                    self.availability[i] = UNAVAILABLE
+            if self.availability[i] != UNAVAILABLE:
+                if i in game_dict:
+                    if game_dict[i]["week"] in schedule:
+                        schedule[game_dict[i]["week"]].append(game_dict[i]["day"])
+                    else:
+                        schedule[game_dict[i]["week"]] = [game_dict[i]["day"]]
+                    if game_dict[i]["day"] in ts_day_counter:
+                        ts_day_counter[game_dict[i]["day"]] += 1
+                    else:
+                        ts_day_counter[game_dict[i]["day"]] = 1
+
+        count_by_days = 0
+        for day in ts_day_counter:
+            count_by_days += min(ts_day_counter[day], rules["max_games_day"])
+        count_by_weeks = len(schedule) * rules["max_games_week"]
+        return min(count_by_weeks, count_by_days)
 
     def set_availability_score_relation(self, mean_score):
         """
@@ -176,8 +135,14 @@ class Player:
         """
         potentials = []
         for g in gameslots:
-            if self.availability[g.timeslot_id] == AVAILABLE or self.availability[g.timeslot_id] == AVAILABLE_LP:
-                if self.days.count(g.day_number) < self.rules["max_games_day"] and self.days.count(g.day_number) < self.rules["max_games_day"]:
+            if (
+                self.availability[g.timeslot_id] == AVAILABLE
+                or self.availability[g.timeslot_id] == AVAILABLE_LP
+            ):
+                if (
+                    self.days.count(g.day_number) < self.rules["max_games_day"]
+                    and self.days.count(g.day_number) < self.rules["max_games_day"]
+                ):
                     potentials.append(g)
         self.potentials = potentials
         return potentials
@@ -425,7 +390,7 @@ class Player:
 
         Returns:
             bool: Based on the code provided:
-            
+
             The output returned by this function is `AVAILABLE` or `AVAILABLE_LP`.
 
         """

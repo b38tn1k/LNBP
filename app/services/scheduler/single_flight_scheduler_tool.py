@@ -356,7 +356,12 @@ class SingleFlightScheduleTool:
         self.gameslots = sorted(self.gameslots, key=lambda gs: gs.availability_score)
         if self.mutate < len(ts):
             self.gameslots = shift_blocks(self.gameslots, self.mutate)
+            # print("SHIFTER")
+        elif self.mutate > 2*len(ts):
+            shuffle(self.gameslots)
+            # print("SHUFFLER")
         else:
+            # print("CARD DECK")
             self.gameslots = interlace_and_rotate(self.gameslots, self.mutate - len(ts))
         ts_list = []
         seen = set()
@@ -643,6 +648,16 @@ class SingleFlightScheduleTool:
             if good is True:
                 break
 
+    def get_underover_scheduled_players(self):
+        underscheduled = []
+        overscheduled = []
+        for p in self.players:
+            if p.game_count < p.rules["min_games_total"]:
+                underscheduled.append(p)
+            if p.game_count > p.rules["max_games_total"]:
+                overscheduled.append(p)
+        return underscheduled, overscheduled
+
     def fix_unscheduled_players(self):
         # find unsatisfied players
         """
@@ -652,13 +667,7 @@ class SingleFlightScheduleTool:
 
         """
         self.recalculate_players()
-        underscheduled = []
-        overscheduled = []
-        for p in self.players:
-            if p.game_count < p.rules["min_games_total"]:
-                underscheduled.append(p)
-            if p.game_count > p.rules["max_games_total"]:
-                overscheduled.append(p)
+        underscheduled, overscheduled = self.get_underover_scheduled_players()
         common_timeslots = {}
         for p in underscheduled:
             for timeslot_id, availability in p.availability.items():
@@ -698,10 +707,10 @@ class SingleFlightScheduleTool:
             if len(p.days) != len(set(p.days)):
                 double_headed_players.append(p)
 
-        if (
-            len(double_headed_players) > len(self.players) / 2
-        ):  # if it is going to be too much work, just give up
-            return False
+        # if (
+        #     len(double_headed_players) > len(self.players) / 2
+        # ):  # if it is going to be too much work, just give up
+        #     return False
 
         c = {}  # candidate ts and data collector, days first cause it might fix weeks
 
@@ -770,6 +779,7 @@ class SingleFlightScheduleTool:
                                     {"p": op, "g": gc}
                                 )  # other players and the candidate game they woudl swap from
                     source.swap_with_best_candidate(p, swap_candidates)
+                    self.recalculate_players()
 
         return True
 

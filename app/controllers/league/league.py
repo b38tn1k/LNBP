@@ -196,7 +196,6 @@ def schedule_league(id):
                     }
                 )
             elif data["contents"] == "schedule":
-                print("Hey")
                 s = Scheduler(
                     league, Scheduler.SINGLE_FLIGHT, flight_id=data["data"]["flight_id"]
                 )
