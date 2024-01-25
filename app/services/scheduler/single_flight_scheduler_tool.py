@@ -850,6 +850,20 @@ class SingleFlightScheduleTool:
         return games
     
     def get_possible_games_for_player(self, player):
+        """
+        This function get_possible_games_for_player() takes a player object as
+        input and returns a list of games that the player can play.
+
+        Args:
+            player (): The `player` input parameter passed to the function
+                `get_possible_games_for_player` is used to filter which games are
+                possible for that specific player.
+
+        Returns:
+            list: The output of this function is a list of `Game` objects for which
+            the given `player` has availability and the game is not full.
+
+        """
         games = []
         for g in self.gameslots:
             pa = player.availability[g.timeslot_id] != UNAVAILABLE

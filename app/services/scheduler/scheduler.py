@@ -716,6 +716,31 @@ def count_categories(my_dict):
     return counter
 
 def eval_optimiser(r1, r2, optimiser_eval):
+    """
+    This function compares two records (r1 and r2) and updates an evaluation object
+    (optimiser_eval) with information about which tier issues are better or worse.
+
+    Args:
+        r1 (dict): The `r1` input parameter is used as a reference point for
+            comparing the issues found by the two optimization strategies.
+        r2 (dict): In the provided code snippet `r2` is the second rational object
+            being compared to the first one `r1`.
+        optimiser_eval (dict): The `optimiser_eval` input parameter is used to
+            store the evaluation of the optimisation strategies.
+
+    Returns:
+        dict: The output returned by this function is a dictionary with the following
+        keys:
+        
+        	- 'tier1 better'
+        	- 'tier1 worse'
+        	- 'tier2 better'
+        	- 'tier2 worse'
+        
+        Each of these keys is a count of the number of issues reduced or increased
+        for that tier.
+
+    """
     if r2["tier1"] < r1["tier1"]:
         print()
         optimiser_eval['tier1 better'] += 1

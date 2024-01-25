@@ -288,6 +288,32 @@ document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".reveal-after").forEach((div) => (div.style.display = "block"));
 });
 
+/**
+* @description This function adds an event listener to all nav links and hides all
+* existing active state and information tabs.
+* 
+* @param { object } e - The `e` input parameter is an event object that contains
+* information about the click event that triggered the function.
+* 
+* @returns { object } This function takes an event object as an argument (e) and
+* performs the following actions:
+* 
+* 1/ Logs the event object to the console.
+* 2/ Removes the "active" class from all elements with the class ".nav-link".
+* 3/ Sets all elements with the class ".nav-info-tab" to hidden.
+* 4/ Adds the "active" class to the current element (e).
+* 5/ Retrieves the target attribute of the current element and logs it to the console.
+* 6/ Finds the element with the ID specified by the target attribute and sets its
+* hidden property to false.
+* 
+* The output returned by this function is:
+* 
+* 	- The current element with the class ".nav-link" has the "active" class added and
+* its ID is logged to the console.
+* 	- All elements with the class ".nav-info-tab" are set to hidden.
+* 	- The element with the ID specified by the target attribute is revealed (its
+* hidden property is set to false).
+*/
 function navClicker(e) {
     console.log(e);
     document.querySelectorAll(".nav-link").forEach((i) => {

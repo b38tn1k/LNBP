@@ -165,6 +165,12 @@ function renameRadio(el, target) {
     });
 }
 
+/**
+* @description This function iterates through all elements with the class
+* ".save-to-update-flash" and sets their inner HTML to "Save to update".
+* 
+* @returns {  } The output returned by this function is undefined.
+*/
 function doFlash() {
     elem = document.querySelectorAll(".save-to-update-flash");
     elem.forEach((i) => {
