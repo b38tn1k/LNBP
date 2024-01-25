@@ -1,0 +1,90 @@
+{% block body %}
+
+<div class="col-6">
+    <div class="card" style="flex: 1">
+        <div class="card-body">
+            <div class="flex-row class-title">
+                <h3 class="card-title">Schedule Tools</h3>
+                <button class="btn btn-primary" onclick="scheduleWizardButtonCallback()" id="run-schedule-wizard">
+                    <i class="fe fe-star"></i> Schedule All
+                </button>
+            </div>
+            <ul class="nav nav-tabs">
+                {% if league.flights %} {% set first_flight = league.flights | first %} {% for flight in league.flights
+                %}
+
+                <li class="nav-item">
+                    <a
+                        href="javascript:void(0);"
+                        onclick="navClicker(this)"
+                        class="nav-link flight-tab {% if flight == first_flight %}active{% endif %}"
+                        target="flight-tab-{{ flight.id }}"
+                    >
+                        <div>
+                            <div><strong>{{ flight.name }}</strong></div>
+                            <div class="light-weight-text">
+                                {% if flight.report %} {% if flight.report.count == 1 %}
+                                <div><span>{{ flight.report.count }} Issue</span></div>
+                                {% else %}
+                                <div><span>{{ flight.report.count }} Issues</span></div>
+                                {% endif %} {% else %}
+                                <div><span>0 Issues</span></div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </a>
+                </li>
+
+                {% set is_first_tab = false %} {% endfor %} {% endif %}
+
+                <li class="nav-item">
+                    <a
+                        href="javascript:void(0);"
+                        class="nav-link flight-tab"
+                        onclick="navClicker(this)"
+                        target="schedule-rules"
+                    >
+                        <div>
+                            <div><br /></div>
+                            <div>League Rules</div>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+            {% for flight in league.flights %}
+            <div class="nav-info-tab" id="flight-tab-{{ flight.id }}" {% if loop.index>
+                1 %} hidden {% endif %}>
+
+                {% if flight.report.count > 0 %} 
+                <h3 class="card-title">Issues</h3>
+                <div class="row">
+                    {% for key in flight.report.issues %}
+                    <div class="col-4" style="padding:1rem;">
+                        <div class="bordered-block" style="height:100%;">
+                            <strong>{{ key }}</strong>
+                            <ul>
+                                {% for p in flight.report.issues[key] %}
+                                <li>{{ p }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div><br /></div>
+                {%endif%}
+
+                <h3 class="card-title">Actions</h3>
+                <div class="gap-row">
+                    <button class="btn btn-primary col-3">Schedule {{flight.name}}</button>
+                    <button class="btn btn-primary col-3">Edit {{flight.name}}</button>
+                    <button class="btn btn-danger col-3">Clear {{flight.name}}</button>
+                </div>
+            </div>
+            {% endfor %}
+            <div class="nav-info-tab" id="schedule-rules" hidden>{% include 'league/league_schedule_rules.html' %}</div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

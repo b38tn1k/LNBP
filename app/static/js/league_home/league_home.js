@@ -1,18 +1,3 @@
-document.addEventListener("DOMContentLoaded", function () {
-    // document.getElementById("run-schedule-wizard").addEventListener("click", function () {
-    //     const data = {
-    //         msg: "schedule-all",
-    //     };
-    //     doFetch(data, null, null);
-    // });
-    // document.getElementById("test-email").addEventListener("click", function () {
-    //     const data = {
-    //         msg: "test-email",
-    //     };
-    //     doFetch(data, null, null);
-    // });
-});
-
 /**
 * @description This function prepares a button for loading by adding a spinner and
 * changing its appearance.

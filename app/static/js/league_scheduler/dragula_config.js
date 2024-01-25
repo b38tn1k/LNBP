@@ -164,6 +164,7 @@ function handleDragEnd(event) {
     let flight = parseInt(event.getAttribute("flight-id"));
     updatePlayerCards(flight);
     organiseAndDisplaySubs(flight);
+    doFlash();
 }
 
 /**

@@ -1,0 +1,282 @@
+{% block body %}
+<div class="row">
+    <div class="col-md-4 flex-col">
+        <div>
+            <p>Total games a player must play</p>
+            <div class="d-flex justify-content-between align-items-end">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="min_games_total">Minimum</label>
+                        <input
+                            class="form-control league-rules"
+                            type="number"
+                            id="min_games_total"
+                            name="min_games_total"
+                            {%
+                            if
+                            league.rules
+                            %}
+                            value="{{ league.rules.min_games_total }}"
+                            {%
+                            endif
+                            %}
+                        />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="max_games_total">Maximum</label>
+                        <input
+                            class="form-control league-rules"
+                            type="number"
+                            id="max_games_total"
+                            name="max_games_total"
+                            {%
+                            if
+                            league.rules
+                            %}
+                            value="{{ league.rules.max_games_total }}"
+                            {%
+                            endif
+                            %}
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <p>Number of players required to make a game</p>
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <input
+                            class="form-control league-rules"
+                            type="number"
+                            id="players_per_match"
+                            name="players_per_match"
+                            {%
+                            if
+                            league.rules
+                            %}
+                            value="{{ league.rules.players_per_match }}"
+                            {%
+                            endif
+                            %}
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <p>Maximum games a player can join in a week</p>
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <input
+                            class="form-control league-rules"
+                            type="number"
+                            id="max_games_week"
+                            name="max_games_week"
+                            {%
+                            if
+                            league.rules
+                            %}
+                            value="{{ league.rules.max_games_week }}"
+                            {%
+                            endif
+                            %}
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 flex-col">
+        <div>
+            <p>Games a player may play on a single day</p>
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="col-md-6" hidden>
+                    <div class="form-group">
+                        <label for="min_games_day">Minimum</label>
+                        <input
+                            class="form-control league-rules"
+                            type="number"
+                            id="min_games_day"
+                            name="min_games_day"
+                            {%
+                            if
+                            league.rules
+                            %}
+                            value="{{ league.rules.min_games_day }}"
+                            {%
+                            endif
+                            %}
+                        />
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="max_games_day">Maximum</label>
+                        <input
+                            class="form-control league-rules"
+                            type="number"
+                            id="max_games_day"
+                            name="max_games_day"
+                            {%
+                            if
+                            league.rules
+                            %}
+                            value="{{ league.rules.max_games_day }}"
+                            {%
+                            endif
+                            %}
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <p>Maximum weeks a player can go without a game</p>
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <input
+                            class="form-control league-rules"
+                            type="number"
+                            id="max_week_gap"
+                            name="max_week_gap"
+                            {%
+                            if
+                            league.rules
+                            %}
+                            value="{{ league.rules.max_week_gap }}"
+                            {%
+                            endif
+                            %}
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <p>Maximum days in league where the player may join multiple games</p>
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="col-md-12">
+                    <input
+                        class="form-control league-rules"
+                        type="number"
+                        id="max_double_headers"
+                        name="max_double_headers"
+                        {%
+                        if
+                        league.rules
+                        %}
+                        value="{{ league.rules.max_double_headers }}"
+                        {%
+                        endif
+                        %}
+                    />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 flex-col">
+        <div>
+            <p>Total games a player must captain</p>
+            <div class="d-flex justify-content-between align-items-end">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="min_games_total">Minimum</label>
+                        <input
+                            class="form-control league-rules"
+                            type="number"
+                            id="min_captained"
+                            name="min_captained"
+                            {%
+                            if
+                            league.rules
+                            %}
+                            value="{{ league.rules.min_captained }}"
+                            {%
+                            endif
+                            %}
+                        />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="max_games_total">Maximum</label>
+                        <input
+                            class="form-control league-rules"
+                            type="number"
+                            id="max_captained"
+                            name="max_captained"
+                            {%
+                            if
+                            league.rules
+                            %}
+                            value="{{ league.rules.max_captained }}"
+                            {%
+                            endif
+                            %}
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <p>Minimum subs required to schedule a game</p>
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <input
+                            class="form-control league-rules"
+                            type="number"
+                            id="minimum_subs_per_game"
+                            name="minimum_subs_per_game"
+                            step="0.1"
+                            {%
+                            if
+                            league.rules
+                            %}
+                            value="{{ league.rules.minimum_subs_per_game }}"
+                            {%
+                            endif
+                            %}
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <p>If a player has not provided availability...</p>
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <select id="assume_busy" name="assume_busy" class="custom-select league-rules">
+                            {% if league.rules %} {% if league.rules.assume_busy %}
+                            <option value="assume_busy">Assume Unavailable</option>
+                            <option value="assume_free">Assume Free</option>
+                            {% else %}
+                            <option value="assume_free">Assume Free</option>
+                            <option value="assume_busy">Assume Unavailable</option>
+                            {% endif %} {% else %}
+                            <option value="assume_busy">Assume Unavailable</option>
+                            <option value="assume_free">Assume Free</option>
+                            {% endif %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

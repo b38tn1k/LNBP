@@ -168,7 +168,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const dates = document.querySelectorAll(".timeslot_header");
     for (let date of dates) {
         dateString = date.getAttribute("startTime");
-        timeslot = date.getAttribute("ts")
+        timeslot = date.getAttribute("ts");
         flatpickr(date, {
             defaultDate: new Date(date.getAttribute("startTime")),
             enableTime: true,
@@ -197,7 +197,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 for (let otherDate of dates) {
                     const otherTimeslot = otherDate.getAttribute("ts");
                     if (otherTimeslot === timeslot) {
-                        console.log(otherDate)
+                        console.log(otherDate);
                         // TODO: Update matching dates
                     }
                 }
@@ -257,16 +257,18 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     const addPlayerButton = document.getElementById("add-player-button");
-    addPlayerButton.addEventListener("click", () => {
-        const playerSelector = document.getElementById("add_player_select");
-        const playerID = parseInt(playerSelector.value);
-        const playerName = playerSelector.options[playerSelector.selectedIndex].textContent;
-        const flightID = parseInt(document.getElementById("add_player_flight_select").value);
-        if (playerID != -1 && flightID != -1) {
-            updateDelta(new Diff("add_player_to_league", { player: playerID, flight: flightID }, 0));
-            addNewPlayerToFlight(playerName, playerID, flightID);
-        }
-    });
+    if (addPlayerButton) {
+        addPlayerButton.addEventListener("click", () => {
+            const playerSelector = document.getElementById("add_player_select");
+            const playerID = parseInt(playerSelector.value);
+            const playerName = playerSelector.options[playerSelector.selectedIndex].textContent;
+            const flightID = parseInt(document.getElementById("add_player_flight_select").value);
+            if (playerID != -1 && flightID != -1) {
+                updateDelta(new Diff("add_player_to_league", { player: playerID, flight: flightID }, 0));
+                addNewPlayerToFlight(playerName, playerID, flightID);
+            }
+        });
+    }
 
     document
         .querySelectorAll(".schedule-table")
@@ -280,75 +282,95 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     document.getElementById("save-button").addEventListener("click", saveButtonCallback);
-    document.getElementById("push-timeslot-button").addEventListener("click", pushTimeSlot);
-    document.getElementById("pop-timeslot-button").addEventListener("click", popTimeSlot);
+    // document.getElementById("push-timeslot-button").addEventListener("click", pushTimeSlot);
+    // document.getElementById("pop-timeslot-button").addEventListener("click", popTimeSlot);
 
     document.querySelectorAll(".reveal-after").forEach((div) => (div.style.display = "block"));
 });
 
+function navClicker(e) {
+    console.log(e);
+    document.querySelectorAll(".nav-link").forEach((i) => {
+        i.classList.remove("active");
+    });
+
+    document.querySelectorAll(".nav-info-tab").forEach((i) => {
+        i.hidden=true;
+    });
+
+    
+    e.classList.add("active");
+    let target = e.getAttribute('target')
+    console.log(target);
+    let info = document.getElementById(target);
+    info.hidden = false;
+
+    
+}
+
 /**
-* @description This function decrements a counter called `pushTSCounter` and updates
-* the value of an HTML attribute called `starttime` based on the previous value of
-* `pushTSCounter`.
-* 
-* @returns {  } Based on the code provided:
-* 
-* The `pushTimeSlot()` function:
-* 
-* 1/ Decrements the `pushTSCounter` variable by 1.
-* 2/ Queryes all elements with the class name `.schedule-table` (presumably a table
-* containing schedules).
-* 3/ Selects the first (`0`) element of the array using `querySelector()` and retrieves
-* the `<thead>` element within it.
-* 4/ Selects the `<tr>` element within the `<thead>`, and then selects all the `<th>`
-* elements within that row using `querySelectorAll()`.
-* 5/ Retrieves the text content of the last `<th>` element (based on the `starttime`
-* attribute).
-* 6/ Updates a Diff object with the "push_time_slot" key and the values `pushTSCounter`,
-* `starttime`.
-* 
-* The output of this function would be the text content of the last `<th>` element
-* within the first table (in the .schedule-table class), after subtracting 1 from
-* the pushTSCounter variable.
-*/
+ * @description This function decrements a counter called `pushTSCounter` and updates
+ * the value of an HTML attribute called `starttime` based on the previous value of
+ * `pushTSCounter`.
+ *
+ * @returns {  } Based on the code provided:
+ *
+ * The `pushTimeSlot()` function:
+ *
+ * 1/ Decrements the `pushTSCounter` variable by 1.
+ * 2/ Queryes all elements with the class name `.schedule-table` (presumably a table
+ * containing schedules).
+ * 3/ Selects the first (`0`) element of the array using `querySelector()` and retrieves
+ * the `<thead>` element within it.
+ * 4/ Selects the `<tr>` element within the `<thead>`, and then selects all the `<th>`
+ * elements within that row using `querySelectorAll()`.
+ * 5/ Retrieves the text content of the last `<th>` element (based on the `starttime`
+ * attribute).
+ * 6/ Updates a Diff object with the "push_time_slot" key and the values `pushTSCounter`,
+ * `starttime`.
+ *
+ * The output of this function would be the text content of the last `<th>` element
+ * within the first table (in the .schedule-table class), after subtracting 1 from
+ * the pushTSCounter variable.
+ */
 function pushTimeSlot() {
     pushTSCounter -= 1;
     schedules = document.querySelectorAll(".schedule-table");
     const tableHead = schedules[0].querySelector("thead");
     const headerRow = tableHead.querySelector("tr");
     const headerColumns = headerRow.querySelectorAll("th");
-    starttime = headerColumns[headerColumns.length - 1].getAttribute('starttime')
+    starttime = headerColumns[headerColumns.length - 1].getAttribute("starttime");
     updateDelta(new Diff("push_time_slot", pushTSCounter, starttime));
 }
 
 // Define the function for the "popTimeSlot" event handler
 /**
-* @description This function does nothing because it is undefined.
-* 
-* @returns { any } The function `popTimeSlot()` will log the message "Pop Time Slot
-* button clicked!" to the console.
-*/
+ * @description This function does nothing because it is undefined.
+ *
+ * @returns { any } The function `popTimeSlot()` will log the message "Pop Time Slot
+ * button clicked!" to the console.
+ */
 function popTimeSlot() {
     // Add your logic for popping a timeslot here
     console.log("Pop Time Slot button clicked!");
 }
 
 /**
-* @description The provided JavaScript function `alignRules` takes two input elements
-* with `value` properties (`min` and `max`), and updates the `value` property of the
-* `max` element to be equal to the value of the `min` element if the former is greater
-* than the latter.
-* 
-* @param { object } min - The `min` input parameter specifies the smaller value of
-* the two arrays being compared.
-* 
-* @param { object } max - The `max` input parameter is passed by reference and updated
-* within the function to be set equal to the value of `min` if `min` is greater than
-* `max`.
-* 
-* @returns { any } The function `alignRules` takes two parameters `min` and `max`,
-* both of which are `HTMLInputElement` objects representing input fields.
-*/
+ * @description The provided JavaScript function `alignRules` takes two input elements
+ * with `value` properties (`min` and `max`), and updates the `value` property of the
+ * `max` element to be equal to the value of the `min` element if the former is greater
+ * than the latter.
+ *
+ * @param { object } min - The `min` input parameter specifies the smaller value of
+ * the two arrays being compared.
+ *
+ * @param { object } max - The `max` input parameter is passed by reference and updated
+ * within the function to be set equal to the value of `min` if `min` is greater than
+ * `max`.
+ *
+ * @returns { any } The function `alignRules` takes two parameters `min` and `max`,
+ * both of which are `HTMLInputElement` objects representing input fields.
+ */
 function alignRules(min, max) {
     if (parseInt(min.value) > parseInt(max.value)) {
         max.value = parseInt(min.value);
@@ -356,23 +378,23 @@ function alignRules(min, max) {
 }
 
 /**
-* @description This function takes an array of league rules and updates the values
-* for each rule. It aligns the minimum and maximum values for certain rules (games
-* total/day), and converts values to appropriate data types (integer/float).
-* 
-* @param { object } event - The `event` input parameter is not used or referenced
-* within the provided code snippet.
-* 
-* @param { object } allRules - The `allRules` input parameter is an array of all the
-* league rules that are being updated.
-* 
-* @returns { object } Based on the code provided:
-* 
-* The `leagueRulesChangeCallback` function takes two parameters: `event` and `allRules`.
-* It updates the `minGT`, `maxGT`, `minGD`, `maxGD`, `minC`, and `maxC` variables
-* with the values from the `allRules` array. It then aligns the rules using the
-* `alignRules` function.
-*/
+ * @description This function takes an array of league rules and updates the values
+ * for each rule. It aligns the minimum and maximum values for certain rules (games
+ * total/day), and converts values to appropriate data types (integer/float).
+ *
+ * @param { object } event - The `event` input parameter is not used or referenced
+ * within the provided code snippet.
+ *
+ * @param { object } allRules - The `allRules` input parameter is an array of all the
+ * league rules that are being updated.
+ *
+ * @returns { object } Based on the code provided:
+ *
+ * The `leagueRulesChangeCallback` function takes two parameters: `event` and `allRules`.
+ * It updates the `minGT`, `maxGT`, `minGD`, `maxGD`, `minC`, and `maxC` variables
+ * with the values from the `allRules` array. It then aligns the rules using the
+ * `alignRules` function.
+ */
 function leagueRulesChangeCallback(event, allRules) {
     newRules = {};
     let minGT, maxGT, minGD, maxGD, minC, maxC;
@@ -411,7 +433,7 @@ function leagueRulesChangeCallback(event, allRules) {
             } else {
                 value = parseInt(value);
             }
-            
+
             if (value < 0) {
                 rule.value = 0;
                 value = 0;
@@ -423,33 +445,34 @@ function leagueRulesChangeCallback(event, allRules) {
 }
 
 /**
-* @description This function saves the data represented by the `delta` variable to
-* the server via a web request.
-* 
-* @param { object } event - The `event` parameter is not used anywhere inside the
-* `saveButtonCallback` function. It is passed as an argument to the function but is
-* not referred to or utilized within the code.
-* 
-* @returns {  } This function takes an `event` parameter and returns nothing (i.e.,
-* it does not return a value).
-*/
+ * @description This function saves the data represented by the `delta` variable to
+ * the server via a web request.
+ *
+ * @param { object } event - The `event` parameter is not used anywhere inside the
+ * `saveButtonCallback` function. It is passed as an argument to the function but is
+ * not referred to or utilized within the code.
+ *
+ * @returns {  } This function takes an `event` parameter and returns nothing (i.e.,
+ * it does not return a value).
+ */
 function saveButtonCallback(event) {
     const saveString = JSON.stringify(delta);
-    sendToServer(saveString);
+    sendToServer({'msg': 'save', 'data': saveString});
 }
 
 /**
-* @description This function sends a POST request to the current URL with the given
-* data and handles the response from the server.
-* 
-* @param { object } data - The `data` input parameter is passed to the fetch API as
-* the body of the request.
-* 
-* @returns { Promise } This function takes a `data` parameter and sends it to the
-* server using fetch API. It then handles the response from the server and logs
-* messages to the console.
-*/
-function sendToServer(data) {
+ * @description This function sends a POST request to the current URL with the given
+ * data and handles the response from the server.
+ *
+ * @param { object } data - The `data` input parameter is passed to the fetch API as
+ * the body of the request.
+ *
+ * @returns { Promise } This function takes a `data` parameter and sends it to the
+ * server using fetch API. It then handles the response from the server and logs
+ * messages to the console.
+ */
+
+function sendToServer(data, success=null, failure=null) {
     const currentUrl = window.location.href;
     const csrf_token = document.querySelector('#hidden-form input[name="csrf_token"]').value;
 
@@ -470,33 +493,68 @@ function sendToServer(data) {
         .then((data) => {
             if (data.status === "success") {
                 console.log("Data successfully ingested by server.");
-                window.location.reload();
+                if (success){
+                    success();
+                }
             } else {
                 console.log("Failure: ", data.error);
+                if (failure){
+                    failure();
+                }
             }
         })
         .catch((error) => console.log("Fetch error: ", error));
 }
 
+
+// function sendToServer(data) {
+//     const currentUrl = window.location.href;
+//     const csrf_token = document.querySelector('#hidden-form input[name="csrf_token"]').value;
+
+//     fetch(currentUrl, {
+//         method: "POST",
+//         headers: {
+//             "Content-Type": "application/json",
+//             "X-CSRFToken": csrf_token,
+//         },
+//         body: JSON.stringify(data),
+//     })
+//         .then((response) => {
+//             if (!response.ok) {
+//                 return Promise.reject("Fetch failed; Server responded with " + response.status);
+//             }
+//             return response.json();
+//         })
+//         .then((data) => {
+//             if (data.status === "success") {
+//                 console.log("Data successfully ingested by server.");
+//                 window.location.reload();
+//             } else {
+//                 console.log("Failure: ", data.error);
+//             }
+//         })
+//         .catch((error) => console.log("Fetch error: ", error));
+// }
+
 /**
-* @description This function adds a new player to a flight table by cloning an
-* existing row and modifying its content with the given player name and ID.
-* 
-* @param { string } playerName - The `playerName` input parameter specifies the name
-* of the player to be added to the flight.
-* 
-* @param { string } playerID - The `playerID` input parameter is used to set the
-* `playerID` attribute for each new row added to the flight table.
-* 
-* @param { number } flightID - The `flightID` input parameter identifies which flight
-* the new player should be added to.
-* 
-* @returns { object } The `addNewPlayerToFlight` function takes three arguments:
-* `playerName`, `playerID`, and `flightID`. It first finds the target table with the
-* given flight ID and clones the first row of its tbody element. It then modifies
-* the content of the cloned row by setting the player name and player ID attributes.
-* Next it updates the availability cells and macro buttons on the row using event listeners.
-*/
+ * @description This function adds a new player to a flight table by cloning an
+ * existing row and modifying its content with the given player name and ID.
+ *
+ * @param { string } playerName - The `playerName` input parameter specifies the name
+ * of the player to be added to the flight.
+ *
+ * @param { string } playerID - The `playerID` input parameter is used to set the
+ * `playerID` attribute for each new row added to the flight table.
+ *
+ * @param { number } flightID - The `flightID` input parameter identifies which flight
+ * the new player should be added to.
+ *
+ * @returns { object } The `addNewPlayerToFlight` function takes three arguments:
+ * `playerName`, `playerID`, and `flightID`. It first finds the target table with the
+ * given flight ID and clones the first row of its tbody element. It then modifies
+ * the content of the cloned row by setting the player name and player ID attributes.
+ * Next it updates the availability cells and macro buttons on the row using event listeners.
+ */
 function addNewPlayerToFlight(playerName, playerID, flightID) {
     // Find flight table
     const flightTables = document.querySelectorAll(".flight-sub-table");
@@ -744,4 +802,111 @@ function handleFlightTableClick(event) {
                 break;
         }
     }
+}
+
+/**
+* @description This function prepares a button for loading by adding a spinner and
+* changing its appearance.
+* 
+* @returns {  } The function `scheduleWizardButtonCallback` takes no arguments and
+* returns nothing (it is a void function). It sets up a button's loading state using
+* `setButtonLoading`, prepares data to be sent to the server via `sendToServer`, and
+* defines two callback functions: `success` and `failure`. The output returned by
+* this function is nothing; it does not return any values.
+*/
+function scheduleWizardButtonCallback() {
+    let button = document.getElementById("run-schedule-wizard");
+    let loaderClass = setButtonLoading(button, "fe-star")
+
+    const data = {
+        msg: "schedule-all",
+    };
+
+/**
+* @description This function updates the appearance of a button using various CSS
+* classes to display a check mark and a success icon (a star) after a successful operation.
+* 
+* @returns { any } This function does not return any value or output.
+*/
+    function success() {
+        flashButtonResult(button, "fe-check-circle", "fg-success", loaderClass, "fe-star");
+        window.location.reload();
+
+    }
+
+/**
+* @description This function sets the button's icon to a failuresymbol with a red
+* border and star rating.
+* 
+* @returns { any } The output returned by the `failure` function is:
+* 
+* 	- A flashing button with the button identifier `button`, displaying a "x" circle
+* icon and the text "fg-failure".
+*/
+    function failure() {
+        flashButtonResult(button, "fe-x-circle", "fg-failure", loaderClass, "fe-star");
+        window.location.reload();
+
+    }
+    sendToServer(data, success, failure);
+}
+
+/**
+* @description This function sets the loading state of a button by adding a "fe-loader"
+* class to the button's icon element (represented by "r") and removing any previously
+* assigned "defaultClass".
+* 
+* @param { object } button - The `button` input parameter is used to select the
+* button element that should have its loading state changed.
+* 
+* @param { string } defaultClass - The `defaultClass` input parameter is used to
+* specify a default class that will be removed from the icon element before adding
+* the "fe-loader" class.
+* 
+* @returns { string } The function `setButtonLoading()` takes a button element and
+* a default class as arguments. It removes the default class from the button's icon
+* (represented by an `i` element) and adds the class "fe-loader". The output returned
+* by the function is the name of the added class i.e.
+*/
+function setButtonLoading(button, defaultClass) {
+    let r = button.querySelector("i");
+    r.classList.remove(defaultClass);
+    r.classList.add("fe-loader");
+    return "fe-loader";
+}
+
+/**
+* @description This function toggles the class names "c1" and "c2" on an i-tag within
+* a button element for 1 second before reverting back to the default class "defaultClass".
+* 
+* @param {  } button - The `button` input parameter is not used anywhere within the
+* provided function implementation.
+* 
+* @param { string } c1 - In the given function `flashButtonResult`, the `c1` parameter
+* is used to add a class to the element (`i`) immediately after removing the `removableClass`.
+* 
+* @param { string } c2 - The `c2` input parameter adds a second class to the button's
+* icon element (represented by the `i` selector) that will be applied for one second
+* before being removed.
+* 
+* @param { string } removableClass - The `removableClass` input parameter is used
+* to specify a class name that should be removed from the button's "i" element
+* immediately after adding the `c1` and `c2` classes.
+* 
+* @param { string } defaultClass - The `defaultClass` parameter is used to set the
+* class that will be added to the `i` element after the animation finishes (i.e.,
+* after 1 second).
+* 
+* @returns { any } This function takes five arguments: `button`, `c1`, `c2`,
+* `removableClass`, and `defaultClass`. It selects an icon element within the button
+* using `querySelector` and adds two classes `c1` and `c2` to it.
+*/
+function flashButtonResult(button, c1, c2, removableClass, defaultClass) {
+    let r = button.querySelector("i");
+    r.classList.remove(removableClass);
+    r.classList.add(c1, c2);
+    setTimeout(function () {
+        r.classList.remove(c1, c2);
+        r.classList.add(defaultClass);
+    }, 1000);
 }

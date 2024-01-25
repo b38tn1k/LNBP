@@ -749,6 +749,8 @@ class SingleFlightScheduleTool:
         for p in self.players:
             if len(p.days) != len(set(p.days)):
                 double_headed_players.append(p)
+        if len(double_headed_players) == 0:
+            return
 
         # if (
         #     len(double_headed_players) > len(self.players) / 2
@@ -821,7 +823,6 @@ class SingleFlightScheduleTool:
                                 )  # other players and the candidate game they woudl swap from
                     source.swap_with_best_candidate(p, swap_candidates)
                     self.recalculate_players()
-        return True
 
     def get_available_games_for_player(self, player):
         """
@@ -847,6 +848,17 @@ class SingleFlightScheduleTool:
             if pa and g.full and not pin:
                 games.append(g)
         return games
+    
+    def get_possible_games_for_player(self, player):
+        games = []
+        for g in self.gameslots:
+            pa = player.availability[g.timeslot_id] != UNAVAILABLE
+            pin = g.player_in_game(player)
+            if pa and g.full and not pin:
+                games.append(g)
+        return games
+    
+    
 
     def get_available_players_for_game(self, game):
         """
@@ -882,14 +894,24 @@ class SingleFlightScheduleTool:
         entities can be matched successfully.
 
         """
+        self.recalculate_players()
         minor_conflicts = []
         for g in self.gameslots:
             if g.full is True:
                 for p in g.game_event:
                     if p.availability[g.timeslot_id] == AVAILABLE_LP:
                         minor_conflicts.append({"player": p, "game": g})
+        mcfilter = {}
+        for mc in minor_conflicts:
+            if mc['player'].id in mcfilter:
+                mcfilter[mc['player'].id] += 1
+            else:
+                mcfilter[mc['player'].id] = 1
+
         for mc in minor_conflicts:
             player = mc["player"]
+            if mcfilter[player.id] < (player.game_count)/2:
+                continue
             game = mc["game"]
             uf_games_for_player = self.get_available_games_for_player(player)
             filtered_gfp = []
@@ -920,6 +942,7 @@ class SingleFlightScheduleTool:
                             candidates.append({"p": p, "g": g})
             if len(candidates) != 0:
                 game.swap_with_best_candidate(p, candidates)
+                self.recalculate_players()
 
     def balance_unscheduled_players(self):
         """
@@ -932,16 +955,14 @@ class SingleFlightScheduleTool:
 
         """
         self.recalculate_players()
-        print("BALANCE UNDERSCHEDULED")
         underscheduled, overscheduled = self.get_underover_scheduled_players()
         gc = [p.game_count for p in underscheduled]
         if len(gc) == 0:
             return
         average = math.ceil(sum(gc)/len(gc))
         freebies = [p for p in underscheduled if p.game_count < average] #players who get a game at the expense of other scheduled players
-        print([p.game_count for p in underscheduled])
         for p in freebies:
-            games = self.get_available_games_for_player(p)
+            games = self.get_possible_games_for_player(p)
             ideas = []
             for g in games:
                 added = False
@@ -957,28 +978,18 @@ class SingleFlightScheduleTool:
                         swapper = max(cands, key=lambda x: x.availability_score)
                     if swapper:
                         ideas.append({'player': swapper, 'overscheduled': iovs, 'target_game': g, 'availability_score': swapper.availability_score})
+                
             if ideas:
-                print('swapping')
-                ideas[0]['target_game'].remove_player_from_match(ideas[0]['player'])
-                ideas[0]['target_game'].force_player_to_match(p)
-
-            # final_candidate_swap = None
-            # g = None
-            # for idea in ideas:
-            #     if idea['overscheduled']:
-            #         final_candidate_swap = idea['player']
-            #         g = idea['target_game']
-            
-            # if final_candidate_swap is None and ideas:
-            #     idea = max(ideas, key=lambda x: x['availability_score'])
-            #     final_candidate_swap = idea['player']
-            #     g = idea['target_game']
-
-            # if final_candidate_swap:
-            #     g.remove_player_from_match(swapper)
-            #     g.force_player_to_match(p)
-        print([p.game_count for p in underscheduled])
-        print("BALANCE UNDERSCHEDULED - DONE")
+                target = ideas[0]
+                for i in ideas:
+                    # print("swap", p.id, 'game count',p.game_count, "to", i['target_game'].timeslot_id, "replacing", i['player'].id, 'who has ascore', i['player'].availability_score, 'game count', i['player'].game_count)
+                    if i['overscheduled'] is True:
+                        target = i
+                        break
+                    if i['player'].availability_score > target['player'].availability_score:
+                        target = i
+                target['target_game'].remove_player_from_match(ideas[0]['player'])
+                target['target_game'].force_player_to_match(p)
 
     def optimise(self):
         """
@@ -989,7 +1000,8 @@ class SingleFlightScheduleTool:
         self.recalculate_players()
         self.balance_unscheduled_players()
         keep_trying = self.fix_unscheduled_players()
-        if keep_trying:
-            self.fix_double_players()
-            self.fix_lp_schedules()
+        self.fix_double_players()
+        # if keep_trying:
+        #     self.fix_double_players()
+        #     # self.fix_lp_schedules()
             

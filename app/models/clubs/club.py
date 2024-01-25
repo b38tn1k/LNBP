@@ -86,9 +86,10 @@ class Club(Model):
         WHITE = "\033[97m"
         RESET = "\033[0m"
 
-        print(RED, "CLUB ALGO STATS", RESET)
+        print(RED, "Algorithm Stats", RESET)
         for key in self.bg_statistics:
             print("  ", MAGENTA, key, RESET , self.bg_statistics[key])
+        print("Most Recent Success: ", item)
 
     # Relationships and other methods as required
     @transaction

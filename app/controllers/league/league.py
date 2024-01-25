@@ -48,65 +48,6 @@ def check_for_membership(*args, **kwargs):
 @login_required
 def league_home(id):
     """
-    This function renders the "league/league_home.html" template with data specific
-    to the current user's club and league (passed as `league` and `club`), checks
-    if the user is authenticated and has a primary membership ID (and displays an
-    error message if not), and redirects to the "main.home" page if no league with
-    the given ID could be found.
-
-    Args:
-        id (int): The `id` input parameter passes an identifier to the function
-            and allows it to fetch a specific League that corresponds with the identifier.
-
-    Returns:
-        str: Based on the code provided:
-
-        The output returned by `league_home(id)` is a HTML page with the name "league/league_home.html"
-
-    """
-    if not current_user.is_authenticated or current_user.primary_membership_id is None:
-        flash("You currently do not have accesss to app", "warning")
-        return redirect(url_for("main.home"))
-    league = current_user.club.get_league_by_id(id)
-    if league is None:
-        return redirect(url_for("main.home"))
-
-    if request.method == "POST":
-        try:
-            data = request.json
-            if data["msg"] == "test-email":
-                email = "Test Email"
-                print(email)  # to do
-            if data["msg"] == "schedule-all":
-                league.delete_all_game_events()
-                db.session.commit()
-                print("Schedule All")
-                for flight in league.flights:
-                    s = Scheduler(league, Scheduler.SINGLE_FLIGHT, flight_id=flight.id)
-                    stats = s.run()
-                    current_user.club.update_statistics(stats)
-                    db.session.commit()
-                for flight in league.flights: #runs better the second time after some prepopulation :-/
-                    s = Scheduler(league, Scheduler.SINGLE_FLIGHT, flight_id=flight.id)
-                    stats = s.run()
-                    current_user.club.update_statistics(stats)
-                    db.session.commit()
-            return jsonify({"status": "success"})
-        except Exception as e:
-            return jsonify({"status": "failure", "error": str(e)})
-
-    return render_template(
-        "league/league_home.html",
-        simple_form=SimpleForm(),
-        league=league,
-        club=current_user.club,
-    )
-
-
-@blueprint.route("/edit/<int:id>", methods=["GET", "POST"])
-@login_required
-def edit_league(id):
-    """
     This function named `edit_league` redirects the user to the home page if they
     don't have access or if the specified league doesn't exist.
 
@@ -128,10 +69,27 @@ def edit_league(id):
         return redirect(url_for("main.home"))
     if request.method == "POST":
         try:
-            apply_edits(league, json.loads(request.json))
-            db.session.commit()
-            flash("League updated successfully.", "success")
-            return jsonify({"status": "success"})
+            data = request.json
+            if data['msg'] == 'save':
+                apply_edits(league, json.loads(data['data']))
+                db.session.commit()
+                # flash("League updated successfully.", "success")
+                return jsonify({"status": "success"})
+            if data["msg"] == "schedule-all":
+                league.delete_all_game_events()
+                db.session.commit()
+                print("Schedule All")
+                for flight in league.flights:
+                    s = Scheduler(league, Scheduler.SINGLE_FLIGHT, flight_id=flight.id)
+                    stats = s.run()
+                    current_user.club.update_statistics(stats)
+                    db.session.commit()
+                for flight in league.flights: #runs better the second time after some prepopulation :-/
+                    s = Scheduler(league, Scheduler.SINGLE_FLIGHT, flight_id=flight.id)
+                    stats = s.run()
+                    current_user.club.update_statistics(stats)
+                    db.session.commit()
+                return jsonify({"status": "success"})
         except Exception as e:
             return jsonify({"status": "failure", "error": str(e)})
 

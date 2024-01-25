@@ -35,16 +35,6 @@
                                             <td>{{ league['start_date'] }}</td>
                                             <td>{{ league['end_date'] }}</td>
                                             <td>{{ league['player_count'] }}</td>
-                                            <!-- <td>
-                                                <a href="{{ url_for('league.edit_league', id=league['id']) }}" class="btn btn-primary">
-                                                    <i class="fe fe-edit"></i>
-                                                </a>
-                                            </td>
-                                            <td>
-                                                <a href="{{ url_for('league.schedule_league', id=league['id']) }}" class="btn btn-primary">
-                                                    <i class="fe fe-star"></i>
-                                                </a>
-                                            </td> -->
                                             <td>
                                                 <a href="{{ url_for('league.delete_league', id=league['id']) }}" class="btn btn-danger">
                                                     <i class="fe fe-trash"></i>

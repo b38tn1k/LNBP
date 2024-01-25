@@ -4,13 +4,7 @@
         <div class="card-header">League Info</div>
         <div class="card-body">{%include 'league/edit_info_form.html' %}</div>
     </div>
-    <div
-        id="infoElement"
-        leagueName="{{ league.name }}"
-        leagueGameDuration="{{league.get_game_duration()}}"
-        leagueType="{{league.type}}"
-        flightCount="{{ league.flights|length }}"
-    ></div>
+    
 </div>
 
 {% endblock %}

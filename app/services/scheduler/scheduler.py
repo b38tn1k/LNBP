@@ -280,8 +280,7 @@ class Scheduler:
         candidates = []
         optimiser_eval = {'tier1 better':0, 'tier1 worse':0, 'tier2 better':0, 'tier2 worse':0}
         for _ in self.league.timeslots:
-            for _ in range(2):
-            # for _ in range(3):
+            for _ in range(3):
                 # print('setup')
                 scheduler = self.setup(i)
                 i += 1
@@ -291,39 +290,8 @@ class Scheduler:
                 r1 = self.evaluate(scheduler)
                 scheduler.optimise()
                 r2 = self.evaluate(scheduler)
-                if r2["tier1"] < r1["tier1"]:
-                    print()
-                    optimiser_eval['tier1 better'] += 1
-                    print(
-                        MAGENTA,
-                        "tier 1 issues reduced",
-                        r1["tier1"],
-                        r2["tier1"],
-                        RESET,
-                    )
-                if r2["tier1"] > r1["tier1"]:
-                    optimiser_eval['tier1 worse'] += 1
-                    print()
-                    print(
-                        RED, "tier 1 issues increased!", r1["tier1"], r2["tier1"], RESET
-                    )
-                    print(count_categories(r1["details"]))
-                    print(count_categories(r2["details"]))
-                if r2["tier2"] < r1["tier2"]:
-                    optimiser_eval['tier2 better'] += 1
-                    print(
-                        MAGENTA,
-                        "tier 2 issues reduced",
-                        r1["tier2"],
-                        r2["tier2"],
-                        RESET,
-                    )
-                if r2["tier2"] > r1["tier2"]:
-                    optimiser_eval['tier2 worse'] += 1
-                    print(
-                        RED, "tier 2 issues increased!", r1["tier2"], r2["tier2"], RESET
-                    )
-
+                optimiser_eval = eval_optimiser(r1, r2, optimiser_eval)
+                
                 # print('captains')
                 scheduler.assign_captains()
                 # print('finalize')
@@ -738,8 +706,48 @@ def count_categories(my_dict):
     counter = {}
     for key in my_dict:
         br = key['broken_rule']
-        if br in counter:
-            counter[br] += 1
-        else:
-            counter[br] = 1
+        if br not in ["min_captained", "max_captained"]:
+            if 'max_repeat_compete' in br:
+                br = 'max_repeat_compete'
+            if br in counter:
+                counter[br] += 1
+            else:
+                counter[br] = 1
     return counter
+
+def eval_optimiser(r1, r2, optimiser_eval):
+    if r2["tier1"] < r1["tier1"]:
+        print()
+        optimiser_eval['tier1 better'] += 1
+        print(
+            MAGENTA,
+            "tier 1 issues reduced",
+            r1["tier1"],
+            r2["tier1"],
+            RESET,
+        )
+    if r2["tier1"] > r1["tier1"]:
+        optimiser_eval['tier1 worse'] += 1
+        print()
+        print(
+            RED, "tier 1 issues increased!", r1["tier1"], r2["tier1"], RESET
+        )
+        print(count_categories(r1["details"]))
+        print(count_categories(r2["details"]))
+    if r2["tier2"] < r1["tier2"]:
+        optimiser_eval['tier2 better'] += 1
+        print(
+            MAGENTA,
+            "tier 2 issues reduced",
+            r1["tier2"],
+            r2["tier2"],
+            RESET,
+        )
+    if r2["tier2"] > r1["tier2"]:
+        optimiser_eval['tier2 worse'] += 1
+        print(
+            RED, "tier 2 issues increased!", r1["tier2"], r2["tier2"], RESET
+        )
+        print(count_categories(r1["details"]))
+        print(count_categories(r2["details"]))
+    return optimiser_eval

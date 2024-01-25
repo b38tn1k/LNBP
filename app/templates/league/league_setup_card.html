@@ -1,0 +1,108 @@
+<div class="col-6">
+    <div class="card" style="flex: 1">
+        <!-- <div class="card-header">
+            <h3 class="card-title">Basic Setup</h3>
+        </div> -->
+        <div class="card-body">
+            <h5 class="card-title">Basic Setup</h5>
+            <div class="row flex-row">
+                <div class="col-4">
+                    <input
+                        type="text"
+                        class="form-control form-control-lg"
+                        id="league-name-input"
+                        placeholder="League Name"
+                        value="{{league.name}}"
+                    />
+                </div>
+
+                <div class="col-4">
+                    <select class="custom-select form-control form-control-lg" id="league-type-input">
+                        <option>Tennis</option>
+                        <option>Paddle</option>
+                    </select>
+                </div>
+
+                <div class="col-4">
+                    <label for="game-duration-slider" class="form-label info-sm"
+                        >Game Duration: <span id="duration-display"></span> minutes</label
+                    >
+                    <input
+                        type="range"
+                        class="form-range"
+                        style="width: 100%"
+                        min="0"
+                        max="180"
+                        value="60"
+                        step="5"
+                        id="game-duration-slider"
+                    />
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <h5 class="card-title">Timeline</h5>
+            <div class="progress-container">
+                <div class="flex-row col-12">
+                    <div class="marker-label first">Launch</div>
+                    <div class="marker-label">Signup Deadline</div>
+                    <div class="marker-label">Availability Deadline</div>
+                    <div class="marker-label">Schedule Release</div>
+                    <div class="marker-label">Kick-off</div>
+                    <div class="marker-label last">Final Match</div>
+                </div>
+                <div>
+                    <div class="progress">
+                        <div class="progress-bar-background"></div>
+                        <div
+                            class="progress-bar"
+                            role="progressbar"
+                            style="width: 25%"
+                            aria-valuenow="25"
+                            aria-valuemin="0"
+                            aria-valuemax="100"
+                        ></div>
+                        <div class="marker" style="left: 0%"><div class="progress-marker active"></div></div>
+                        <div class="marker" style="left: 20%"><div class="progress-marker active"></div></div>
+                        <div class="marker" style="left: 40%"><div class="progress-marker"></div></div>
+                        <div class="marker" style="left: 60%"><div class="progress-marker"></div></div>
+                        <div class="marker" style="left: 80%"><div class="progress-marker"></div></div>
+                        <div class="marker" style="left: 100%"><div class="progress-marker last"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <h5 class="card-title">Facilities</h5>
+            <div class="row flex-row">
+                {% if club.facilities %} {% for facility in club.facilities %}
+                <div class="bordered-block col-2" facility="{{facility.id}}">
+                    <div class="flex-row">
+                        <div class="facility-title">{{ facility.name }}</div>
+                        <input
+                            {%
+                            if
+                            league.facility_in_league(facility)
+                            %}
+                            checked
+                            {%endif%}
+                            type="checkbox"
+                            class="form-check-input-lg facility-checker"
+                            facility="{{facility.id}}"
+                            id="facility-{{ facility.id }}"
+                        />
+                    </div>
+                    <div class="info-sm">{{ facility.asset_type }}</div>
+                </div>
+
+                {% endfor %} {% else %}
+                <p>No facilities available.</p>
+                <p>Head over to Club Settings to add some Facilities.</p>
+                <a href="{{ url_for('club.index') }}" class="btn btn-primary">Go to Club Settings</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

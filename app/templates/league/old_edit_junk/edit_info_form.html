@@ -26,22 +26,4 @@
     </div>
 
 </fieldset>
-
-<script>
-    const rangeInput = document.getElementById("game-duration-slider");
-    const displaySpan = document.getElementById("duration-display");
-
-    // Function to update the display
-    function updateDisplay(value) {
-        displaySpan.textContent = value;
-    }
-
-    // Event listener for changes in the range input
-    rangeInput.addEventListener("input", function () {
-        updateDisplay(this.value);
-    });
-
-    // Initialize display
-    updateDisplay(rangeInput.value);
-</script>
 {% endblock %}

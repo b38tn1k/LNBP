@@ -1,29 +1,51 @@
-{% extends "league/league_base.html" %} {% block title %}Edit {{ league.name }}{% endblock %} 
-{% block body %}
+{% extends "league/league_base.html" %} {% block title %}{{ league.name }}{% endblock %} {% block body %}
 
 <form id="hidden-form" style="display: none">{{ simple_form.hidden_tag() }}</form>
+
+<div
+    id="infoElement"
+    leagueName="{{ league.name }}"
+    leagueGameDuration="{{league.get_game_duration()}}"
+    leagueType="{{league.type}}"
+    flightCount="{{ league.flights|length }}"
+></div>
 
 <div class="my-3 my-md-5">
     <div class="container">
         <div class="d-flex justify-content-between align-items-center">
             <div class="page-header">
-                <h1 class="page-title">Edit {{ league.name }}</h1>
+                <h1 class="page-title">{{ league.name }}</h1>
             </div>
             <button type="button" id="save-button" class="btn btn-lg" title="Save" aria-label="Save">
                 <i class="fe fe-save" style="font-size: 1.5em"></i>
             </button>
         </div>
+
         <div class="row row-cards" style="flex: 1">
-            {% include 'league/edit_info.html' %} {% include 'league/edit_facilities.html' %}
-            <div class="col-4 col-cards">
-                <div class="col-12" >
-                    {% include'league/edit_add_player.html' %} {% include'league/edit_add_remove_last_timeslot.html' %}
-                </div>
-            </div>
+            {% include 'league/league_setup_card.html' %}
+            {% include 'league/league_schedule_tools.html' %}
         </div>
-        <div class="row row-cards">{% include 'league/edit_league_rules.html' %}</div>
-        {% include 'league/league_calendar.html' %}
+        {% include 'league/league_player_availability.html' %}
     </div>
 </div>
+
+<script>
+    const rangeInput = document.getElementById("game-duration-slider");
+    const displaySpan = document.getElementById("duration-display");
+
+    // Function to update the display
+    function updateDisplay(value) {
+        displaySpan.textContent = value;
+    }
+
+    // Event listener for changes in the range input
+    rangeInput.addEventListener("input", function () {
+        updateDisplay(this.value);
+    });
+
+    // Initialize display
+    updateDisplay(rangeInput.value);
+</script>
+
 <script src="{{ url_for('static', filename='js/league_editor/league_editor.js') }}"></script>
 {% endblock %}
