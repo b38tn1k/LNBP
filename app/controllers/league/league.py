@@ -70,6 +70,7 @@ def league_home(id):
     if request.method == "POST":
         try:
             data = request.json
+            print(data)
             if data['msg'] == 'save':
                 apply_edits(league, json.loads(data['data']))
                 db.session.commit()
@@ -89,6 +90,19 @@ def league_home(id):
                     stats = s.run()
                     current_user.club.update_statistics(stats)
                     db.session.commit()
+                return jsonify({"status": "success"})
+            if data["msg"] == "schedule-flight":
+                s = Scheduler(
+                    league, Scheduler.SINGLE_FLIGHT, flight_id=int(data["data"]["flight_id"])
+                )
+                stats = s.run()
+                current_user.club.update_statistics(stats)
+                db.session.commit()
+                return jsonify({"status": "success"})
+            if data["msg"] == "clear-flight":
+                id = int(data["data"]["flight_id"])
+                flight = league.get_flight_by_id(id)
+                flight.delete_all_game_events()
                 return jsonify({"status": "success"})
         except Exception as e:
             return jsonify({"status": "failure", "error": str(e)})

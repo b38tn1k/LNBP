@@ -936,3 +936,47 @@ function flashButtonResult(button, c1, c2, removableClass, defaultClass) {
         r.classList.add(defaultClass);
     }, 1000);
 }
+
+function scheduleFlight(button) {
+    let loaderClass = setButtonLoading(button, "fe-star")
+    let flightID = button.getAttribute('flight-id')
+
+    const data = {
+        msg: "schedule-flight",
+        data: {'flight_id': flightID},
+    };
+
+    function success() {
+        flashButtonResult(button, "fe-check-circle", "fg-success", loaderClass, "fe-star");
+        window.location.reload();
+
+    }
+    function failure() {
+        flashButtonResult(button, "fe-x-circle", "fg-failure", loaderClass, "fe-star");
+        window.location.reload();
+
+    }
+    sendToServer(data, success, failure);
+}
+
+function clearFlight(button) {
+    let loaderClass = setButtonLoading(button, "fe-star")
+    let flightID = button.getAttribute('flight-id')
+
+    const data = {
+        msg: "clear-flight",
+        data: {'flight_id': flightID},
+    };
+
+    function success() {
+        flashButtonResult(button, "fe-check-circle", "fg-success", loaderClass, "fe-star");
+        window.location.reload();
+
+    }
+    function failure() {
+        flashButtonResult(button, "fe-x-circle", "fg-failure", loaderClass, "fe-star");
+        window.location.reload();
+
+    }
+    sendToServer(data, success, failure);
+}
