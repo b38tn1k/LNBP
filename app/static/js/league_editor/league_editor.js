@@ -937,6 +937,20 @@ function flashButtonResult(button, c1, c2, removableClass, defaultClass) {
     }, 1000);
 }
 
+/**
+* @description This function schedules a flight using a button click event. It sets
+* the button as loading with a specified class name and retrieves the flight ID from
+* the button's attribute. It then sends a JSON object to the server with the scheduled
+* flight information and specifies two callback functions for success and failure.
+* 
+* @param {  } button - The `button` input parameter passed to the `scheduleFlight()`
+* function is used as a reference to the HTML button element that triggered the
+* function call.
+* 
+* @returns {  } The `scheduleFlight` function returns nothing (i.e., `undefined`)
+* because it is a function that sets the button loading state and sends a request
+* to the server with the button's flight ID.
+*/
 function scheduleFlight(button) {
     let loaderClass = setButtonLoading(button, "fe-star")
     let flightID = button.getAttribute('flight-id')
@@ -946,11 +960,30 @@ function scheduleFlight(button) {
         data: {'flight_id': flightID},
     };
 
+/**
+* @description This function executes when a success condition is met and it has the
+* following actions:
+* 
+* 1/ Flashes a button with a check mark icon.
+* 2/ Reloads the current web page.
+* 
+* @returns { any } The output of the function `success` is:
+* 
+* 	- Flashing a button with a success icon (a check circle) and a green fill color.
+* 	- Reloading the page.
+*/
     function success() {
         flashButtonResult(button, "fe-check-circle", "fg-success", loaderClass, "fe-star");
         window.location.reload();
 
     }
+/**
+* @description This function displays a failing/error message to the user and then
+* reloads the current web page.
+* 
+* @returns { any } This function takes no arguments and returns nothing (void),
+* meaning it does not produce any output or return any values.
+*/
     function failure() {
         flashButtonResult(button, "fe-x-circle", "fg-failure", loaderClass, "fe-star");
         window.location.reload();
@@ -959,6 +992,25 @@ function scheduleFlight(button) {
     sendToServer(data, success, failure);
 }
 
+/**
+* @description This function clears a flight reservation. It sets a button to loading
+* state while making a server request to clear the flight. If the request is successful
+* (i.e., the server acknowledges the request), it updates the button's appearance
+* with a success message and reloads the page.
+* 
+* @param {  } button - The `button` input parameter is passed as a reference to the
+* HTML button element that triggered the function.
+* 
+* @returns { any } The output returned by this function is two flags (loading and
+* error) and a string of the button's new class names.
+* 
+* Concisely:
+* 
+* 	- loading: false or "fe-star" if the flight was cleared successfully
+* 	- error: false or "fe-x-circle" if there was an error while clearing the flight
+* 	- classes: a space-separated string of new class names for the button ("fe-check-circle
+* fg-success" or "fe-x-circle fg-failure")
+*/
 function clearFlight(button) {
     let loaderClass = setButtonLoading(button, "fe-star")
     let flightID = button.getAttribute('flight-id')
@@ -968,11 +1020,26 @@ function clearFlight(button) {
         data: {'flight_id': flightID},
     };
 
+/**
+* @description This function calls the `flashButtonResult` function with various
+* arguments to stylishly update the appearance of a button using Font Awesome icons
+* and CSS classes.
+* 
+* @returns {  } The function `success()` returns no value or void.
+*/
     function success() {
         flashButtonResult(button, "fe-check-circle", "fg-success", loaderClass, "fe-star");
         window.location.reload();
 
     }
+/**
+* @description This function calls `flashButtonResult` with various arguments to
+* update the appearance of a button and then immediately reloads the current page
+* (by calling `window.location.reload()`).
+* 
+* @returns {  } The function `failure` takes no arguments and has no return statement.
+* Therefore it does not return any value or output.
+*/
     function failure() {
         flashButtonResult(button, "fe-x-circle", "fg-failure", loaderClass, "fe-star");
         window.location.reload();
