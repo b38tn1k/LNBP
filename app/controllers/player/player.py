@@ -130,6 +130,29 @@ def new_player():
 
 @blueprint.route("/<hashid:club_id>/<hashid:player_id>", methods=["GET", "POST"])
 def public_portal(club_id, player_id):
+    """
+    This function renders the public portal page for a specific club and player
+    based on the current user's authentication status. It takes two input parameters:
+    `club_id` and `player_id`. If the current user is authenticated and the club
+    and player exist respectively then it will display the template with the
+    respective values.
+
+    Args:
+        club_id (int): The `club_id` input parameter specifies the ID of the club
+            for which the portal is being accessed.
+        player_id (int): The `player_id` input parameter is used to retrieve a
+            specific player from the club's roster using the `get_player_by_id()`
+            method of the club object.
+
+    Returns:
+        dict: The output returned by this function is a JSON object with the
+        following properties:
+        
+        	- status (string): "success" or "failure" depending on whether the request
+        was successful or not.
+        	- data (string): the value of the portal style set by the user.
+
+    """
     club = Club.query.get(club_id)
     player = club.get_player_by_id(player_id)
     logged_in = False

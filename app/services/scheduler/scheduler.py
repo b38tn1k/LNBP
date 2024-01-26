@@ -61,6 +61,10 @@ class Scheduler:
         
     
     def clear_flight_db_obj(self):
+        """
+        This function clears all game events associated with the current flight object.
+
+        """
         self.flight.delete_all_game_events()
 
 
@@ -234,6 +238,24 @@ class Scheduler:
         return fails
     
     def copy_flight_with_games(self, flight):
+        """
+        This function copies a flight and adds game events to the new copy while
+        ensuring player availability and adhering to rules such as forcing captains
+        to play together and limiting captain count per player.
+
+        Args:
+            flight (): The `flight` input parameter is the flight for which the
+                games are being generated.
+
+        Returns:
+            bool: The output returned by this function is a tuple of two items:
+            
+            1/ A binary value representing the optimality of the scheduled games
+            (true if the schedule is optimal and false otherwise).
+            2/ An instance of the `Schedule` class containing the scheduled game
+            events.
+
+        """
         if flight is None:
             self.flight = self.league.get_flight_by_id(self.flight_id)
             flight = self.flight

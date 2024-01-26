@@ -5,6 +5,48 @@ from app.models import ModelProxy, transaction
 
 def construct_schedule_string(day_counter, time_counter):
     # Calculate the average counts
+    """
+    This function constructs a sentence that summarizes a sports team's schedule
+    for the day. It takes two dictionaries as input: one with the number of games
+    played on each day of the week (represented as integers), and another with the
+    number of times each game was played at each time (represented as integers).
+    The function calculates the average number of games per day and time and uses
+    that information to create a string representing the schedule.
+
+    Args:
+        day_counter (dict): The `day_counter` input parameter is a dictionary that
+            keeps track of how many times each day of the week (i.e. "Monday",
+            "Tuesday", etc.) appears as a game date.
+        time_counter (dict): The `time_counter` input parameter is a dictionary
+            of counts for each time slot.
+
+    Returns:
+        str: The output returned by the `construct_schedule_string` function is a
+        string representing the team's schedule. Here's an example:
+        
+        Suppose we have the following dicts `day_counter` and `time_counter`:
+        ```python
+        day_counter = {
+            "Monday": 20.,
+            "Tuesday": 15.,
+            "Wednesday": 25.,
+            "Thursday": 10.
+        }
+        
+        time_counter = {
+            "16:00": 30.,
+            "17:00": 15.,
+            "18:00": 10.,
+            "19:00": 5.
+        }
+        ```
+        Then running `construct_schedule_string(day_counter=day_counter',
+        time_counter=time_counter)` would return the following schedule string:
+        ```text
+        Monday. Games at 16:00 and 18:00 evenings. Tuesday. Games at 17:00 Wednesday.
+        Games at 16:00 and 19:00 Thursday.
+
+    """
     total_days = len(day_counter)
     total_times = len(time_counter)
     average_day_count = sum(day_counter.values()) / total_days if total_days > 0 else 0
@@ -663,6 +705,21 @@ class League(Model):
             return None
         
     def get_past_player_games(self, player):
+        """
+        This function retrieves a list of all games that contain a given player
+        as an element of the players' list.
+
+        Args:
+            player (str): The `player` input parameter is passed as an argument
+                to the `get_past_player_games()` function and is used to filter
+                which game events should be included inside the resulting list of
+                games that are returned by the function.
+
+        Returns:
+            list: The function `get_past_player_games` returns a list of games
+            called `games`.
+
+        """
         games = []
         for game in self.game_events:
             if player in game.players:
@@ -701,34 +758,94 @@ class League(Model):
         return None
 
     def get_start_date(self):
+        """
+        This function returns the earliest start date of all timeslots associated
+        with an instance of the object.
+
+        Returns:
+            : The output returned by the function `get_start_date()` is the minimum
+            start time of all the timeslots.
+
+        """
         self.start_date = min(self.timeslots, key=lambda ts: ts.start_time).start_time
         return self.start_date
 
     def get_end_date(self):
+        """
+        This function returns the end date of a schedule by finding the time slot
+        with the earliest start time and returning its start time.
+
+        Returns:
+            : The function `get_end_date` returns the maximum start time of all
+            `Timeslot` objects within the list `self.timeslots`.
+
+        """
         self.end_date = max(self.timeslots, key=lambda ts: ts.start_time).start_time
         return self.end_date
 
     def get_launch_date(self):
+        """
+        The function `get_launch_date` takes the instance object `self` and returns
+        the launch date of a product.
+
+        Returns:
+            : The output returned by the function `get_launch_date()` is
+            `self.start_date - timedelta(days=28)`.
+
+        """
         if self.launch_date is None:
             self.launch_date = self.start_date - timedelta(days=28)
         return self.launch_date
 
     def get_signup_deadline(self):
+        """
+        This function calculates and returns the signup deadline based on the start
+        date and currently nonexistent signup deadline.
+
+        Returns:
+            : The output returned by this function would be `self.start_date - timedelta(days=14)`.
+
+        """
         if self.signup_deadline is None:
             self.signup_deadline = self.start_date - timedelta(days=14)
         return self.signup_deadline
 
     def get_availability_deadline(self):
+        """
+        This function sets the availability deadline of an object to 10 days after
+        its start date if it is not already set.
+
+        Returns:
+            : The output returned by this function is `self.start_date - timedelta(days=10)`.
+
+        """
         if self.availability_deadline is None:
             self.availability_deadline = self.start_date - timedelta(days=10)
         return self.availability_deadline
 
     def get_schedule_release_date(self):
+        """
+        This function retrieves the schedule release date based on the start date
+        and sets it to 7 days prior if it is not already set.
+
+        Returns:
+            : The output returned by this function would be `self.start_date - timedelta(days=7)`.
+
+        """
         if self.schedule_release_date is None:
             self.schedule_release_date = self.start_date - timedelta(days=7)
         return self.schedule_release_date
 
     def get_days_and_times_string(self):
+        """
+        This function takes a list of `TimeSlot` objects as input and returns a
+        string representing the schedule of these timeslots.
+
+        Returns:
+            str: The function "get_days_and_times_string" returns a string
+            representing the schedule of slots for a given list of timeslots.
+
+        """
         day_counter = {}
         time_counter = {}
         for ts in self.timeslots:
@@ -746,9 +863,28 @@ class League(Model):
         return result
 
     def get_league_description(self):
+        """
+        The `get_league_description` function returns a string representing a
+        simple description of the league.
+
+        Returns:
+            str: The output returned by the function `get_league_description()`
+            is "A simple description!"
+
+        """
         return "A simple description!"
     
     def is_available_for_signup(self):
+        """
+        This function checks whether the signup deadline for an object is before
+        the current date or not.
+
+        Returns:
+            bool: Based on the code provided:
+            
+            The output returned by this function is `True`.
+
+        """
         today_date = datetime.now()
         signup_date = self.get_signup_deadline()
         return signup_date > today_date

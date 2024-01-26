@@ -59,6 +59,15 @@ class Club(Model):
         return club
     
     def get_portal_style(self):
+        """
+        This function returns the URL for a CSS file based on a specified portal
+        style.
+
+        Returns:
+            str: The function returns a URL for a CSS file based on the `portal_style`
+            attribute of the object.
+
+        """
         if self.portal_style is None:
             # self.portal_style = 'lux.min.css'
             self.portal_style = 'superhero.min.css'

@@ -42,6 +42,29 @@ function availabilityCallback(button) {
 
 }
 
+/**
+* @description This function sends data to the server via fetch API and handles
+* success and failure responses. It takes three arguments: 'data', 'success', and
+* 'failure' (which are all optional).
+* 
+* @param { object } data - The `data` input parameter is the data that is being sent
+* to the server via a POST request.
+* 
+* @param {  } success - The `success` input parameter is an optional callback function
+* that is called if the server responds with a "success" status.
+* 
+* @param {  } failure - The `failure` input parameter is a callback function that
+* is executed if the server responds with an error.
+* 
+* @returns { object } The `sendToServer` function takes a `data` object and two
+* callback functions: `success` and `failure`. It sends a POST request to the current
+* URL with the `data` object encoded as JSON. If the server responds with an error
+* status code (e.g., 404), the function rejects with an error message containing the
+* status code. If the server responds with "success", the function logs a success
+* message and calls the `success` callback with the response data. Otherwise (i.e.,
+* the server returns any other response status code), the function logs an error
+* message and calls the `failure` callback with the response data.
+*/
 function sendToServer(data, success = null, failure = null) {
     const currentUrl = window.location.href;
     const csrf_token = document.querySelector('#hidden-form input[name="csrf_token"]').value;
@@ -76,6 +99,16 @@ function sendToServer(data, success = null, failure = null) {
         .catch((error) => console.log("Fetch error: ", error));
 }
 
+/**
+* @description This function called "changeTheme" changes the theme of a web page
+* and notifies the server about the new theme. It takes one parameter called "theme"
+* and logs a message to the console indicating the new theme.
+* 
+* @param { string } theme - The `theme` input parameter passed to the `changeTheme()`
+* function represents the selected theme that needs to be applied to the page.
+* 
+* @returns { any } The output returned by this function is "Theme changed to: <selected_theme>".
+*/
 function changeTheme(theme) {
     // Call your JavaScript function here with the selected theme
     // For example, you can update the page's styles based on the theme.
