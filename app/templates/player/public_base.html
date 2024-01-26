@@ -51,20 +51,21 @@
                 margin-bottom: 0.75rem;
                 padding: 1rem;
             }
-            td, th {
+            td,
+            th {
                 padding: 0.75rem;
             }
-            .timeslot-availability{
+            .timeslot-availability {
                 margin: 2rem;
             }
 
-            .availability_indicator{
+            .availability_indicator {
                 margin-top: 1rem;
                 margin: 0.5rem;
                 cursor: pointer;
             }
 
-            .card{
+            .card {
                 margin-bottom: 1rem;
             }
         </style>
@@ -77,22 +78,47 @@
                 <nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
                     <div class="container-fluid">
                         <a class="navbar-brand" href="#">{{club.name}}</a>
-                        <div class="dropdown" style="margin-right: 2rem">
-                            <a
-                                class="nav-link dropdown-toggle"
-                                data-bs-toggle="dropdown"
-                                href="#"
-                                role="button"
-                                aria-haspopup="true"
-                                aria-expanded="false"
-                                >Theme</a
-                            >
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" href="#" onclick="changeTheme('cerulean')">Cerulean</a>
-                                <a class="dropdown-item" href="#" onclick="changeTheme('darkly')">Darkly</a>
-                                <a class="dropdown-item" href="#" onclick="changeTheme('lux')">Lux</a>
-                                <a class="dropdown-item" href="#" onclick="changeTheme('superhero')">Super Hero</a>
+                        <div class="navbar-nav me-auto">
+                            {% if logged_in %}
+                            <div class="nav-item dropdown">
+                                <a
+                                    class="nav-link dropdown-toggle"
+                                    data-bs-toggle="dropdown"
+                                    href="#"
+                                    role="button"
+                                    aria-haspopup="true"
+                                    aria-expanded="false"
+                                    >Themes</a
+                                >
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="#" onclick="changeTheme('cerulean')">Cerulean</a>
+                                    <a class="dropdown-item" href="#" onclick="changeTheme('cosmo')">Cosmo</a>
+                                    <a class="dropdown-item" href="#" onclick="changeTheme('cyborg')">Cyborg</a>
+                                    <a class="dropdown-item" href="#" onclick="changeTheme('darkly')">Darkly</a>
+                                    <a class="dropdown-item" href="#" onclick="changeTheme('flatly')">Flatly</a>
+                                    <a class="dropdown-item" href="#" onclick="changeTheme('journal')">Journal</a>
+                                    <a class="dropdown-item" href="#" onclick="changeTheme('litera')">Litera</a>
+                                    <a class="dropdown-item" href="#" onclick="changeTheme('lumen')">Lumen</a>
+                                    <a class="dropdown-item" href="#" onclick="changeTheme('lux')">Lux</a>
+                                    <a class="dropdown-item" href="#" onclick="changeTheme('materia')">Materia</a>
+                                    <a class="dropdown-item" href="#" onclick="changeTheme('minty')">Minty</a>
+                                    <a class="dropdown-item" href="#" onclick="changeTheme('morph')">Morph</a>
+                                    <a class="dropdown-item" href="#" onclick="changeTheme('pulse')">Pulse</a>
+                                    <a class="dropdown-item" href="#" onclick="changeTheme('quartz')">Quartz</a>
+                                    <a class="dropdown-item" href="#" onclick="changeTheme('sandstone')">Sandstone</a>
+                                    <a class="dropdown-item" href="#" onclick="changeTheme('simplex')">Simplex</a>
+                                    <a class="dropdown-item" href="#" onclick="changeTheme('sketchy')">Sketchy</a>
+                                    <a class="dropdown-item" href="#" onclick="changeTheme('slate')">Slate</a>
+                                    <a class="dropdown-item" href="#" onclick="changeTheme('solar')">Solar</a>
+                                    <a class="dropdown-item" href="#" onclick="changeTheme('spacelab')">Spacelab</a>
+                                    <a class="dropdown-item" href="#" onclick="changeTheme('superhero')">Super Hero</a>
+                                    <a class="dropdown-item" href="#" onclick="changeTheme('united')">United</a>
+                                    <a class="dropdown-item" href="#" onclick="changeTheme('vapor')">Vapor</a>
+                                    <a class="dropdown-item" href="#" onclick="changeTheme('yeti')">Yeti</a>
+                                    <a class="dropdown-item" href="#" onclick="changeTheme('zephyr')">Zephyr</a>
+                                </div>
                             </div>
+                            {% endif %}
                         </div>
                     </div>
                 </nav>
