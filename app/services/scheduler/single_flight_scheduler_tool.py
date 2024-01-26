@@ -1002,8 +1002,9 @@ class SingleFlightScheduleTool:
                         break
                     if i['player'].availability_score > target['player'].availability_score:
                         target = i
-                target['target_game'].remove_player_from_match(ideas[0]['player'])
+                target['target_game'].remove_player_from_match(target['player'])
                 target['target_game'].force_player_to_match(p)
+                self.recalculate_players()
 
     def optimise(self):
         """
@@ -1012,7 +1013,7 @@ class SingleFlightScheduleTool:
 
         """
         self.recalculate_players()
-        self.balance_unscheduled_players()
+        # self.balance_unscheduled_players()
         keep_trying = self.fix_unscheduled_players()
         self.fix_double_players()
         # if keep_trying:

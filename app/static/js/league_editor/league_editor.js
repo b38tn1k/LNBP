@@ -289,49 +289,44 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 /**
-* @description This function adds an event listener to all nav links and hides all
-* existing active state and information tabs.
-* 
-* @param { object } e - The `e` input parameter is an event object that contains
-* information about the click event that triggered the function.
-* 
-* @returns { object } This function takes an event object as an argument (e) and
-* performs the following actions:
-* 
-* 1/ Logs the event object to the console.
-* 2/ Removes the "active" class from all elements with the class ".nav-link".
-* 3/ Sets all elements with the class ".nav-info-tab" to hidden.
-* 4/ Adds the "active" class to the current element (e).
-* 5/ Retrieves the target attribute of the current element and logs it to the console.
-* 6/ Finds the element with the ID specified by the target attribute and sets its
-* hidden property to false.
-* 
-* The output returned by this function is:
-* 
-* 	- The current element with the class ".nav-link" has the "active" class added and
-* its ID is logged to the console.
-* 	- All elements with the class ".nav-info-tab" are set to hidden.
-* 	- The element with the ID specified by the target attribute is revealed (its
-* hidden property is set to false).
-*/
+ * @description This function adds an event listener to all nav links and hides all
+ * existing active state and information tabs.
+ *
+ * @param { object } e - The `e` input parameter is an event object that contains
+ * information about the click event that triggered the function.
+ *
+ * @returns { object } This function takes an event object as an argument (e) and
+ * performs the following actions:
+ *
+ * 1/ Logs the event object to the console.
+ * 2/ Removes the "active" class from all elements with the class ".nav-link".
+ * 3/ Sets all elements with the class ".nav-info-tab" to hidden.
+ * 4/ Adds the "active" class to the current element (e).
+ * 5/ Retrieves the target attribute of the current element and logs it to the console.
+ * 6/ Finds the element with the ID specified by the target attribute and sets its
+ * hidden property to false.
+ *
+ * The output returned by this function is:
+ *
+ * 	- The current element with the class ".nav-link" has the "active" class added and
+ * its ID is logged to the console.
+ * 	- All elements with the class ".nav-info-tab" are set to hidden.
+ * 	- The element with the ID specified by the target attribute is revealed (its
+ * hidden property is set to false).
+ */
 function navClicker(e) {
-    console.log(e);
     document.querySelectorAll(".nav-link").forEach((i) => {
         i.classList.remove("active");
     });
 
     document.querySelectorAll(".nav-info-tab").forEach((i) => {
-        i.hidden=true;
+        i.hidden = true;
     });
 
-    
     e.classList.add("active");
-    let target = e.getAttribute('target')
-    console.log(target);
+    let target = e.getAttribute("target");
     let info = document.getElementById(target);
     info.hidden = false;
-
-    
 }
 
 /**
@@ -483,7 +478,7 @@ function leagueRulesChangeCallback(event, allRules) {
  */
 function saveButtonCallback(event) {
     const saveString = JSON.stringify(delta);
-    sendToServer({'msg': 'save', 'data': saveString});
+    sendToServer({ msg: "save", data: saveString });
 }
 
 /**
@@ -498,7 +493,7 @@ function saveButtonCallback(event) {
  * messages to the console.
  */
 
-function sendToServer(data, success=null, failure=null) {
+function sendToServer(data, success = null, failure = null) {
     const currentUrl = window.location.href;
     const csrf_token = document.querySelector('#hidden-form input[name="csrf_token"]').value;
 
@@ -519,19 +514,18 @@ function sendToServer(data, success=null, failure=null) {
         .then((data) => {
             if (data.status === "success") {
                 console.log("Data successfully ingested by server.");
-                if (success){
+                if (success) {
                     success();
                 }
             } else {
                 console.log("Failure: ", data.error);
-                if (failure){
+                if (failure) {
                     failure();
                 }
             }
         })
         .catch((error) => console.log("Fetch error: ", error));
 }
-
 
 // function sendToServer(data) {
 //     const currentUrl = window.location.href;
@@ -831,69 +825,67 @@ function handleFlightTableClick(event) {
 }
 
 /**
-* @description This function prepares a button for loading by adding a spinner and
-* changing its appearance.
-* 
-* @returns {  } The function `scheduleWizardButtonCallback` takes no arguments and
-* returns nothing (it is a void function). It sets up a button's loading state using
-* `setButtonLoading`, prepares data to be sent to the server via `sendToServer`, and
-* defines two callback functions: `success` and `failure`. The output returned by
-* this function is nothing; it does not return any values.
-*/
+ * @description This function prepares a button for loading by adding a spinner and
+ * changing its appearance.
+ *
+ * @returns {  } The function `scheduleWizardButtonCallback` takes no arguments and
+ * returns nothing (it is a void function). It sets up a button's loading state using
+ * `setButtonLoading`, prepares data to be sent to the server via `sendToServer`, and
+ * defines two callback functions: `success` and `failure`. The output returned by
+ * this function is nothing; it does not return any values.
+ */
 function scheduleWizardButtonCallback() {
     let button = document.getElementById("run-schedule-wizard");
-    let loaderClass = setButtonLoading(button, "fe-star")
+    let loaderClass = setButtonLoading(button, "fe-star");
 
     const data = {
         msg: "schedule-all",
     };
 
-/**
-* @description This function updates the appearance of a button using various CSS
-* classes to display a check mark and a success icon (a star) after a successful operation.
-* 
-* @returns { any } This function does not return any value or output.
-*/
+    /**
+     * @description This function updates the appearance of a button using various CSS
+     * classes to display a check mark and a success icon (a star) after a successful operation.
+     *
+     * @returns { any } This function does not return any value or output.
+     */
     function success() {
         flashButtonResult(button, "fe-check-circle", "fg-success", loaderClass, "fe-star");
         window.location.reload();
-
     }
 
-/**
-* @description This function sets the button's icon to a failuresymbol with a red
-* border and star rating.
-* 
-* @returns { any } The output returned by the `failure` function is:
-* 
-* 	- A flashing button with the button identifier `button`, displaying a "x" circle
-* icon and the text "fg-failure".
-*/
+    /**
+     * @description This function sets the button's icon to a failuresymbol with a red
+     * border and star rating.
+     *
+     * @returns { any } The output returned by the `failure` function is:
+     *
+     * 	- A flashing button with the button identifier `button`, displaying a "x" circle
+     * icon and the text "fg-failure".
+     */
     function failure() {
         flashButtonResult(button, "fe-x-circle", "fg-failure", loaderClass, "fe-star");
         window.location.reload();
-
     }
     sendToServer(data, success, failure);
 }
 
 /**
-* @description This function sets the loading state of a button by adding a "fe-loader"
-* class to the button's icon element (represented by "r") and removing any previously
-* assigned "defaultClass".
-* 
-* @param { object } button - The `button` input parameter is used to select the
-* button element that should have its loading state changed.
-* 
-* @param { string } defaultClass - The `defaultClass` input parameter is used to
-* specify a default class that will be removed from the icon element before adding
-* the "fe-loader" class.
-* 
-* @returns { string } The function `setButtonLoading()` takes a button element and
-* a default class as arguments. It removes the default class from the button's icon
-* (represented by an `i` element) and adds the class "fe-loader". The output returned
-* by the function is the name of the added class i.e.
-*/
+ * @description This function sets the loading state of a button by adding a "fe-loader"
+ * class to the button's icon element (represented by "r") and removing any previously
+ * assigned "defaultClass".
+ *
+ * @param { object } button - The `button` input parameter is used to select the
+ * button element that should have its loading state changed.
+ *
+ * @param { string } defaultClass - The `defaultClass` input parameter is used to
+ * specify a default class that will be removed from the icon element before adding
+ * the "fe-loader" class.
+ *
+ * @returns { string } The function `setButtonLoading()` takes a button element and
+ * a default class as arguments. It removes the default class from the button's icon
+ * (represented by an `i` element) and adds the class "fe-loader". The output returned
+ * by the function is the name of the added class i.e.
+ */
 function setButtonLoading(button, defaultClass) {
     let r = button.querySelector("i");
     r.classList.remove(defaultClass);
@@ -902,31 +894,31 @@ function setButtonLoading(button, defaultClass) {
 }
 
 /**
-* @description This function toggles the class names "c1" and "c2" on an i-tag within
-* a button element for 1 second before reverting back to the default class "defaultClass".
-* 
-* @param {  } button - The `button` input parameter is not used anywhere within the
-* provided function implementation.
-* 
-* @param { string } c1 - In the given function `flashButtonResult`, the `c1` parameter
-* is used to add a class to the element (`i`) immediately after removing the `removableClass`.
-* 
-* @param { string } c2 - The `c2` input parameter adds a second class to the button's
-* icon element (represented by the `i` selector) that will be applied for one second
-* before being removed.
-* 
-* @param { string } removableClass - The `removableClass` input parameter is used
-* to specify a class name that should be removed from the button's "i" element
-* immediately after adding the `c1` and `c2` classes.
-* 
-* @param { string } defaultClass - The `defaultClass` parameter is used to set the
-* class that will be added to the `i` element after the animation finishes (i.e.,
-* after 1 second).
-* 
-* @returns { any } This function takes five arguments: `button`, `c1`, `c2`,
-* `removableClass`, and `defaultClass`. It selects an icon element within the button
-* using `querySelector` and adds two classes `c1` and `c2` to it.
-*/
+ * @description This function toggles the class names "c1" and "c2" on an i-tag within
+ * a button element for 1 second before reverting back to the default class "defaultClass".
+ *
+ * @param {  } button - The `button` input parameter is not used anywhere within the
+ * provided function implementation.
+ *
+ * @param { string } c1 - In the given function `flashButtonResult`, the `c1` parameter
+ * is used to add a class to the element (`i`) immediately after removing the `removableClass`.
+ *
+ * @param { string } c2 - The `c2` input parameter adds a second class to the button's
+ * icon element (represented by the `i` selector) that will be applied for one second
+ * before being removed.
+ *
+ * @param { string } removableClass - The `removableClass` input parameter is used
+ * to specify a class name that should be removed from the button's "i" element
+ * immediately after adding the `c1` and `c2` classes.
+ *
+ * @param { string } defaultClass - The `defaultClass` parameter is used to set the
+ * class that will be added to the `i` element after the animation finishes (i.e.,
+ * after 1 second).
+ *
+ * @returns { any } This function takes five arguments: `button`, `c1`, `c2`,
+ * `removableClass`, and `defaultClass`. It selects an icon element within the button
+ * using `querySelector` and adds two classes `c1` and `c2` to it.
+ */
 function flashButtonResult(button, c1, c2, removableClass, defaultClass) {
     let r = button.querySelector("i");
     r.classList.remove(removableClass);
@@ -952,12 +944,12 @@ function flashButtonResult(button, c1, c2, removableClass, defaultClass) {
 * to the server with the button's flight ID.
 */
 function scheduleFlight(button) {
-    let loaderClass = setButtonLoading(button, "fe-star")
-    let flightID = button.getAttribute('flight-id')
+    let loaderClass = setButtonLoading(button, "fe-star");
+    let flightID = button.getAttribute("flight-id");
 
     const data = {
         msg: "schedule-flight",
-        data: {'flight_id': flightID},
+        data: { flight_id: flightID },
     };
 
 /**
@@ -975,7 +967,6 @@ function scheduleFlight(button) {
     function success() {
         flashButtonResult(button, "fe-check-circle", "fg-success", loaderClass, "fe-star");
         window.location.reload();
-
     }
 /**
 * @description This function displays a failing/error message to the user and then
@@ -987,7 +978,6 @@ function scheduleFlight(button) {
     function failure() {
         flashButtonResult(button, "fe-x-circle", "fg-failure", loaderClass, "fe-star");
         window.location.reload();
-
     }
     sendToServer(data, success, failure);
 }
@@ -1012,12 +1002,12 @@ function scheduleFlight(button) {
 * fg-success" or "fe-x-circle fg-failure")
 */
 function clearFlight(button) {
-    let loaderClass = setButtonLoading(button, "fe-star")
-    let flightID = button.getAttribute('flight-id')
+    let loaderClass = setButtonLoading(button, "fe-star");
+    let flightID = button.getAttribute("flight-id");
 
     const data = {
         msg: "clear-flight",
-        data: {'flight_id': flightID},
+        data: { flight_id: flightID },
     };
 
 /**
@@ -1030,7 +1020,6 @@ function clearFlight(button) {
     function success() {
         flashButtonResult(button, "fe-check-circle", "fg-success", loaderClass, "fe-star");
         window.location.reload();
-
     }
 /**
 * @description This function calls `flashButtonResult` with various arguments to
@@ -1043,7 +1032,6 @@ function clearFlight(button) {
     function failure() {
         flashButtonResult(button, "fe-x-circle", "fg-failure", loaderClass, "fe-star");
         window.location.reload();
-
     }
     sendToServer(data, success, failure);
 }
