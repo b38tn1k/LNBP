@@ -5,13 +5,11 @@
             <div class="card-body" style="overflow-x: auto; overflow-y: hidden; margin-right: 16px">
                 {% if league.flights %} {% for flight in league.flights %} {% set flightCounter = loop.index %}
                 <table
+                    {% if loop.index > 1 %} hidden {% endif %}
                     id="flight-{{ flightCounter }}"
                     flight="{{ flight.id }}"
                     flight-number="{{ flightCounter }}"
-                    class="schedule-table csv-table flight-sub-table table table-bordered table-hover table-sm"
-                    {% if loop.index>
-                        1 %} hidden {% endif %}
-                >
+                    class="schedule-table csv-table flight-sub-table table table-bordered table-hover table-sm">
                     <thead>
                         <tr>
                             <th colspan="2">
