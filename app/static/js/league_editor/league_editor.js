@@ -332,7 +332,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function setTimelineValueToToday() {
     let today = new Date();
-    console.log("Today's Date:", today);
+    // console.log("Today's Date:", today);
     let dates = {};
     document.querySelectorAll(".timeline-marker").forEach((i) => {
         let dateString = i.getAttribute("time").replace(" ", "T");
@@ -365,7 +365,7 @@ function setTimelineValueToToday() {
     }
     let bar = document.getElementById("league-timeline-progress-bar");
     let markers = document.querySelectorAll(".progress-marker");
-    console.log(bar, markers);
+    // console.log(bar, markers);
     if (beforeFirstDate == true) {
         bar.style.width = "0%";
         markers.forEach((i) => {
