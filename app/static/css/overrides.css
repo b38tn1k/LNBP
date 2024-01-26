@@ -272,3 +272,9 @@ tr.double-top-border {
     margin: 0.5rem;
     width:100%;
 }
+
+.tools-actions-to-bottom {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* This will push the child to the bottom */
+}

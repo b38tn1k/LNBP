@@ -692,6 +692,19 @@ def push_time_slot(league, d):
     end_time = start_time + timedelta(minutes=game_duration)
     league.create_timeslot(start_time, end_time)
 
+def update_deadline(league, d):
+    print(d)
+    time = datetime.strptime(d["values"], '%Y-%m-%dT%H:%M:%S.%f')
+    match d["ids"]:
+        case "launch":
+            league.launch_date = time
+        case "signup-deadline":
+            league.signup_deadline = time
+        case "availability-deadline":
+            league.availability_deadline = time
+        case "schedule-out":
+            league.schedule_release_date = time
+
 
 def apply_edits(league, updates):
     # priority
@@ -734,6 +747,9 @@ def apply_edits(league, updates):
                 change_flight(league, d)
             case "availability":
                 update_availability(league, d)
+            case "deadline":
+                print("update deadline")
+                update_deadline(league, d)
 
 
 def create_games_from_request(league, data):

@@ -205,6 +205,46 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    const deadlines = document.querySelectorAll(".league-timeline-date");
+    for (let date of deadlines) {
+        dateString = date.getAttribute("startTime");
+        timeslot = date.getAttribute("ts");
+        flatpickr(date, {
+            defaultDate: new Date(date.getAttribute("time")),
+            enableTime: true,
+            dateFormat: "m/d/y",
+            /**
+             * @description This function updates the values of a `<time>` element's `innerHTML`
+             * property and a `ts` attribute with the selected date using `Date()` constructor
+             * and `formatLocalDateTime()` method.
+             *
+             * @param { array } selectedDates - The `selectedDates` input parameter is an array
+             * of dates selected by the user through a dropdown or other interface element.
+             *
+             * @param { string } dateStr - Based on the code provided:
+             *
+             * The `dateStr` input parameter is a string representing the date displayed on the
+             * webpage via the `innerHTML` assignment.
+             *
+             * @returns { object } The function takes two arguments `selectedDates` and `dateStr`.
+             * It updates the `innerHTML` of an element with the value of `dateStr`, and then
+             * creates a new `Date` object from the selected dates.
+             */
+            onChange: function (selectedDates, dateStr) {
+                date.innerHTML = dateStr;
+                const newDate = new Date(selectedDates);
+                updateDelta(new Diff("deadline", date.getAttribute("category"), formatLocalDateTime(newDate)));
+                for (let otherDate of dates) {
+                    const otherTimeslot = otherDate.getAttribute("ts");
+                    if (otherTimeslot === timeslot) {
+                        console.log(otherDate);
+                        // TODO: Update matching dates
+                    }
+                }
+            },
+        });
+    }
+
     const flightNameInputs = document.querySelectorAll(".flight-name-input");
     for (let input of flightNameInputs) {
         input.addEventListener("change", function () {
@@ -285,8 +325,75 @@ document.addEventListener("DOMContentLoaded", function () {
     // document.getElementById("push-timeslot-button").addEventListener("click", pushTimeSlot);
     // document.getElementById("pop-timeslot-button").addEventListener("click", popTimeSlot);
 
+    setTimelineValueToToday();
+
     document.querySelectorAll(".reveal-after").forEach((div) => (div.style.display = "block"));
 });
+
+function setTimelineValueToToday() {
+    let today = new Date();
+    console.log("Today's Date:", today);
+    let dates = {};
+    document.querySelectorAll(".timeline-marker").forEach((i) => {
+        let dateString = i.getAttribute("time").replace(" ", "T");
+        dates[i.getAttribute("category")] = { date: new Date(dateString), order: parseInt(i.getAttribute("order")) };
+    });
+
+    // Sort categories by date
+    let sortedCategories = Object.keys(dates).sort((a, b) => dates[a]["date"] - dates[b]["date"]);
+
+    let currentCategory = null;
+    let nextCategory = null;
+    let beforeFirstDate = false;
+    let afterLastDate = false;
+
+    for (let i = 0; i < sortedCategories.length; i++) {
+        if (today < dates[sortedCategories[i]]["date"]) {
+            if (i === 0) {
+                // Today is before the first date
+                beforeFirstDate = true;
+            } else {
+                // Today is between the previous and current dates
+                currentCategory = sortedCategories[i - 1];
+                nextCategory = sortedCategories[i];
+            }
+            break;
+        } else if (i === sortedCategories.length - 1) {
+            // Today is after the last date
+            afterLastDate = true;
+        }
+    }
+    let bar = document.getElementById("league-timeline-progress-bar");
+    let markers = document.querySelectorAll(".progress-marker");
+    console.log(bar, markers);
+    if (beforeFirstDate == true) {
+        bar.style.width = "0%";
+        markers.forEach((i) => {
+            i.classList.remove("active");
+        });
+    } else if (afterLastDate == true) {
+        bar.style.width = "100%";
+        markers.forEach((i) => {
+            console.log(i);
+            i.classList.add("active");
+        });
+    } else {
+        target = dates[currentCategory];
+        next = dates[nextCategory];
+        markers.forEach((i) => {
+            let order = parseInt(i.getAttribute("order"));
+            if (order <= target["order"]) {
+                i.classList.add("active");
+            }
+            
+        });
+        let fill_percent = (target["order"]-1) * 20;
+        let totalDuration = next['date'] - target['date'];
+        let currentDuration = today - target['date'];
+        fill_percent += (currentDuration / totalDuration) * 20;
+        bar.style.width = String(fill_percent) + "%";
+    }
+}
 
 /**
  * @description This function adds an event listener to all nav links and hides all
@@ -327,6 +434,17 @@ function navClicker(e) {
     let target = e.getAttribute("target");
     let info = document.getElementById(target);
     info.hidden = false;
+
+    flightID = e.getAttribute("flight-id");
+    if (flightID) {
+        document.querySelectorAll(".schedule-table").forEach((i) => {
+            if (i.getAttribute("flight") == flightID) {
+                i.hidden = false;
+            } else {
+                i.hidden = true;
+            }
+        });
+    }
 }
 
 /**
@@ -478,7 +596,15 @@ function leagueRulesChangeCallback(event, allRules) {
  */
 function saveButtonCallback(event) {
     const saveString = JSON.stringify(delta);
-    sendToServer({ msg: "save", data: saveString });
+    sendToServer(
+        { msg: "save", data: saveString },
+        () => {
+            window.location.reload();
+        },
+        () => {
+            window.location.reload();
+        }
+    );
 }
 
 /**
@@ -930,19 +1056,19 @@ function flashButtonResult(button, c1, c2, removableClass, defaultClass) {
 }
 
 /**
-* @description This function schedules a flight using a button click event. It sets
-* the button as loading with a specified class name and retrieves the flight ID from
-* the button's attribute. It then sends a JSON object to the server with the scheduled
-* flight information and specifies two callback functions for success and failure.
-* 
-* @param {  } button - The `button` input parameter passed to the `scheduleFlight()`
-* function is used as a reference to the HTML button element that triggered the
-* function call.
-* 
-* @returns {  } The `scheduleFlight` function returns nothing (i.e., `undefined`)
-* because it is a function that sets the button loading state and sends a request
-* to the server with the button's flight ID.
-*/
+ * @description This function schedules a flight using a button click event. It sets
+ * the button as loading with a specified class name and retrieves the flight ID from
+ * the button's attribute. It then sends a JSON object to the server with the scheduled
+ * flight information and specifies two callback functions for success and failure.
+ *
+ * @param {  } button - The `button` input parameter passed to the `scheduleFlight()`
+ * function is used as a reference to the HTML button element that triggered the
+ * function call.
+ *
+ * @returns {  } The `scheduleFlight` function returns nothing (i.e., `undefined`)
+ * because it is a function that sets the button loading state and sends a request
+ * to the server with the button's flight ID.
+ */
 function scheduleFlight(button) {
     let loaderClass = setButtonLoading(button, "fe-star");
     let flightID = button.getAttribute("flight-id");
@@ -952,29 +1078,29 @@ function scheduleFlight(button) {
         data: { flight_id: flightID },
     };
 
-/**
-* @description This function executes when a success condition is met and it has the
-* following actions:
-* 
-* 1/ Flashes a button with a check mark icon.
-* 2/ Reloads the current web page.
-* 
-* @returns { any } The output of the function `success` is:
-* 
-* 	- Flashing a button with a success icon (a check circle) and a green fill color.
-* 	- Reloading the page.
-*/
+    /**
+     * @description This function executes when a success condition is met and it has the
+     * following actions:
+     *
+     * 1/ Flashes a button with a check mark icon.
+     * 2/ Reloads the current web page.
+     *
+     * @returns { any } The output of the function `success` is:
+     *
+     * 	- Flashing a button with a success icon (a check circle) and a green fill color.
+     * 	- Reloading the page.
+     */
     function success() {
         flashButtonResult(button, "fe-check-circle", "fg-success", loaderClass, "fe-star");
         window.location.reload();
     }
-/**
-* @description This function displays a failing/error message to the user and then
-* reloads the current web page.
-* 
-* @returns { any } This function takes no arguments and returns nothing (void),
-* meaning it does not produce any output or return any values.
-*/
+    /**
+     * @description This function displays a failing/error message to the user and then
+     * reloads the current web page.
+     *
+     * @returns { any } This function takes no arguments and returns nothing (void),
+     * meaning it does not produce any output or return any values.
+     */
     function failure() {
         flashButtonResult(button, "fe-x-circle", "fg-failure", loaderClass, "fe-star");
         window.location.reload();
@@ -983,24 +1109,24 @@ function scheduleFlight(button) {
 }
 
 /**
-* @description This function clears a flight reservation. It sets a button to loading
-* state while making a server request to clear the flight. If the request is successful
-* (i.e., the server acknowledges the request), it updates the button's appearance
-* with a success message and reloads the page.
-* 
-* @param {  } button - The `button` input parameter is passed as a reference to the
-* HTML button element that triggered the function.
-* 
-* @returns { any } The output returned by this function is two flags (loading and
-* error) and a string of the button's new class names.
-* 
-* Concisely:
-* 
-* 	- loading: false or "fe-star" if the flight was cleared successfully
-* 	- error: false or "fe-x-circle" if there was an error while clearing the flight
-* 	- classes: a space-separated string of new class names for the button ("fe-check-circle
-* fg-success" or "fe-x-circle fg-failure")
-*/
+ * @description This function clears a flight reservation. It sets a button to loading
+ * state while making a server request to clear the flight. If the request is successful
+ * (i.e., the server acknowledges the request), it updates the button's appearance
+ * with a success message and reloads the page.
+ *
+ * @param {  } button - The `button` input parameter is passed as a reference to the
+ * HTML button element that triggered the function.
+ *
+ * @returns { any } The output returned by this function is two flags (loading and
+ * error) and a string of the button's new class names.
+ *
+ * Concisely:
+ *
+ * 	- loading: false or "fe-star" if the flight was cleared successfully
+ * 	- error: false or "fe-x-circle" if there was an error while clearing the flight
+ * 	- classes: a space-separated string of new class names for the button ("fe-check-circle
+ * fg-success" or "fe-x-circle fg-failure")
+ */
 function clearFlight(button) {
     let loaderClass = setButtonLoading(button, "fe-star");
     let flightID = button.getAttribute("flight-id");
@@ -1010,25 +1136,25 @@ function clearFlight(button) {
         data: { flight_id: flightID },
     };
 
-/**
-* @description This function calls the `flashButtonResult` function with various
-* arguments to stylishly update the appearance of a button using Font Awesome icons
-* and CSS classes.
-* 
-* @returns {  } The function `success()` returns no value or void.
-*/
+    /**
+     * @description This function calls the `flashButtonResult` function with various
+     * arguments to stylishly update the appearance of a button using Font Awesome icons
+     * and CSS classes.
+     *
+     * @returns {  } The function `success()` returns no value or void.
+     */
     function success() {
         flashButtonResult(button, "fe-check-circle", "fg-success", loaderClass, "fe-star");
         window.location.reload();
     }
-/**
-* @description This function calls `flashButtonResult` with various arguments to
-* update the appearance of a button and then immediately reloads the current page
-* (by calling `window.location.reload()`).
-* 
-* @returns {  } The function `failure` takes no arguments and has no return statement.
-* Therefore it does not return any value or output.
-*/
+    /**
+     * @description This function calls `flashButtonResult` with various arguments to
+     * update the appearance of a button and then immediately reloads the current page
+     * (by calling `window.location.reload()`).
+     *
+     * @returns {  } The function `failure` takes no arguments and has no return statement.
+     * Therefore it does not return any value or output.
+     */
     function failure() {
         flashButtonResult(button, "fe-x-circle", "fg-failure", loaderClass, "fe-star");
         window.location.reload();

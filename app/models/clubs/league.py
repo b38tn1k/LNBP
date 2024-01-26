@@ -1,5 +1,5 @@
 from app.models import db, Model
-from datetime import datetime
+from datetime import datetime, timedelta
 from app.models import ModelProxy, transaction
 
 
@@ -12,6 +12,10 @@ class League(Model):
     type = db.Column(db.String)
     start_date = db.Column(db.DateTime, default=datetime.utcnow)
     end_date = db.Column(db.DateTime, default=datetime.utcnow)
+    launch_date = db.Column(db.DateTime, default=datetime.utcnow)
+    signup_deadline = db.Column(db.DateTime, default=datetime.utcnow)
+    availability_deadline = db.Column(db.DateTime, default=datetime.utcnow)
+    schedule_release_date = db.Column(db.DateTime, default=datetime.utcnow)
     bg_color = db.Column(db.String(7), default="#000000")
     fg_color = db.Column(db.String(7), default="#ffffff")
 
@@ -646,3 +650,31 @@ class League(Model):
                 return flight
         print("fail")
         return None
+    
+    def get_start_date(self):
+        self.start_date = min(self.timeslots, key=lambda ts: ts.start_time).start_time
+        return self.start_date
+    
+    def get_end_date(self):
+        self.end_date = max(self.timeslots, key=lambda ts: ts.start_time).start_time
+        return self.end_date
+
+    def get_launch_date(self):
+        if self.launch_date is None:
+            self.launch_date = self.start_date - timedelta(days=28)
+        return self.launch_date
+    
+    def get_signup_deadline(self):
+        if self.signup_deadline is None:
+            self.signup_deadline = self.start_date - timedelta(days=14)
+        return self.signup_deadline
+    
+    def get_availability_deadline(self):
+        if self.availability_deadline is None:
+            self.availability_deadline = self.start_date - timedelta(days=10)
+        return self.availability_deadline
+    
+    def get_schedule_release_date(self):
+        if self.schedule_release_date is None:
+            self.schedule_release_date = self.start_date - timedelta(days=7)
+        return self.schedule_release_date

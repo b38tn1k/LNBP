@@ -156,3 +156,24 @@ class Timeslot(Model):
         """
         duration = self.end_time - self.start_time
         return int(duration.total_seconds() / 60)
+
+    def get_facility_for_player_in_game_event(self, player):
+            """
+            This method returns the facility associated with the timeslot for a given player.
+
+            Args:
+                player (Player): The Player object for which to find the associated facility.
+
+            Returns:
+                Facility: The Facility object associated with the player and timeslot, if any; otherwise, None.
+            """
+            for game_event in self.game_events:
+                if player in game_event.players:
+                    return game_event.facility
+            return None
+    
+    def is_player_captain(self, player):
+        for game_event in self.game_events:
+                if player == game_event.captain:
+                    return True
+        return False

@@ -1,10 +1,10 @@
-<div class="col-6">
+<div class="col-12">
     <div class="card" style="flex: 1">
         <!-- <div class="card-header">
             <h3 class="card-title">Basic Setup</h3>
         </div> -->
         <div class="card-body">
-            <h5 class="card-title">Basic Setup</h5>
+            <h5 class="card-title">Setup</h5>
             <div class="row flex-row">
                 <div class="col-4">
                     <input
@@ -45,30 +45,31 @@
             <h5 class="card-title">Timeline</h5>
             <div class="progress-container">
                 <div class="flex-row col-12">
-                    <div class="marker-label first">Launch</div>
-                    <div class="marker-label">Signup Deadline</div>
-                    <div class="marker-label">Availability Deadline</div>
-                    <div class="marker-label">Schedule Release</div>
-                    <div class="marker-label">Kick-off</div>
-                    <div class="marker-label last">Final Match</div>
+                    <div class="marker-label first"><span style="cursor: default;">Launch</span><div order='1' class="timeline-marker league-timeline-date" category='launch' time="{{ league.get_launch_date() }}">{{ league.get_launch_date().strftime('%m/%d/%y') }}</div></div>
+                    <div class="marker-label"><span style="cursor: default;">Signup Deadline</span><div order='2' class="timeline-marker league-timeline-date" category='signup-deadline' time="{{ league.get_signup_deadline() }}">{{ league.get_signup_deadline().strftime('%m/%d/%y') }}</div></div>
+                    <div class="marker-label"><span style="cursor: default;">Availability Deadline</span><div order='3' class="timeline-marker league-timeline-date" category='availability-deadline' time="{{ league.get_availability_deadline() }}">{{ league.get_availability_deadline().strftime('%m/%d/%y') }}</div></div>
+                    <div class="marker-label"><span style="cursor: default;">Schedule Release</span><div order='4' class="timeline-marker league-timeline-date" category='schedule-out' time="{{ league.get_schedule_release_date() }}">{{ league.get_schedule_release_date().strftime('%m/%d/%y') }}</div></div>
+                    <div class="marker-label"><span style="cursor: default;">Kick-off</span><div order='5' class="timeline-marker" category='kick-off' time="{{ league.get_start_date() }}">{{ league.get_start_date().strftime('%m/%d/%y') }}</div></div>
+                    <div class="marker-label last"><span style="cursor: default;">Final Match</span><div order='6' class="timeline-marker" category='finale-match' time="{{ league.get_end_date() }}">{{league.get_end_date().strftime('%m/%d/%y')}}</div></div>
                 </div>
                 <div>
                     <div class="progress">
                         <div class="progress-bar-background"></div>
                         <div
+                            id="league-timeline-progress-bar"
                             class="progress-bar"
                             role="progressbar"
-                            style="width: 25%"
+                            style="width: 0%"
                             aria-valuenow="25"
                             aria-valuemin="0"
                             aria-valuemax="100"
                         ></div>
-                        <div class="marker" style="left: 0%"><div class="progress-marker active"></div></div>
-                        <div class="marker" style="left: 20%"><div class="progress-marker active"></div></div>
-                        <div class="marker" style="left: 40%"><div class="progress-marker"></div></div>
-                        <div class="marker" style="left: 60%"><div class="progress-marker"></div></div>
-                        <div class="marker" style="left: 80%"><div class="progress-marker"></div></div>
-                        <div class="marker" style="left: 100%"><div class="progress-marker last"></div></div>
+                        <div class="marker" style="left: 0%"><div order='1' class="progress-marker"></div></div>
+                        <div class="marker" style="left: 20%"><div order='2' class="progress-marker"></div></div>
+                        <div class="marker" style="left: 40%"><div order='3' class="progress-marker"></div></div>
+                        <div class="marker" style="left: 60%"><div order='4' class="progress-marker"></div></div>
+                        <div class="marker" style="left: 80%"><div order='5' class="progress-marker"></div></div>
+                        <div class="marker" style="left: 100%"><div order='6' class="progress-marker last"></div></div>
                     </div>
                 </div>
             </div>

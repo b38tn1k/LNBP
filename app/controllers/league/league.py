@@ -108,7 +108,7 @@ def league_home(id):
             return jsonify({"status": "failure", "error": str(e)})
 
     return render_template(
-        "league/edit.html",
+        "league/lh.html",
         simple_form=SimpleForm(),
         league=league,
         club=current_user.club,

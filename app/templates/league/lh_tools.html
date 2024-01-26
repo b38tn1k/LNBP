@@ -1,6 +1,6 @@
 {% block body %}
 
-<div class="col-6">
+<div class="col-12">
     <div class="card" style="flex: 1">
         <div class="card-body">
             <div class="flex-row class-title">
@@ -19,6 +19,7 @@
                         onclick="navClicker(this)"
                         class="nav-link flight-tab {% if flight == first_flight %}active{% endif %}"
                         target="flight-tab-{{ flight.id }}"
+                        flight-id="{{ flight.id }}"
                     >
                         <div>
                             <div><strong>{{ flight.name }}</strong></div>
@@ -45,7 +46,6 @@
                         target="schedule-rules"
                     >
                         <div>
-                            
                             <div><strong>League Rules</strong></div>
                             <div><br /></div>
                         </div>
@@ -55,13 +55,27 @@
             {% for flight in league.flights %}
             <div class="nav-info-tab" id="flight-tab-{{ flight.id }}" {% if loop.index>
                 1 %} hidden {% endif %}>
-                {% if flight.report %}
-                {% if flight.report.count > 0 %} 
-                <h3 class="card-title">Issues</h3>
+                <div>
+                    <div class="flex-row">
+                        <button onclick="scheduleFlight(this)" flight-id="{{flight.id}}" class="btn btn-primary col-3">
+                            <i class="fe fe-star"></i> Schedule {{flight.name}}
+                        </button>
+                        <a
+                            href="{{ url_for('league.schedule_league', id=league['id']) }}#target_flight={{ flight.id }}"
+                            class="btn btn-primary col-3"
+                            >Edit {{ flight.name }}</a
+                        >
+                        <button onclick="clearFlight(this)" flight-id="{{flight.id}}" class="btn btn-danger col-3">
+                            <i class="fe fe-trash-2"></i> Clear {{flight.name}}
+                        </button>
+                    </div>
+                </div>
+
+                {% if flight.report %} {% if flight.report.count > 0 %}
                 <div class="row">
                     {% for key in flight.report.issues %}
-                    <div class="col-4" style="padding:1rem;">
-                        <div class="bordered-block" style="height:100%;">
+                    <div class="col-4" style="padding: 1rem">
+                        <div class="bordered-block" style="height: 100%; margin-bottom: 0;  padding-bottom: 0">
                             <strong>{{ key }}</strong>
                             <ul>
                                 {% for p in flight.report.issues[key] %}
@@ -73,18 +87,10 @@
                     {% endfor %}
                 </div>
                 <div><br /></div>
-                {%endif%}
-                {%endif%}
-
-                <h3 class="card-title">Actions</h3>
-                <div class="gap-row">
-                    <button onclick="scheduleFlight(this)" flight-id="{{flight.id}}" class="btn btn-primary col-3"><i class="fe fe-star"></i> Schedule {{flight.name}}</button>
-                    <a href="{{ url_for('league.schedule_league', id=league['id']) }}#target_flight={{ flight.id }}" class="btn btn-primary col-3">Edit {{ flight.name }}</a>
-                    <button onclick="clearFlight(this)" flight-id="{{flight.id}}" class="btn btn-danger col-3"> <i class="fe fe-trash-2"></i> Clear {{flight.name}}</button>
-                </div>
+                {%endif%} {%endif%}
             </div>
             {% endfor %}
-            <div class="nav-info-tab" id="schedule-rules" hidden>{% include 'league/league_schedule_rules.html' %}</div>
+            <div class="nav-info-tab" id="schedule-rules" hidden>{% include 'league/lh_rules.html' %}</div>
         </div>
     </div>
 </div>
