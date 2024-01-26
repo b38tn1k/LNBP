@@ -1,3 +1,9 @@
+# IDEAS:
+# - Scheduler Method that works on players voting for gameslots in groups of potential games
+# - lower availability score is higher voice
+# - players can give and take votes, should eventually only vote for 4 favs
+# - final round of voting, voters may be influence by popularity amoungst other voters
+
 from .single_flight_scheduler_tool import SingleFlightScheduleTool
 from .constants import *
 from .player import Player
@@ -52,7 +58,11 @@ class Scheduler:
 
         """
         self.flight = self.league.get_flight_by_id(self.flight_id)
+        
+    
+    def clear_flight_db_obj(self):
         self.flight.delete_all_game_events()
+
 
     def sf_setup(self, mutate):
         """
@@ -182,7 +192,7 @@ class Scheduler:
                 record_broken_rules(player, tiers, fails, "min_captained")
 
             if captainhood_over:
-                record_broken_rules(player, tiers, fails, "min_captained")
+                record_broken_rules(player, tiers, fails, "max_captained")
 
             # player mostly scheduled low preference
             over_scheduled_lp = (p[AVAILABLE_LP] * 2) > p["game_count"]
@@ -222,6 +232,42 @@ class Scheduler:
                         player, tiers, fails, "max_repeat_compete", notes=str(c)
                     )
         return fails
+    
+    def copy_flight_with_games(self, flight):
+        if flight is None:
+            self.flight = self.league.get_flight_by_id(self.flight_id)
+            flight = self.flight
+        gameslots = create_gameslot_objects(self.league, self.rules, check=False)
+        players = create_player_objects(flight, self.league, self.rules)
+        generate_gameslot_availability_scores(gameslots, players)
+        find_player_exceptions(players, gameslots, self.rules)
+        player_dict = {}
+        for p in players:
+            player_dict[p.id] = p
+        gameslots_dict = {}
+        for gs in gameslots:
+            if gs.facility_id in gameslots_dict:
+                gameslots_dict[gs.facility_id][gs.timeslot_id] = gs
+            else:
+                gameslots_dict[gs.facility_id] = {}
+                gameslots_dict[gs.facility_id][gs.timeslot_id] = gs
+
+        for event in flight.game_events:
+            fid = event.facility_id
+            tid = event.timeslot_id
+            if fid in gameslots_dict:
+                if tid in gameslots_dict[fid]:
+                    gs = gameslots_dict[fid][tid]
+                    for p in event.players:
+                        gs.force_player_to_match(player_dict[p.id])
+                    gs.captain = player_dict[event.captain.id]
+                    gs.captain.captain_count += 1
+        scheduler = SingleFlightScheduleTool(
+            flight.id, self.rules, players, gameslots, 0
+        )
+        scheduler.finalize()
+        res = self.evaluate(scheduler)
+        return res, scheduler
 
     def report(self):
         """
@@ -232,37 +278,8 @@ class Scheduler:
         """
         print("GENERATE REPORT")
         for flight in self.league.flights:
-            flight.report = []
-            gameslots = create_gameslot_objects(self.league, self.rules, check=False)
-            players = create_player_objects(flight, self.league, self.rules)
-            generate_gameslot_availability_scores(gameslots, players)
-            find_player_exceptions(players, gameslots, self.rules)
-            player_dict = {}
-            for p in players:
-                player_dict[p.id] = p
-            gameslots_dict = {}
-            for gs in gameslots:
-                if gs.facility_id in gameslots_dict:
-                    gameslots_dict[gs.facility_id][gs.timeslot_id] = gs
-                else:
-                    gameslots_dict[gs.facility_id] = {}
-                    gameslots_dict[gs.facility_id][gs.timeslot_id] = gs
-
-            for event in flight.game_events:
-                fid = event.facility_id
-                tid = event.timeslot_id
-                if fid in gameslots_dict:
-                    if tid in gameslots_dict[fid]:
-                        gs = gameslots_dict[fid][tid]
-                        for p in event.players:
-                            gs.force_player_to_match(player_dict[p.id])
-                        gs.captain = player_dict[event.captain.id]
-                        gs.captain.captain_count += 1
-            scheduler = SingleFlightScheduleTool(
-                flight.id, self.rules, players, gameslots, 0
-            )
-            scheduler.finalize()
-            res = self.evaluate(scheduler)
+            flight.report = {}
+            res, scheduler = self.copy_flight_with_games(flight)
             report = unpack_report(self.league, {"scheduler": scheduler, "res": res})
             print(report)
             flight.report = report
@@ -279,6 +296,17 @@ class Scheduler:
         i = 0
         candidates = []
         optimiser_eval = {'tier1 better':0, 'tier1 worse':0, 'tier2 better':0, 'tier2 worse':0}
+        res, scheduler = self.copy_flight_with_games(self.flight)
+        candidates.append(
+            {
+                "scheduler": scheduler,
+                "res": res,
+                "mutate_value": -1,
+                "mutate_mode": 'Prior',
+                "scheduler_mode": 'Prior',
+            }
+        )
+        self.clear_flight_db_obj()
         for _ in self.league.timeslots:
             for _ in range(3):
                 # print('setup')
@@ -310,6 +338,11 @@ class Scheduler:
         best_candidate = min(
             candidates, key=lambda x: (x["res"]["tier1"], x["res"]["tier2"])
         )
+        print()
+        print("Best Candidate found using", best_candidate["mutate_mode"], 'with index', best_candidate["mutate_value"])
+        print("Previous", candidates[0]['res']['tier1'], candidates[0]['res']['tier2'])
+        print("Now", best_candidate['res']['tier1'], best_candidate['res']['tier2'])
+        print()
         report = unpack_report(self.league, best_candidate)
         flight = self.build(best_candidate["scheduler"])
         flight.report = report
@@ -706,13 +739,15 @@ def count_categories(my_dict):
     counter = {}
     for key in my_dict:
         br = key['broken_rule']
+        inc = 1
         if br not in ["min_captained", "max_captained"]:
             if 'max_repeat_compete' in br:
                 br = 'max_repeat_compete'
+                inc = 0.5
             if br in counter:
-                counter[br] += 1
+                counter[br] += inc
             else:
-                counter[br] = 1
+                counter[br] = inc
     return counter
 
 def eval_optimiser(r1, r2, optimiser_eval):

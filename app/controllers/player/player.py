@@ -1,12 +1,23 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, jsonify
+from flask import (
+    Blueprint,
+    render_template,
+    abort,
+    redirect,
+    url_for,
+    flash,
+    request,
+    jsonify,
+)
 from flask_login import login_required, current_user
 from app.models import db
+from app.models.clubs import Club
 from app.forms.player_form import PlayerForm
 from app.forms import SimpleForm
 
-blueprint = Blueprint('player', __name__)
+blueprint = Blueprint("player", __name__)
 
-@blueprint.route('/<hashid:player_id>', methods=["GET", "POST"])
+
+@blueprint.route("/<hashid:player_id>", methods=["GET", "POST"])
 @login_required
 def index(player_id):
     """
@@ -28,7 +39,7 @@ def index(player_id):
 
     """
     if not current_user.is_authenticated or current_user.primary_membership_id is None:
-        flash('You currently do not have accesss to app', 'warning')
+        flash("You currently do not have accesss to app", "warning")
         return redirect(url_for("main.home"))
     club = current_user.club
     player = next((p for p in club.players if p.id == player_id), None)
@@ -36,12 +47,18 @@ def index(player_id):
     if form.validate_on_submit():
         form.populate_obj(player)
         db.session.commit()
-        flash('Player information updated successfully.', 'success')
+        flash("Player information updated successfully.", "success")
 
-    return render_template('player/player.html', club=club, my_player=player, form=form, simple_form=SimpleForm())
+    return render_template(
+        "player/player.html",
+        club=club,
+        my_player=player,
+        form=form,
+        simple_form=SimpleForm(),
+    )
 
 
-@blueprint.route('/delete/<int:player_id>', methods=["POST"])
+@blueprint.route("/delete/<int:player_id>", methods=["POST"])
 @login_required
 def delete_player(player_id):
     """
@@ -56,13 +73,13 @@ def delete_player(player_id):
 
     Returns:
         dict: Based on the code provided:
-        
+
         Output: JSON response with status "success" and message "Player deleted"
         (200 HTTP status code).
 
     """
     if not current_user.is_authenticated or current_user.primary_membership_id is None:
-        return jsonify({'status': 'error', 'message': 'Not authenticated'}), 401
+        return jsonify({"status": "error", "message": "Not authenticated"}), 401
 
     # Check if the player belongs to the current user's club
     club = current_user.club
@@ -72,12 +89,12 @@ def delete_player(player_id):
         # Perform deletion logic
         db.session.delete(player)
         db.session.commit()
-        return jsonify({'status': 'success', 'message': 'Player deleted'}), 200
+        return jsonify({"status": "success", "message": "Player deleted"}), 200
     else:
-        return jsonify({'status': 'error', 'message': 'Player not found'}), 404
-    
+        return jsonify({"status": "error", "message": "Player not found"}), 404
 
-@blueprint.route('/new', methods=["GET", "POST"])
+
+@blueprint.route("/new", methods=["GET", "POST"])
 @login_required
 def new_player():
     """
@@ -95,15 +112,49 @@ def new_player():
 
     """
     if not current_user.is_authenticated or current_user.primary_membership_id is None:
-        flash('You currently do not have accesss to app', 'warning')
+        flash("You currently do not have accesss to app", "warning")
         return redirect(url_for("main.home"))
-    club = current_user.club    
+    club = current_user.club
     form = PlayerForm()
     if form.validate_on_submit():
         player = club.new_player("", "")
         form.obj = player
         form.populate_obj(player)
         db.session.commit()
-        flash('Player information updated successfully.', 'success')
+        flash("Player information updated successfully.", "success")
 
-    return render_template('player/new.html', club=club, form=form, simple_form=SimpleForm())
+    return render_template(
+        "player/new.html", club=club, form=form, simple_form=SimpleForm()
+    )
+
+
+@blueprint.route("/<hashid:club_id>/<hashid:player_id>", methods=["GET", "POST"])
+def public_portal(club_id, player_id):
+    club = Club.query.get(club_id)
+    player = club.get_player_by_id(player_id)
+    logged_in = False
+    if current_user.is_authenticated:
+        logged_in = True
+    if not club or not player:
+        flash("You currently do not have accesss to app", "warning")
+        return redirect(url_for("main.home"))
+
+    if request.method == "POST":
+        try:
+            data = request.json
+            print(data)
+            if data["msg"] == "change_theme":
+                theme = data["theme"] + ".min.css"
+                club.portal_style = theme
+                db.session.commit()
+                return jsonify({"status": "success", "data": club.get_portal_style()})
+            return jsonify({"status": "success"})
+        except Exception as e:
+            return jsonify({"status": "failure", "error": str(e)})
+    return render_template(
+        "player/public_portal.html",
+        simple_form=SimpleForm(),
+        club=club,
+        player=player,
+        logged_in=logged_in,
+    )

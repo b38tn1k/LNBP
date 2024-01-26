@@ -74,6 +74,9 @@ def league_home(id):
             if data['msg'] == 'save':
                 apply_edits(league, json.loads(data['data']))
                 db.session.commit()
+                s = Scheduler(league, Scheduler.GENERATE_REPORT)
+                s.report()
+                db.session.commit()
                 # flash("League updated successfully.", "success")
                 return jsonify({"status": "success"})
             if data["msg"] == "schedule-all":

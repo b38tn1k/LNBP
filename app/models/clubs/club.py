@@ -1,6 +1,7 @@
 from app.models import db, Model
 from app.models import ModelProxy, transaction
 from sqlalchemy.orm.attributes import flag_modified
+from flask import url_for
 
 
 class Club(Model):
@@ -21,6 +22,8 @@ class Club(Model):
     country = db.Column(db.String(100))
     todos = db.relationship("Todo", back_populates="club", lazy="dynamic")
     bg_statistics = db.Column(db.JSON)
+    country = db.Column(db.String(100))
+    portal_style = db.Column(db.String(100), default='lux.min.css')
 
     GDPR_EXPORT_COLUMNS = {
         "id": "ID of the club",
@@ -54,6 +57,13 @@ class Club(Model):
         db.session.add(club)
         db.session.commit()
         return club
+    
+    def get_portal_style(self):
+        if self.portal_style is None:
+            # self.portal_style = 'lux.min.css'
+            self.portal_style = 'superhero.min.css'
+        return url_for('static', filename='css/portal_styles/' + self.portal_style)
+
 
     def update_statistics(self, item):
         """

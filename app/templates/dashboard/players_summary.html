@@ -1,4 +1,4 @@
-<div class="col-6 col-sm-6 col-lg-6">
+<div class="col-4 col-sm-4 col-lg-4">
     <div class="card" style="flex: 1;">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h3 class="card-title">Players</h3>
@@ -12,6 +12,8 @@
                 <thead>
                     <tr>
                         <th>Name</th>
+                        <th>Ranking</th>
+                        <th>Player Portal</th>
                         <th>Edit</th>
                         <th>Delete</th>
                     </tr>
@@ -20,6 +22,17 @@
                     {% for p in club.players|sort(attribute='last_name') %}
                     <tr>
                         <td>{{p.full_name}}</td>
+                        <td>{{p.club_ranking}}</td>
+                        <td>
+                            <a
+                                class="btn btn-primary"
+                                title="Player Portal"
+                                aria-label="Player Portal"
+                                href="{{ url_for('player.public_portal', player_id=p.id, club_id=club.id) }}"
+                            >
+                                <i class="fe fe-globe"></i>
+                            </a>
+                        </td>
                         <td>
                             <a
                                 class="btn btn-primary"

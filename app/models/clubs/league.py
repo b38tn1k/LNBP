@@ -3,6 +3,50 @@ from datetime import datetime, timedelta
 from app.models import ModelProxy, transaction
 
 
+def construct_schedule_string(day_counter, time_counter):
+    # Calculate the average counts
+    total_days = len(day_counter)
+    total_times = len(time_counter)
+    average_day_count = sum(day_counter.values()) / total_days if total_days > 0 else 0
+    average_time_count = (
+        sum(time_counter.values()) / total_times if total_times > 0 else 0
+    )
+
+    # Check if all times are after 16:00
+    all_times_after_1600 = all(time > "16:00" for time in time_counter.keys())
+
+    # Initialize lists to store day and time strings
+    day_strings = []
+    time_strings = []
+
+    # Iterate over day_counter to construct day strings
+    for day, count in day_counter.items():
+        if count >= average_day_count:
+            day_strings.append(day)
+        else:
+            day_strings.append(f"occasionally {day}")
+
+    # Iterate over time_counter to construct time strings
+    for time, count in time_counter.items():
+        if count >= average_time_count:
+            time_strings.append(time)
+        else:
+            time_strings.append(f"occasionally {time}")
+
+    # Join day and time strings with appropriate separators
+    day_string = ", ".join(day_strings)
+    time_string = ", ".join(time_strings)
+
+    # Add 'evenings' if all times are after 16:00
+    if all_times_after_1600:
+        day_string += " evenings"
+
+    # Construct the final schedule string
+    schedule_string = f"{day_string}. Games at {time_string}"
+
+    return schedule_string
+
+
 class League(Model):
     __tablename__ = "league"
 
@@ -206,7 +250,7 @@ class League(Model):
             return player_availability.availability
         else:
             return -1
-        
+
     def get_player_availability_dict(self, player):
         """
         This function returns a dictionary of player availability for each timeslot
@@ -226,7 +270,6 @@ class League(Model):
         for t in self.timeslots:
             a[t.id] = self.get_player_availability(player, t)
         return a
-
 
     def delete_game_event(self, game_event):
         """
@@ -258,13 +301,13 @@ class League(Model):
 
         """
         for f in self.flights:
-            print (f.name)
+            print(f.name)
             print()
             for fpa in f.player_associations:
                 player = fpa.player
-                my_string = player.full_name + '\t'
-                my_string += str(self.get_player_availability_dict(player))      
-                print(my_string)           
+                my_string = player.full_name + "\t"
+                my_string += str(self.get_player_availability_dict(player))
+                print(my_string)
             print()
 
     def get_player_association(self, player):
@@ -289,8 +332,6 @@ class League(Model):
             None,
         )
         return league_association
-        
-            
 
     def create_timeslot(self, start_time, end_time, add=True, commit=False):
         """
@@ -621,6 +662,14 @@ class League(Model):
         else:
             return None
         
+    def get_past_player_games(self, player):
+        games = []
+        for game in self.game_events:
+            if player in game.players:
+                games.append(game)
+        return games
+
+
     def clean(self):
         """
         This function 'clean' cleans up the list of facility associations by
@@ -634,7 +683,7 @@ class League(Model):
                 db.session.delete(facility_assoc)
             else:
                 already_seen.add(facility_assoc.facility.id)
-        
+
     def get_flight_for_player(self, player):
         """
         Get the flight that contains the specified player.
@@ -650,11 +699,11 @@ class League(Model):
                 return flight
         print("fail")
         return None
-    
+
     def get_start_date(self):
         self.start_date = min(self.timeslots, key=lambda ts: ts.start_time).start_time
         return self.start_date
-    
+
     def get_end_date(self):
         self.end_date = max(self.timeslots, key=lambda ts: ts.start_time).start_time
         return self.end_date
@@ -663,18 +712,43 @@ class League(Model):
         if self.launch_date is None:
             self.launch_date = self.start_date - timedelta(days=28)
         return self.launch_date
-    
+
     def get_signup_deadline(self):
         if self.signup_deadline is None:
             self.signup_deadline = self.start_date - timedelta(days=14)
         return self.signup_deadline
-    
+
     def get_availability_deadline(self):
         if self.availability_deadline is None:
             self.availability_deadline = self.start_date - timedelta(days=10)
         return self.availability_deadline
-    
+
     def get_schedule_release_date(self):
         if self.schedule_release_date is None:
             self.schedule_release_date = self.start_date - timedelta(days=7)
         return self.schedule_release_date
+
+    def get_days_and_times_string(self):
+        day_counter = {}
+        time_counter = {}
+        for ts in self.timeslots:
+            day = ts.start_time.strftime("%A")
+            time = ts.start_time.strftime("%H:%M")
+            if day in day_counter:
+                day_counter[day] += 1
+            else:
+                day_counter[day] = 1
+            if time in time_counter:
+                time_counter[time] += 1
+            else:
+                time_counter[time] = 1
+        result = construct_schedule_string(day_counter, time_counter)
+        return result
+
+    def get_league_description(self):
+        return "A simple description!"
+    
+    def is_available_for_signup(self):
+        today_date = datetime.now()
+        signup_date = self.get_signup_deadline()
+        return signup_date > today_date
