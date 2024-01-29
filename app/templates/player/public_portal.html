@@ -7,131 +7,14 @@
 
 <div class="row">
     <div class="col-8 col-sm-12 col-lg-8">
-        {% for assoc in player.league_associations %} {% set league = assoc.league %}
-        <div class="availability_league card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <div>
-                    <h3 class="card-title">{{league.name}}</h3>
-                    <div class="lead">
-                        Availability Deadline: {{league.get_availability_deadline().strftime('%m/%d/%y')}}
-                    </div>
-                </div>
-                <button type="button" class="btn btn-primary">Save Availability</button>
-            </div>
-
-            <div class="card-body">
-                <div class="row">
-                    {% for ts in league.timeslots %}
-                    <div class="col-3 col-sm-4 col-lg-2">
-                        <div class="card league_card">
-                            {% set time = ts.human_readable_mmdd_hhmm() %}
-                            <div class="text-body-secondary">{{ time.split()[0] }} {{ time.split()[1] }}</div>
-                            <div class="text-body">{{ time.split()[2] }}</div>
-                            {% set avail = league.get_player_availability(player, ts) %} {% if avail == 1 %}
-                            <button
-                                id="{{ts.id}}"
-                                avail="{{avail}}"
-                                type="button"
-                                class="availability_indicator btn btn-success"
-                            >
-                                I am in!
-                            </button>
-                            {% elif avail == 2 %}
-                            <button
-                                id="{{ts.id}}"
-                                avail="{{avail}}"
-                                type="button"
-                                class="availability_indicator btn btn-warning"
-                            >
-                                ...Maybe
-                            </button>
-                            {% elif avail == 3 %}
-                            <button
-                                id="{{ts.id}}"
-                                avail="{{avail}}"
-                                type="button"
-                                class="availability_indicator btn btn-danger"
-                            >
-                                Nope
-                            </button>
-                            {% endif %}
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-        {% endfor %} {% for assoc in player.league_associations %} {% set league = assoc.league %}
-
-        <div class="availability_league card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <div>
-                    <h3 class="card-title">Scores</h3>
-                </div>
-                <button type="button" class="btn btn-primary">Submit</button>
-            </div>
-
-            <div class="card-body">
-                <div class="row">
-                    {% for game in league.get_past_player_games(player) %}
-
-                    <div class="col-6 col-sm-12 col-lg-6">
-                        <div class="card league_card">
-                            <h5 class="card-title">{{league.name}}: {{game.flight.name}}</h5>
-                            <div class="text-body-secondary">{{game.timeslot.human_readable_mmdd_hhmm()}}</div>
-                            <div class="text-body">
-                                With {% for p in game.players %} {% if not loop.last %} {{ p.first_name }}, {% else %} &
-                                {{ p.first_name }} {% endif %} {% endfor %}
-                            </div>
-                            <div class="text-body"><br>Collect Scores (Will)</div>
-                        </div>
-                    </div>
-                    {% endfor %} {% endfor %}
-                </div>
-            </div>
-        </div>
+        {% include 'player/public_player_available_form.html' %}
+        {% include 'player/public_score_cards.html' %}
+        
     </div>
 
     <div class="col-4 col-sm-12 col-lg-4">
-        <div class="card" style="flex: 1">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h4 class="card-title">Your Upcomming Matches</h4>
-            </div>
-            <div class="card-body">
-                //TODO
-                // add to calendar tool also
-            </div>
-        </div>
-
-        <div class="card" style="flex: 1">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h4 class="card-title">Upcomming Leagues</h4>
-            </div>
-            <div class="card-body">
-                {% for league in club.leagues %} {% if league.is_available_for_signup() %}
-                <div class="signup-leagues card league_card">
-                    <div class="d-flex justify-content-between align-items-center" style="margin-bottom: 0.5rem">
-                        <div>
-                            <h5 class="card-title">{{league.name}}</h5>
-                            <p class="text-body-secondary">{{league.get_league_description()}}</p>
-                        </div>
-                        <button type="button" class="btn btn-primary">Sign Up</button>
-                    </div>
-                    <div class="text-body-secondary">
-                        Signup Deadline: {{league.get_signup_deadline().strftime('%m/%d/%y')}}
-                    </div>
-                    {% set start_time = league.get_start_date() %}
-                    <div class="text-body">
-                        {{start_time.strftime('%m/%d/%y')}} to {{league.get_end_date().strftime('%m/%d/%y')}}
-                    </div>
-                    {% set info = league.get_days_and_times_string() %}
-                    <div class="text-body-secondary">{{ info.split('.')[0] }}</div>
-                    <div class="text-body-secondary">{{ info.split('.')[1] }}</div>
-                </div>
-                {% endif %} {% endfor %}
-            </div>
-        </div>
+        {% include 'player/public_upcoming_matches.html' %}
+        {% include 'player/public_upcoming_leagues.html' %}
     </div>
-
-    {% endblock %}
 </div>
+{% endblock %}

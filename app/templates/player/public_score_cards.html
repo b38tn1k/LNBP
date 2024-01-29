@@ -1,0 +1,29 @@
+{% for assoc in player.league_associations %} {% set league = assoc.league %}
+<div class="score_cards card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <div>
+            <h3 class="card-title">Scores</h3>
+        </div>
+        <button type="button" class="btn btn-primary">Submit</button>
+    </div>
+
+    <div class="card-body">
+        <div class="row">
+            {% for game in league.get_past_player_games(player) %}
+
+            <div class="col-6 col-sm-12 col-lg-6">
+                <div class="card league_card">
+                    <h5 class="card-title">{{league.name}}: {{game.flight.name}}</h5>
+                    <div class="text-body-secondary">{{game.timeslot.human_readable_mmdd_hhmm()}}</div>
+                    <div class="text-body">
+                        With {% for p in game.players %} {% if not loop.last %} {{ p.first_name }}, {% else %} & {{
+                        p.first_name }} {% endif %} {% endfor %}
+                    </div>
+                    <div class="text-body"><br />Collect Scores (Will)</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endfor %}

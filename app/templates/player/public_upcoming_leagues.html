@@ -1,0 +1,31 @@
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h4 class="card-title">Upcoming Leagues</h4>
+    </div>
+
+    <div class="card-body">
+        {% for league in club.leagues %} {% if league.is_available_for_signup() %}
+        <div class="signup-leagues card league_card">
+            <div class="d-flex justify-content-between align-items-center" style="margin-bottom: 0.5rem">
+                <div>
+                    <h5 class="card-title">{{league.name}}</h5>
+                    <p class="text-body-secondary">{{league.get_league_description()}}</p>
+                </div>
+                <button type="button" class="btn btn-primary">Sign Up</button>
+            </div>
+            <div class="text-body-secondary">
+                Signup Deadline: {{league.get_signup_deadline().strftime('%m/%d/%y')}}
+            </div>
+            {% set start_time = league.get_start_date() %}
+            <div class="text-body">
+                {{start_time.strftime('%m/%d/%y')}} to {{league.get_end_date().strftime('%m/%d/%y')}}
+            </div>
+            {% set info = league.get_days_and_times_string() %}
+            <div class="text-body-secondary">{{ info.split('.')[0] }}</div>
+            <div class="text-body-secondary">{{ info.split('.')[1] }}</div>
+        </div>
+        {% endif %} {% endfor %}
+    </div>
+    
+</div>

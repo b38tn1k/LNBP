@@ -1,0 +1,31 @@
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h4 class="card-title">Your Upcoming Matches</h4>
+    </div>
+
+    <div class="card-body">
+        <div class="row">
+            {% for game in player.get_upcoming_games_in_order() %}
+            <div class="col-12 col-sm-12 col-lg-12">
+                <div class="card league_card">
+                    <div class="d-flex justify-content-between align-items-top">
+                        <div>
+                            <h5 class="card-title">{{game.league.name}}: {{game.flight.name}}</h5>
+                            {% set date=game.timeslot.human_readable_mmdd_hhmm() %}
+                            <div class="text-body-secondary">{{ date.split(' ')[0] }} {{ date.split(' ')[1] }}</div>
+                            <div class="text-body-secondary">{{ date.split(' ')[2] }}</div>
+                            <div class="text-body">
+                                With {% for p in game.players %} {% if not loop.last %} {{ p.first_name }}, {% else %} &
+                                {{ p.first_name }} {% endif %} {% endfor %}
+                            </div>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-primary">Find a Sub</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>

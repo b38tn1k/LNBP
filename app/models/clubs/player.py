@@ -1,5 +1,6 @@
 from app.models import Model, db
 from app.models import ModelProxy, transaction
+from datetime import datetime
 
 class Player(Model):
     __tablename__ = 'player'
@@ -65,6 +66,16 @@ class Player(Model):
 
         """
         return any(association.flight_id == flight.id for association in self.flight_associations)
+    
+    def get_upcoming_games_in_order(self):
+        res = []
+        today_date = datetime.now()
+        for game in self.game_events:
+            if game.timeslot.start_time > today_date:
+                res.append(game)
+        res.sort(key=lambda x: x.timeslot.start_time)
+
+        return res
 
     
     def __repr__(self):

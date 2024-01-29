@@ -68,6 +68,7 @@
             .card {
                 margin-bottom: 1rem;
             }
+            
         </style>
     </head>
 
@@ -75,28 +76,20 @@
         <form id="hidden-form" style="display: none">{{ simple_form.hidden_tag() }}</form>
         <div class="page">
             <div class="page-main">
-                <nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
+                {% if logged_in %}
+                <nav class="navbar navbar-expand-lg bg-body-tertiary">
                     <div class="container-fluid">
-                      <a class="navbar-brand" href="#">{{club.name}}</a>
-                      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+                      <a class="navbar-brand" href="#">Admin Panel</a>
+                      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor04" aria-controls="navbarColor04" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
                       </button>
-                      <div class="collapse navbar-collapse" id="navbarColor01">
+                      <div class="collapse navbar-collapse" id="navbarColor04">
                         <ul class="navbar-nav me-auto">
-                          <li class="nav-item">
-                            <a class="nav-link active" href="#">In Progress
-                              <span class="visually-hidden">(current)</span>
-                            </a>
-                          </li>
-                          <li class="nav-item">
-                            <a class="nav-link" href="#">Past Leagues</a>
-                          </li>
-                          <li class="nav-item">
-                            <a class="nav-link" href="#">Upcoming Leagues</a>
-                          </li>
-                          {% if logged_in %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('player.index', player_id=player.id) }}"> Edit Player</a>
+                              </li>
                           <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Club Themes (admin only)</a>
+                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Club Themes</a>
                             <div class="dropdown-menu">
                               <a class="dropdown-item" href="#" onclick="changeTheme('cerulean')">Cerulean</a>
                               <a class="dropdown-item" href="#" onclick="changeTheme('cosmo')">Cosmo</a>
@@ -125,7 +118,32 @@
                               <a class="dropdown-item" href="#" onclick="changeTheme('zephyr')">Zephyr</a>
                           </div>
                           </li>
-                          {% endif %}
+                        </ul>
+                        <span class="badge bg-success">Club Admin Logged In</span>
+                      </div>
+                    </div>
+                  </nav>
+                  {% endif %}
+
+                <nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
+                    <div class="container-fluid">
+                      <a class="navbar-brand" href="#">{{club.name}}</a>
+                      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                      </button>
+                      <div class="collapse navbar-collapse" id="navbarColor01">
+                        <ul class="navbar-nav me-auto">
+                          <li class="nav-item">
+                            <a class="nav-link active" href="#">In Progress
+                              <span class="visually-hidden">(current)</span>
+                            </a>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link" href="#">Past Leagues</a>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link" href="#">Upcoming Leagues</a>
+                          </li>
                         </ul>
                         <!-- <form class="d-flex">
                           <input class="form-control me-sm-2" type="search" placeholder="Search">
