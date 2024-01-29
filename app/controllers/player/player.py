@@ -167,9 +167,15 @@ def public_portal(club_id, player_id):
             data = request.json
             print(data)
             if data["msg"] == "change_theme":
-                theme = data["theme"] + ".min.css"
-                club.portal_style = theme
-                db.session.commit()
+                if current_user.is_authenticated:
+                    theme = data["theme"] + ".min.css"
+                    club.portal_style = theme
+                    db.session.commit()
+                    return jsonify({"status": "success", "data": club.get_portal_style()})
+                else:
+                    return jsonify({"status": "failure", "error": "who r u?"})
+            if data["msg"] == "availability":
+                print('AVAILABILITY UPDATE')
                 return jsonify({"status": "success", "data": club.get_portal_style()})
             return jsonify({"status": "success"})
         except Exception as e:

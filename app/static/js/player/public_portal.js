@@ -15,28 +15,45 @@ document.addEventListener("DOMContentLoaded", function () {
 <button id={{ts.id}} avail={{avail}} type="button" class="availability_indicator btn btn-sm btn-danger">Nope</button> */
 
 
+function saveAvailability(){
+    elems = document.querySelectorAll('.availability_indicator')
+    result = []
+    elems.forEach((e)=>{
+        a = parseInt(e.getAttribute('avail'))
+        ts = parseInt(e.id)
+        result.push({'timeslot': ts, 'availability': a})
+    })
+    console.log(result)
+    sendToServer(
+        { msg: "availability", data: result },
+        (success = () => {
+            window.location.reload();
+        }),
+        (failure = null)
+    );
+}
+
 function availabilityCallback(button) {
-    console.log("Button clicked:", button.textContent);
     current = parseInt(button.getAttribute("avail"));
     console.log(current);
     switch (current) {
         case 1:
-            button.textContent = '...Maybe'
+            button.querySelector('.availability-status').textContent = '...Maybe'
             button.setAttribute("avail", 2)
-            button.classList.remove('btn-success')
-            button.classList.add('btn-warning')
+            button.classList.remove('btn-outline-success')
+            button.classList.add('btn-outline-warning')
             break;
         case 2:
-            button.textContent = 'Nope'
+            button.querySelector('.availability-status').textContent = 'Nope'
             button.setAttribute("avail", 3)
-            button.classList.remove('btn-warning')
-            button.classList.add('btn-danger')
+            button.classList.remove('btn-outline-warning')
+            button.classList.add('btn-outline-danger')
             break;
         case 3:
-            button.textContent = 'I am in!'
+            button.querySelector('.availability-status').textContent = 'I am in!'
             button.setAttribute("avail", 1)
-            button.classList.remove('btn-danger')
-            button.classList.add('btn-success')
+            button.classList.remove('btn-outline-danger')
+            button.classList.add('btn-outline-success')
             break;
     }
 
@@ -112,8 +129,6 @@ function sendToServer(data, success = null, failure = null) {
 function changeTheme(theme) {
     // Call your JavaScript function here with the selected theme
     // For example, you can update the page's styles based on the theme.
-    console.log("Theme changed to:", theme);
-
     sendToServer(
         { msg: "change_theme", theme: theme },
         (success = () => {

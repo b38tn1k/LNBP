@@ -298,6 +298,42 @@ class SingleFlightScheduleTool:
         # print()
         self.players = sorted(players, key=lambda player: player.availability_score)
         self.players = shift_blocks(self.players, mutate)
+        self.do_voting()
+
+    
+    def do_voting(self):
+        ascores = [p.availability_score for p in self.players]
+        pv = []
+        gv = []
+        timeslots = set([g.timeslot_id for g in self.gameslots])
+        for ts in timeslots:
+            i = {}
+            i['v'] = 0
+            i['ts'] = ts
+            gv.append(i)
+        for p in self.players:
+            i = {}
+            i['vc'] = p.rules['min_games_total']
+            i['r'] = p.rules
+            i['vv'] = max(ascores)/p.availability_score
+            i['a'] = p.availability
+            i['id'] = p.id
+            pv.append(i)
+        for p in pv:
+            for g in gv:
+                if p['a'][g['ts']] == AVAILABLE:
+                    g['v'] += p['vv']
+        sorted_gv = sorted(gv, key=lambda x: x['v'], reverse=True)
+        ordered_ts = [entry['ts'] for entry in sorted_gv]
+        games_resorted = []
+        for ts in ordered_ts:
+            for g in self.gameslots:
+                if g.timeslot_id == ts:
+                    games_resorted.append(g)
+        self.gameslots = games_resorted
+
+                
+
 
     def generate_timeslot_player_pool(self):
         """
@@ -355,7 +391,8 @@ class SingleFlightScheduleTool:
         """
         init_histories(self.players)
         tpp, ts = self.generate_timeslot_player_pool()
-        self.gameslots = sorted(self.gameslots, key=lambda gs: gs.availability_score)
+        # self.gameslots = sorted(self.gameslots, key=lambda gs: gs.availability_score)
+        self.do_voting()
         if self.mutate < len(ts):
             self.gameslots = shift_blocks(self.gameslots, self.mutate)
             self.mutate_mode = "Availability score ordered shift"

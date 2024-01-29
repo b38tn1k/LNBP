@@ -85,3 +85,5 @@ pytest-cov==3.0.0
 mccabe==0.6.1
 flake8==4.0.1
 
+# Sentry
+sentry-sdk[flask]

@@ -41,23 +41,16 @@ class Scheduler:
         self.league = league
         self.rules = league.get_league_rules_dict()
         self.flight_id = flight_id
+        if flight_id:
+            self.flight = self.league.get_flight_by_id(self.flight_id)
         self.mode = mode
 
         if mode == self.GENERATE_REPORT:
             pass
 
         if mode == self.SINGLE_FLIGHT:
-            self.prepare = self.sf_prepare
-            self.setup = self.sf_setup
-            self.build = self.sf_build
-
-    def sf_prepare(self):
-        """
-        This function prepares a flight object for use by deleting all game events
-        associated with it.
-
-        """
-        self.flight = self.league.get_flight_by_id(self.flight_id)
+            pass
+        
         
     
     def clear_flight_db_obj(self):
@@ -68,7 +61,7 @@ class Scheduler:
         self.flight.delete_all_game_events()
 
 
-    def sf_setup(self, mutate):
+    def setup(self, mutate, my_class=SingleFlightScheduleTool):
         """
         This function creates a scheduling tool (a `SingleFlightScheduleTool`) for
         a fantasy football league using the given flight data and rules.
@@ -86,12 +79,12 @@ class Scheduler:
         gameslots = create_gameslot_objects(self.league, self.rules)
         generate_gameslot_availability_scores(gameslots, players)
         find_player_exceptions(players, gameslots, self.rules)
-        scheduler = SingleFlightScheduleTool(
+        scheduler = my_class(
             self.flight.id, self.rules, players, gameslots, mutate
         )
         return scheduler
 
-    def sf_build(self, scheduler):
+    def build(self, scheduler):
         """
         This function takes a scheduler and iterates through its returned events
         (i.e., games) and creates a game for each one using the `create_game_from_scheduler`
@@ -313,7 +306,6 @@ class Scheduler:
         `League`. It iterates over the timeslots of the league and finds the best
         scheduling plan based on two tiers of evaluation metrics.
         """
-        self.prepare()
         print("Scheduling " + self.flight.name)
         i = 0
         candidates = []
@@ -329,6 +321,7 @@ class Scheduler:
             }
         )
         self.clear_flight_db_obj()
+
         for _ in self.league.timeslots:
             for _ in range(3):
                 # print('setup')
@@ -340,7 +333,7 @@ class Scheduler:
                 r1 = self.evaluate(scheduler)
                 scheduler.optimise()
                 r2 = self.evaluate(scheduler)
-                optimiser_eval = eval_optimiser(r1, r2, optimiser_eval)
+                optimiser_eval = eval_optimiser(r1, r2, optimiser_eval, log=False)
                 
                 # print('captains')
                 scheduler.assign_captains()
@@ -772,7 +765,7 @@ def count_categories(my_dict):
                 counter[br] = inc
     return counter
 
-def eval_optimiser(r1, r2, optimiser_eval):
+def eval_optimiser(r1, r2, optimiser_eval, log=True):
     """
     This function compares two records (r1 and r2) and updates an evaluation object
     (optimiser_eval) with information about which tier issues are better or worse.
@@ -799,37 +792,41 @@ def eval_optimiser(r1, r2, optimiser_eval):
 
     """
     if r2["tier1"] < r1["tier1"]:
-        print()
         optimiser_eval['tier1 better'] += 1
-        print(
-            MAGENTA,
-            "tier 1 issues reduced",
-            r1["tier1"],
-            r2["tier1"],
-            RESET,
-        )
+        if log:
+            print()
+            print(
+                MAGENTA,
+                "tier 1 issues reduced",
+                r1["tier1"],
+                r2["tier1"],
+                RESET,
+            )
     if r2["tier1"] > r1["tier1"]:
         optimiser_eval['tier1 worse'] += 1
-        print()
-        print(
-            RED, "tier 1 issues increased!", r1["tier1"], r2["tier1"], RESET
-        )
-        print(count_categories(r1["details"]))
-        print(count_categories(r2["details"]))
+        if log:
+            print()
+            print(
+                RED, "tier 1 issues increased!", r1["tier1"], r2["tier1"], RESET
+            )
+            print(count_categories(r1["details"]))
+            print(count_categories(r2["details"]))
     if r2["tier2"] < r1["tier2"]:
         optimiser_eval['tier2 better'] += 1
-        print(
-            MAGENTA,
-            "tier 2 issues reduced",
-            r1["tier2"],
-            r2["tier2"],
-            RESET,
-        )
+        if log:
+            print(
+                MAGENTA,
+                "tier 2 issues reduced",
+                r1["tier2"],
+                r2["tier2"],
+                RESET,
+            )
     if r2["tier2"] > r1["tier2"]:
         optimiser_eval['tier2 worse'] += 1
-        print(
-            RED, "tier 2 issues increased!", r1["tier2"], r2["tier2"], RESET
-        )
-        print(count_categories(r1["details"]))
-        print(count_categories(r2["details"]))
+        if log:
+            print(
+                RED, "tier 2 issues increased!", r1["tier2"], r2["tier2"], RESET
+            )
+            print(count_categories(r1["details"]))
+            print(count_categories(r2["details"]))
     return optimiser_eval

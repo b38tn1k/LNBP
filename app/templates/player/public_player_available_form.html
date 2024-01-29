@@ -1,4 +1,3 @@
-
 {% for assoc in player.league_associations %} {% set league = assoc.league %}
 <div class="availability_league card">
     <div class="card-header d-flex justify-content-between align-items-center">
@@ -6,49 +5,46 @@
             <h3 class="card-title">{{league.name}}</h3>
             <div class="lead">Availability Deadline: {{league.get_availability_deadline().strftime('%m/%d/%y')}}</div>
         </div>
-        <button type="button" class="btn btn-primary">Save Availability</button>
+        <button type="button" onclick="saveAvailability()" class="btn btn-primary">Save Availability</button>
     </div>
 
     <div class="card-body">
-        <div class="row">
+        <div style="display: flex; flex-wrap: wrap">
             {% for ts in league.timeslots %}
-            <div class="col-3 col-sm-4 col-lg-2">
-                <div class="card league_card">
-                    {% set time = ts.human_readable_mmdd_hhmm() %}
-                    <div class="text-body-secondary">{{ time.split()[0] }} {{ time.split()[1] }}</div>
-                    <div class="text-body">{{ time.split()[2] }}</div>
-                    {% set avail = league.get_player_availability(player, ts) %} {% if avail == 1 %}
+            <div class="col-4 col-sm-4 col-lg-2">
+                <div class="availability-container" style="height:100%; padding:10px;">
+                    {% set time = ts.human_readable_mmdd_hhmm() %} {% set avail = league.get_player_availability(player,
+                    ts) %}
+                    
                     <button
                         id="{{ts.id}}"
                         avail="{{avail}}"
                         type="button"
-                        class="availability_indicator btn btn-success"
-                    >
-                        I am in!
-                    </button>
-                    {% elif avail == 2 %}
-                    <button
-                        id="{{ts.id}}"
+                        style="height:100%"
+                        {% if avail == 2 %}
+                        class="availability_indicator btn btn-outline-warning"
                         avail="{{avail}}"
-                        type="button"
-                        class="availability_indicator btn btn-warning"
-                    >
-                        ...Maybe
-                    </button>
-                    {% elif avail == 3 %}
-                    <button
-                        id="{{ts.id}}"
+                        {% elif avail == 3 %}
+                        class="availability_indicator btn btn-outline-danger"
                         avail="{{avail}}"
-                        type="button"
-                        class="availability_indicator btn btn-danger"
-                    >
-                        Nope
+                        {% else %}
+                        class="availability_indicator btn btn-outline-success"
+                        avail="1"
+                        {% endif %} >
+                        <div class="text-body">{{ time.split()[0] }} {{ time.split()[1] }}</div>
+                        <div class="text-body">{{ time.split()[2] }}</div>
+                        {% if avail == 1 %}
+                        <div class="availability-status">I am in!</div>
+                        {% elif avail == 2 %}
+                        <div class="availability-status">...Maybe</div>
+                        {% elif avail == 3 %}
+                        <div class="availability-status">Nope</div>
+                        {% endif %}
                     </button>
-                    {% endif %}
                 </div>
             </div>
             {% endfor %}
         </div>
     </div>
 </div>
-{% endfor %} 
+{% endfor %}
