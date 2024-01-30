@@ -88,6 +88,7 @@ function setupPlayerDraggableOrigins() {
             let parent = item.closest(".player-card");
             let id = parseInt(parent.getAttribute("player-id"));
             let name = parent.getAttribute("player-name");
+            console.log(name)
             let full_name = parent.getAttribute("player-full-name");
             let tile = makeDraggablePlayerTile(id, name, full_name, flightID);
             item.appendChild(tile);

@@ -175,8 +175,12 @@ def public_portal(club_id, player_id):
                 else:
                     return jsonify({"status": "failure", "error": "who r u?"})
             if data["msg"] == "availability":
-                print('AVAILABILITY UPDATE')
-                return jsonify({"status": "success", "data": club.get_portal_style()})
+                league = club.get_league_by_id(data['data']["league_id"])
+                for a in data['data']['availability']:
+                    timeslot = league.get_timeslot_by_id(a['timeslot'])
+                    league.add_player_availability(player, timeslot, a['availability'])
+                    db.session.commit()
+                return jsonify({"status": "success"})
             return jsonify({"status": "success"})
         except Exception as e:
             return jsonify({"status": "failure", "error": str(e)})

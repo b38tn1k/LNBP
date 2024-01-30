@@ -81,7 +81,7 @@ def create_app(object_name):
 
     token.init_app(app)
     mail.init_app(app)
-    limiter.init_app(app)
+    # limiter.init_app(app)
     stripe.init_app(app)
     hashids.init_app(app)
 

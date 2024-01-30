@@ -22,6 +22,7 @@ RESET = "\033[0m"
 class Scheduler:
     SINGLE_FLIGHT = 0
     GENERATE_REPORT = 1
+    ASSIGN_CAPTAINS = 2
 
     def __init__(self, league, mode, flight_id=None):
         """
@@ -168,7 +169,7 @@ class Scheduler:
             if not p["satisfied"] and not underscheduled:
                 record_broken_rules(player, tiers, fails, "game_count")
             # player min game count
-            if p["game_count"] < rules["min_games_total"] and not underscheduled:
+            if p["game_count"] < rules["min_games_total"]:
                 record_broken_rules(player, tiers, fails, "min_games_total")
             # player max game count
             if p["game_count"] > rules["max_games_total"]:
@@ -299,6 +300,25 @@ class Scheduler:
             print(report)
             flight.report = report
         print("DONE")
+
+    def assign_captains(self):
+        """
+        This function generates a schedule for a fantasy league game week by
+        resolving conflicts and finding the optimal games slots for each player
+        based on their preferences and restrictions.
+
+        """
+        print("Assign Captains")
+        flight = self.flight
+        flight.report = {}
+        res, scheduler = self.copy_flight_with_games(flight)
+        scheduler.assign_captains()
+        res = self.evaluate(scheduler)
+        report = unpack_report(self.league, {"scheduler": scheduler, "res": res})
+        self.flight.delete_all_game_events()
+        self.build(scheduler)
+        flight.report = report
+
 
     def run(self):
         """

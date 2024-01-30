@@ -57,3 +57,5 @@ app/static/public/*
 ignite-code.txt
 dev.sh
 broken_database.db
+
+databaseJamesRobertCarthewAccountLoaded.db

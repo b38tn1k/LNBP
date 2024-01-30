@@ -54,7 +54,7 @@
                                     class="player_in_sg"
                                     player-id="{{p.id}}"
                                     player-fullname="{{p.full_name}}"
-                                    player-name="{{ p.first_name[0] }} {{ p.last_name[:8] }}"
+                                    player-name="{{ p.first_name[0] }} {{ p.last_name[:7] }}"
                                     captain="{{ 1 if p.id == games[0].captain.id else 0 }}"
                                 ></div>
                                 {% endfor %}

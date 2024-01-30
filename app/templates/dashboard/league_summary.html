@@ -23,8 +23,7 @@
                                         <th>Start Date</th>
                                         <th>End Date</th>
                                         <th>Player Count</th>
-                                        <!-- <th>Edit</th>
-                                        <th>Schedule</th> -->
+                                        <th>Schedule Issues</th>
                                         <th>Delete</th>
                                     </tr>
                                 </thead>
@@ -35,6 +34,7 @@
                                             <td>{{ league['start_date'] }}</td>
                                             <td>{{ league['end_date'] }}</td>
                                             <td>{{ league['player_count'] }}</td>
+                                            <td> {{ league['issue_count'] }}</td>
                                             <td>
                                                 <a href="{{ url_for('league.delete_league', id=league['id']) }}" class="btn btn-danger">
                                                     <i class="fe fe-trash"></i>

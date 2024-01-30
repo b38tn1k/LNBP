@@ -71,8 +71,8 @@ def league_home(id):
         try:
             data = request.json
             print(data)
-            if data['msg'] == 'save':
-                apply_edits(league, json.loads(data['data']))
+            if data["msg"] == "save":
+                apply_edits(league, json.loads(data["data"]))
                 db.session.commit()
                 s = Scheduler(league, Scheduler.GENERATE_REPORT)
                 s.report()
@@ -88,7 +88,11 @@ def league_home(id):
                     stats = s.run()
                     current_user.club.update_statistics(stats)
                     db.session.commit()
-                for flight in league.flights: #runs better the second time after some prepopulation :-/
+                for (
+                    flight
+                ) in (
+                    league.flights
+                ):  # runs better the second time after some prepopulation :-/
                     s = Scheduler(league, Scheduler.SINGLE_FLIGHT, flight_id=flight.id)
                     stats = s.run()
                     current_user.club.update_statistics(stats)
@@ -96,7 +100,9 @@ def league_home(id):
                 return jsonify({"status": "success"})
             if data["msg"] == "schedule-flight":
                 s = Scheduler(
-                    league, Scheduler.SINGLE_FLIGHT, flight_id=int(data["data"]["flight_id"])
+                    league,
+                    Scheduler.SINGLE_FLIGHT,
+                    flight_id=int(data["data"]["flight_id"]),
                 )
                 stats = s.run()
                 current_user.club.update_statistics(stats)
@@ -132,7 +138,7 @@ def schedule_league(id):
     Returns:
         dict: The output returned by this function is a JSON object with the
         following structure:
-        
+
         {
         "status": "success",
         "data": [
@@ -142,7 +148,7 @@ def schedule_league(id):
         } for flight в league.flights
         ]
         }
-        
+
         This means that the function successfully scheduled games and generated a
         report for the specified league.
 
@@ -156,6 +162,7 @@ def schedule_league(id):
     if request.method == "POST":
         try:
             data = request.json
+            print(data)
             if data["contents"] == "games":
                 create_games_from_request(league, data["data"])
                 # league.clean()
@@ -178,6 +185,13 @@ def schedule_league(id):
                 )
                 stats = s.run()
                 current_user.club.update_statistics(stats)
+                db.session.commit()
+                return jsonify({"status": "success"})
+            elif data["contents"] == "captains":
+                s = Scheduler(
+                    league, Scheduler.ASSIGN_CAPTAINS, flight_id=data["flight_id"]
+                )
+                s.assign_captains()
                 db.session.commit()
                 return jsonify({"status": "success"})
         except Exception as e:

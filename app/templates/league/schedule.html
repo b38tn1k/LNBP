@@ -40,6 +40,9 @@
                 <h1 class="page-title">{{ league.name }} Scheduler</h1>
             </div>
             <div>
+                <button style="margin-right: 10px" onclick="assignCaptainsCallback(this)" type="button" id="assign-captain-button" class="btn btn-lg" title="Assign Captains" aria-label="Assign Captains">
+                    <i class="fe fe-user" style="font-size: 1.5em"></i> Assign Captains
+                </button>
                 <button
                     style="margin-right: 10px"
                     type="button"
@@ -48,10 +51,10 @@
                     title="Schedule"
                     aria-label="Schedule"
                 >
-                    <i class="fe fe-star" style="font-size: 1.5em"></i>
+                    <i class="fe fe-star" style="font-size: 1.5em"></i> Schedule
                 </button>
                 <button type="button" id="save-button" class="btn btn-lg" title="Save" aria-label="Save">
-                    <i class="fe fe-save" style="font-size: 1.5em"></i>
+                    <i class="fe fe-save" style="font-size: 1.5em"></i> Save
                 </button>
             </div>
         </div>

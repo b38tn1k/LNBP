@@ -888,3 +888,9 @@ class League(Model):
         today_date = datetime.now()
         signup_date = self.get_signup_deadline()
         return signup_date > today_date
+    
+    def get_total_flight_issues(self):
+        i = 0
+        for flight in self.flights:
+            i += flight.report['count']
+        return i

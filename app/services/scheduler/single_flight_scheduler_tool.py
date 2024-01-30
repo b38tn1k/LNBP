@@ -392,8 +392,8 @@ class SingleFlightScheduleTool:
         init_histories(self.players)
         tpp, ts = self.generate_timeslot_player_pool()
         # self.gameslots = sorted(self.gameslots, key=lambda gs: gs.availability_score)
-        self.do_voting()
         if self.mutate < len(ts):
+            self.do_voting()
             self.gameslots = shift_blocks(self.gameslots, self.mutate)
             self.mutate_mode = "Availability score ordered shift"
             # print("SHIFTER")
@@ -402,6 +402,7 @@ class SingleFlightScheduleTool:
             self.mutate_mode = "Random shuffle"
             # print("SHUFFLER")
         else:
+            self.do_voting()
             self.mutate_mode = "Interlace and rotate"
             self.gameslots = interlace_and_rotate(self.gameslots, self.mutate - len(ts))
         ts_list = []
@@ -728,6 +729,7 @@ class SingleFlightScheduleTool:
         for p in underscheduled:
             for timeslot_id, availability in p.availability.items():
                 if availability in [AVAILABLE, AVAILABLE_LP]:
+                    # if availability in [AVAILABLE]:
                     if timeslot_id in common_timeslots:
                         common_timeslots[timeslot_id].append(p)
                     else:
