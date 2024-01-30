@@ -35,6 +35,17 @@ function saveAvailability(button) {
     );
 }
 
+/**
+* @description This function updates the text and styles of a button based on its
+* availability status.
+* 
+* @param {  } button - The `button` input parameter is passed as a reference to the
+* DOM button element that triggered the event.
+* 
+* @returns { number } The function `availabilityCallback` takes a button element as
+* an argument and updates the availability status of the button based on its current
+* value.
+*/
 function availabilityCallback(button) {
     current = parseInt(button.getAttribute("avail"));
     console.log(current);

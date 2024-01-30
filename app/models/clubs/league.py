@@ -890,6 +890,16 @@ class League(Model):
         return signup_date > today_date
     
     def get_total_flight_issues(self):
+        """
+        This function calculates the total number of issues reported for all flights
+        stored within an instance of the `self` object. It iterates over each
+        flight and adds up their respective issue counts.
+
+        Returns:
+            int: The output returned by the `get_total_flight_issues` function is
+            `0`.
+
+        """
         i = 0
         for flight in self.flights:
             i += flight.report['count']

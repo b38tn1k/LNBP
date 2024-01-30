@@ -656,6 +656,13 @@ function organiseAndDisplaySubs(flightID) {
     });
 }
 
+/**
+* @description This function toggles the visibility of all elements with class
+* "sub-row" by alternately showing or hiding them.
+* 
+* @returns {  } This function takes no arguments and returns nothing. It only modifies
+* the CSS display property of all elements with class "subs".
+*/
 function toggleSubs() {
     // Select all elements with class "subs"
     const subsElements = document.querySelectorAll(".sub-row");

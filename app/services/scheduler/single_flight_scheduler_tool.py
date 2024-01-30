@@ -302,6 +302,11 @@ class SingleFlightScheduleTool:
 
     
     def do_voting(self):
+        """
+        This function reschedules games that have available players and satisfies
+        minimum game requirements for each player.
+
+        """
         ascores = [p.availability_score for p in self.players]
         pv = []
         gv = []

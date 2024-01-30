@@ -1,3 +1,14 @@
+/**
+* @description This function assigns a flight ID to the current active tab and
+* disables the button. It then sends a JSON object containing the "contents" and
+* "flight_id" to the server using the `sendToServer()` function.
+* 
+* @param {  } button - The `button` input parameter is not used anywhere within the
+* function code.
+* 
+* @returns { any } The function `assignCaptainsCallback` takes a button argument and
+* logs various elements to the console.
+*/
 function assignCaptainsCallback(button) {
     console.log(button);
     let flightID = -1;

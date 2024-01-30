@@ -5,6 +5,24 @@ from app import db
 
 def get_club_facility_summary(club_id):
     # Fetch all facilities that belong to the club
+    """
+    This function gets a club's facilities and returns a dictionary with two items:
+    'total_count' (the number of facilities) and 'asset_type' (a dict counting the
+    facilities by asset type).
+
+    Args:
+        club_id (int): The `club_id` input parameter is used to filter the facilities
+            that belong to a specific club.
+
+    Returns:
+        dict: The output returned by the function `get_club_facility_summary()`
+        is a dictionary with two key-value pairs:
+        
+        	- 'total_count': an integer representing the total number of facilities
+        belonging to the specified club.
+        	- 'asset_type': a dictionary mapping asset types to their counts.
+
+    """
     facilities = Facility.query.filter_by(club_id=club_id).all()
 
     # If there are no facilities, return None
@@ -28,6 +46,28 @@ def get_club_facility_summary(club_id):
 
 def get_leagues_by_status(club_id, past_league_limit=10):
     # Fetch all leagues belonging to a club
+    """
+    This function retrieves all leagues associated with a given club ID and
+    categorizes them based on their start date into current leagues (active),
+    planned leagues (upcoming), and past leagues (finished).
+
+    Args:
+        club_id (int): The `club_id` input parameter specifies which clubs' leagues
+            should be retrieved.
+        past_league_limit (int): The `past_league_limit` input parameter limits
+            the number of past leagues returned by the function.
+
+    Returns:
+        dict: The output returned by the function `get_leagues_by_status` is a
+        dictionary with three key-value pairs:
+        
+        	- `current`: A list of dictionaries containing details about current leagues.
+        	- `planned`: A list of dictionaries containing details about planned
+        leagues that have not yet started.
+        	- `past`: A list of dictionaries containing details about past leagues
+        that have already ended.
+
+    """
     leagues = League.query.filter_by(club_id=club_id).all()
     if not leagues:
         return None
