@@ -59,3 +59,5 @@ dev.sh
 broken_database.db
 
 databaseJamesRobertCarthewAccountLoaded.db
+wsgi.py
+app/settings.py
