@@ -14,6 +14,6 @@ class ClubSetup(BaseForm):
 
 class FacilitySetup(BaseForm):
     name = StringField('Facility Name', validators=[validators.InputRequired()])
-    facility_type = SelectField('Facility Type', choices=[('Tennis Court', 'Tennis Court'), ('Pickle Ball Court', 'Pickle Ball Court')])
+    facility_type = SelectField('Facility Type', choices=[('Tennis Court', 'Tennis Court'), ('Pickle Ball Court', 'Pickle Ball Court'), ('Platform Tennis Court', 'Platform Tennis Court'), ('Squash Court', 'Squash Court') , ('Padel Court', 'Padel Court') , ('Racquet Ball Court', 'Racquet Ball Court')])
 
     # custom-select

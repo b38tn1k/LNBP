@@ -423,7 +423,7 @@ def unpack_report(league, candidate):
     messages["max_games_day"] = "Daily Game Limit Exceeded:"
     messages["max_repeat_compete"] = "Frequent Team Pairings:"
 
-    messages["underscheduled_on_purpose"] = "Mostly Unavailable:"
+    messages["underscheduled_on_purpose"] = "Availability Below Min:"
     report = {}
     for d in candidate["res"]["details"]:
         br = d["broken_rule"]

@@ -1,0 +1,34 @@
+drop down to choose if you want to view flight players in order of problems or alphabetical or ranking
+subs could have the same drop down? 
+zoom in out button to view full schedule to assist in swapping players in and out to fix issues?
+assign captains, schedule, save buttons on the left side of page
+modulate the colors of players to neutral if they are happy (or pastel?)
+League Title and Sport 
+Timeline
+Facilities Needed 
+League Parameters 
+League Schedule 
+League Standings go where?
+Maximum weeks a player can go without a game...not game...use match instead...use match in other similiar use cases
+pop up asking to save before running the schedule button
+center align all text in the schedule grid
+url # flight page
+players should only move up and down in their own flight via up down arrows 
+up down arrows useful when allocating players to a flight before scheduling occurs 
+when editing a flight would be nice to be able to not only move players up and down but also to have a drop down menu to
+order the players based on rank, availability, alphabetical, problems, etc
+add a parameter to try to balance out the number of matches at all time slots so we dont have 5 matches at 6:30
+and only one match at 8:15. This helps with creating a fun atmosphere at the courts because if there are 20 men hanging out at 6:30
+and 4 men hanging out at 8:15 it is not as good. So, an atmosphere/ambiance/vibe/social factor could be a great little addition as well. 
+Light and dark mode?
+Planned leagues should be Past Leagues on home page
+Players box under Facilities box on home page 
+Flight editor doesnt need to change availability colors when clicked on
+New rule - max percentage of games with same player
+Hovering over a player's name in the schedule editor shows their availability and matches in blue etc.
+problem players show up in rainbow color and the happy ones are neutral tones.
+subs are in neutral tones.
+sigma plan verison history so user can try tweaking a pretty good flight without risking fucking it up entirely 
+pop up when clicking the schedule button - are you sure you want to remake this schedule?
+Mostly Unavailable = Availablity Below Min
+New Rule - Low Priority % - Toggle Parameter 
