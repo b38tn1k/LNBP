@@ -200,6 +200,23 @@ class Timeslot(Model):
             return None
     
     def is_player_captain(self, player):
+        """
+        This function checks if a given player is the captain of the game by
+        iterating through a list of `GameEvent` objects and checking the `captain`
+        attribute of each event. If the given player is found to be the captain
+        of any of the events, the function returns `True`. Otherwise, it returns
+        `False`.
+
+        Args:
+            player (str): The `player` input parameter in this function checks if
+                the player being passed to it is the captain of the current game
+                event.
+
+        Returns:
+            bool: The output of this function is `True` if the provided player is
+            the captain of the game, and `False` otherwise.
+
+        """
         for game_event in self.game_events:
                 if player == game_event.captain:
                     return True

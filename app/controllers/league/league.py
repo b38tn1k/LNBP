@@ -206,6 +206,26 @@ def schedule_league(id):
 @blueprint.route("/raw/<int:id>", methods=["GET", "POST"])
 @login_required
 def raw(id):
+    """
+    This function defines a route in a Flask web application that allows users to
+    access a league's data. It first checks if the user is authenticated and has
+    the required membership ID, and redirects them to the homepage if they don't
+    meet these criteria. If the user is authenticated and has the required membership
+    ID, it retrieves the league data for the specified ID using the `get_league_by_id()`
+    method of the current user's club object, and renders the "league/export_table.html"
+    template with the retrieved data.
+
+    Args:
+        id (int): In this function, `id` is a parameter passed to the `def raw(id:
+            int)` definition. It represents the id of the league that the user
+            wants to view export table for. The function uses this parameter to
+            retrieve the league object from the current user's membership data.
+
+    Returns:
+        : The `raw` function returns a rendered HTML template (`render_template`)
+        for the `league/export_table.html` file based on the input `id`.
+
+    """
     if not current_user.is_authenticated or current_user.primary_membership_id is None:
         flash("You currently do not have accesss to app", "warning")
         return redirect(url_for("main.home"))
