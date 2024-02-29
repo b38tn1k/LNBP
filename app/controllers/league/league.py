@@ -203,6 +203,18 @@ def schedule_league(id):
         club=current_user.club,
     )
 
+@blueprint.route("/raw/<int:id>", methods=["GET", "POST"])
+@login_required
+def raw(id):
+    if not current_user.is_authenticated or current_user.primary_membership_id is None:
+        flash("You currently do not have accesss to app", "warning")
+        return redirect(url_for("main.home"))
+    league = current_user.club.get_league_by_id(id)
+    if league is None:
+        return redirect(url_for("main.home"))
+    return render_template("league/export_table.html", league=league)
+
+
 
 @blueprint.route("/delete/<int:id>", methods=["GET", "POST"])
 @login_required
@@ -271,7 +283,7 @@ def create_league():
                 return jsonify(
                     {
                         "status": "success",
-                        "redirect_url": url_for("league.edit_league", id=league.id),
+                        "redirect_url": url_for("league.league_home", id=league.id),
                     }
                 )
             else:

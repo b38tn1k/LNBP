@@ -892,5 +892,17 @@ class League(Model):
     def get_total_flight_issues(self):
         i = 0
         for flight in self.flights:
-            i += flight.report['count']
+            if flight:
+                if flight.report:
+                    if 'count' in flight.report:
+                        i += flight.report['count']
         return i
+    
+    def get_ordered_game_events(self):
+        # Retrieve the game events associated with the league
+        game_events = self.game_events
+
+        # Sort the game events based on the start time
+        sorted_game_events = sorted(game_events, key=lambda event: event.timeslot.start_time)
+
+        return sorted_game_events

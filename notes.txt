@@ -28,7 +28,7 @@ New rule - max percentage of games with same player
 Hovering over a player's name in the schedule editor shows their availability and matches in blue etc.
 problem players show up in rainbow color and the happy ones are neutral tones.
 subs are in neutral tones.
-sigma plan verison history so user can try tweaking a pretty good flight without risking fucking it up entirely 
+sigma plant verison history so user can try tweaking a pretty good flight without risking fucking it up entirely 
 pop up when clicking the schedule button - are you sure you want to remake this schedule?
 Mostly Unavailable = Availablity Below Min
 New Rule - Low Priority % - Toggle Parameter 

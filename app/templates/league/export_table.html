@@ -1,0 +1,132 @@
+{% extends "league/league_base.html" %} {% block title %}{{ league.name }}{% endblock %} {% block body %} <div class="row row-cards">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body" style="overflow-x: auto; overflow-y: hidden; margin-right: 16px">
+          <button id="copyButton">Copy Table to Clipboard</button>
+          <table id="scheduletable" style="color:black; background-color: white;" class="schedule-table csv-table flight-sub-table table table-bordered table-hover table-sm"> 
+            {% if league.flights %} {% for flight in league.flights %} {% set flightCounter = loop.index %} <thead  style="border:none;">
+              <tr>
+                <td>
+                  <b>{{ flight.name }}</b>
+                </td> {% if league.timeslots %} {% for ts in league.timeslots %} <td ts="{{ts.id}}" startTime="{{ ts.start_time }}" class="timeslot_header">
+                  {{ ts.human_readable_mmdd_hhmm() }}
+                </td> {% endfor %} {% endif %}
+              </tr>
+            </thead>
+
+            <tbody style="border:none;"> {% if league.players %} {% if league.players|length > 0 %} {% for p in league.players %} {% if
+                          p.in_flight(flight) %} <tr playerID="{{p.id}}" flight-number="{{ flightCounter }}">
+                <td style="width: 100px; overflow-x: scroll; white-space: nowrap">
+                  {{ p.first_name }} {{ p.last_name }}
+                </td> {% for ts in league.timeslots %} {% set player_availability =
+                              league.get_player_availability(p, ts) %} <td {% if player_availability == 1 %} class="availability" title="{{ p.full_name }}" availability="{{ player_availability }}" timeslot="{{ts.id}}" player="{{p.id}}" {% elif player_availability == 2 %} class="availability" title="{{ p.full_name }}" availability="{{ player_availability }}" timeslot="{{ts.id}}" player="{{p.id}}" {% else %} class="availability" title="{{ p.full_name }}" availability="{{ player_availability }}" timeslot="{{ts.id}}" player="{{p.id}}" {% endif %}>
+                  <div class="INFO" style="color:black;"> {% set captain = ts.is_player_captain(p) %} {% set facility = ts.get_facility_for_player_in_game_event(p) %} {% if facility %} {% if captain %} Captain: {% endif %} {{ facility.name }} {% endif %} {% if player_availability == 1 %} {% elif player_availability == 2 %} --- {% else %} XXX {% endif %} </div>
+                </td> {% endfor %}
+              </tr> {% endif %} {% endfor %} {% else %} <tr>
+                <td>No players found.</td>
+              </tr> {% endif %} {% else %} <tr>
+                <td>Players attribute not found.</td>
+              </tr> {% endif %} 
+              <tr>
+                <td style="border:none;"></td>
+                {% for ts in league.timeslots %}
+                <td style="border:none;"></td>
+               {% endfor %}
+              </tr>
+            </tbody>
+            {% endfor %} 
+            <tbody  style="border:none;">
+            {% for ge in league.get_ordered_game_events() %}
+            <tr>
+                <td><b>{{ge.flight.name}}</b></td>
+                <td>{{ge.timeslot.human_readable_hhmm()}}</td>
+                <td>{{ge.timeslot.human_readable_dayname_mdy()}}</td>
+                
+                <td><span style="color:red;">6-4</span></td>
+                <td><span style="color:red;">5-7</span></td>
+                <td><span style="color:red;">7-6</span></td>
+                <td><span style="color:red;">18 <small>(6+5+7)</small></span></td>
+                <td><span style="color:red;">17 <small>(4+7+6)</small></span></td>
+                <td><span style="color:red;">2</span></td>
+                <td><span style="color:red;">20 <small>(18+2)</small> - 17</span></td>
+            
+            </tr>
+            <tr>
+                <td>Court:</td>
+                <td>
+                    Name:
+                </td>
+                
+                <td>
+                    Sub's Name
+                </td>
+                <td>1st Set</td>
+                <td>2nd Set</td>
+                <td>3rd Set</td>
+                <td>Games Won</td>
+                <td>Games Lost</td>
+                <td>Sets Won</td>
+                <td>Games W-L Adjusted</td>
+            </tr>
+
+            {% for p in ge.players %}
+            <tr><td>
+                {{ge.facility.name}}
+            </td>
+            <td>
+                {% if p.id == ge.captain_id%}
+                Captain:&nbsp;
+                {% endif %}
+                {{p.full_name}}</td>
+                <td>
+                </td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            {% endfor %}
+                <tr style="border:none;">
+                <td style="border:none;"></td>
+                <td style="border:none;"></td>
+                <td style="border:none;"></td>
+                <td style="border:none;"></td>
+                <td style="border:none;"></td>
+                <td style="border:none;"></td>
+                <td style="border:none;"></td>
+                <td style="border:none;"></td>
+                <td style="border:none;"></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+          </table> 
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    document.getElementById('copyButton').addEventListener('click', function() {
+      copyTableToClipboard('scheduletable');
+    });
+  
+    function copyTableToClipboard(tableId) {
+      // Select the table element
+      const table = document.getElementById(tableId);
+      // Create a range object to select the table content
+      const range = document.createRange();
+      range.selectNode(table);
+      // Select the table content
+      window.getSelection().removeAllRanges(); // Clear the current selection
+      window.getSelection().addRange(range); // Add the new selection
+      // Copy the selected content to the clipboard
+      document.execCommand('copy');
+      // Deselect the content
+      window.getSelection().removeAllRanges();
+      // Optionally, provide feedback to the user
+      alert('Table copied to clipboard!');
+    }
+  </script> {% endblock %}

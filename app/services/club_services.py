@@ -52,8 +52,10 @@ def get_leagues_by_status(club_id, past_league_limit=10):
 
         # Calculate the player count through the League-Player associations
         player_count = db.session.query(LeaguePlayerAssociation).filter_by(league_id=league.id).count()
-
-        issue_count = league.get_total_flight_issues()
+        if league:
+            issue_count = league.get_total_flight_issues()
+        else:
+            issue_count = 0
 
         # Prepare league summary
         league_summary = {

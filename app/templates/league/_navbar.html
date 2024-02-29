@@ -33,6 +33,12 @@
                         > <i class="fe fe-star"></i> Flight Schedule Editor</a>
                     </li>
 
+                    <li class="nav-item {{ 'active' if request.blueprint == 'league' }}">
+                        <a href="{{ url_for('league.raw', id=league['id']) }}"
+                        class="nav-link {{ 'active' if request.endpoint == 'league.raw' }}"
+                        > <i class="fe fe-star"></i> Export Schedule</a>
+                    </li>
+
                     {% endif %} {% else %}
                     <li class="nav-item {{ 'active' if request.endpoint == 'main.home' }}">
                         <a class="nav-link" href="{{ url_for('main.home') }}">Home</a>

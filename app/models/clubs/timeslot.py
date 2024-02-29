@@ -58,6 +58,20 @@ class Timeslot(Model):
         # Check if one timeslot starts during the other
         return (self.start_time < other_timeslot.end_time and self.end_time > other_timeslot.start_time) \
             or (other_timeslot.start_time < self.end_time and other_timeslot.end_time > self.start_time)
+    
+    def human_readable_hhmm(self):
+        """
+        This function takes an object 'self' and returns a human-readable
+        representation of the start time field as a string formatted as '%H:%M %m/%d/%Y'.
+
+        Returns:
+            str: The output returned by the function `human_readable_hhmm_mdy`
+            would be:
+            
+            "14:30 03/02/2023"
+
+        """
+        return self.start_time.strftime('%H:%M')
 
 
     def human_readable_hhmm_mdy(self):
@@ -86,6 +100,19 @@ class Timeslot(Model):
 
         """
         return self.start_time.strftime('%H:%M %A %m/%d/%Y')
+    
+    def human_readable_dayname_mdy(self):
+        """
+        This function returns a human-readable string representing the current day
+        and time based on the 'start_time' attribute of the object.
+
+        Returns:
+            str: The output returned by the `human_readable_hhmm_dayname_mdy`
+            function is a string representation of the current date and time using
+            the format "%H:%M %A %m/%d/%Y".
+
+        """
+        return self.start_time.strftime('%A %m/%d/%Y')
 
     def human_readable_hhmm(self):
         """
@@ -96,7 +123,7 @@ class Timeslot(Model):
             str: The output returned by the `human_readable_hhmm` function is `0:00`.
 
         """
-        return self.start_time.strftime('%H:%M')
+        return self.start_time.strftime('%I:%M %p')
 
     def human_readable_dayname_monthname(self):
         """
