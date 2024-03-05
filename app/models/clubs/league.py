@@ -890,6 +890,18 @@ class League(Model):
         return signup_date > today_date
     
     def get_total_flight_issues(self):
+        """
+        This function returns the total number of flight issues by iterating through
+        a list of flights and checking if the "report" key exists in each flight
+        object, then adding the value inside the "count" key of that flight report
+        to a running total.
+
+        Returns:
+            int: The function `get_total_flight_issues` returns the total number
+            of issues across all flights in the list of flights passed to it. In
+            other words, it returns the sum of the issue counts across all flights.
+
+        """
         i = 0
         for flight in self.flights:
             if flight:
@@ -900,6 +912,17 @@ class League(Model):
     
     def get_ordered_game_events(self):
         # Retrieve the game events associated with the league
+        """
+        This function retrieves a list of game events associated with a league,
+        sorts them based on the start time of each event, and returns the sorted
+        list.
+
+        Returns:
+            list: The function `get_ordered_game_events` returns a sorted list of
+            `GameEvent` objects based on their start time, in descending order.
+            In other words, the most recent events are returned first.
+
+        """
         game_events = self.game_events
 
         # Sort the game events based on the start time
