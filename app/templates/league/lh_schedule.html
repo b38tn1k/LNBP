@@ -12,7 +12,7 @@
                     class="schedule-table csv-table flight-sub-table table table-bordered table-hover table-sm">
                     <thead>
                         <tr>
-                            <th colspan="2">
+                            <th>
                                 <input
                                     type="text"
                                     class="form-control form-control-lg flight-name-input"
@@ -33,32 +33,6 @@
                         p.in_flight(flight) %}
 
                         <tr playerID="{{p.id}}" flight-number="{{ flightCounter }}">
-                            <td
-                                style="min-width: 120px"
-                                class="d-flex justify-content-between align-items-center player-macros"
-                            >
-                                <button
-                                    macro-type="up"
-                                    flight-number="{{ flightCounter }}"
-                                    class="btn btn-primary btn-sm move-up-button player_macro_button"
-                                >
-                                    <i class="fe fe-arrow-up"></i>
-                                </button>
-                                <button
-                                    macro-type="down"
-                                    flight-number="{{ flightCounter }}"
-                                    class="btn btn-primary btn-sm move-down-button player_macro_button"
-                                >
-                                    <i class="fe fe-arrow-down"></i>
-                                </button>
-                                <button
-                                    macro-type="remove"
-                                    flight-number="{{ flightCounter }}"
-                                    class="btn btn-danger btn-sm remove-user-button player_macro_button"
-                                >
-                                    <i class="fe fe-trash"></i>
-                                </button>
-                            </td>
                             <td style="width: 100px; overflow-x: scroll; white-space: nowrap">
                                 {{ p.first_name[0] }} {{ p.last_name }}
                             </td>

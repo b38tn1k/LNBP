@@ -89,6 +89,14 @@ class GameSlot:
             gs.game_event.append(p)
         gs.full = self.full
         return gs
+    
+    def has_player_with_lp(self):
+        res = False
+        for p in self.game_event:
+            if p.availability[self.timeslot_id] == AVAILABLE_LP:
+                res = True
+        return res
+
 
     def log(self, dofilter=True):
         """

@@ -327,6 +327,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
     setTimelineValueToToday();
 
+    if (window.location.hash) {
+        // Extract the hash value which includes the 'flightid'
+        const hash = window.location.hash.substring(1); // remove the '#' symbol
+
+        // Now, split the hash by '=' assuming the format is 'flightid=11'
+        const [key, flightId] = hash.split("=");
+
+        // Check if the first part of the split is 'flightid'
+        if (key === "flightid") {
+            // If it is, log the flightId to the console
+            console.log(flightId);
+            moveFocusToFlight(flightId);
+            switchNavTab(flightId);
+        }
+    }
+
     document.querySelectorAll(".reveal-after").forEach((div) => (div.style.display = "block"));
 });
 
@@ -385,11 +401,10 @@ function setTimelineValueToToday() {
             if (order <= target["order"]) {
                 i.classList.add("active");
             }
-            
         });
-        let fill_percent = (target["order"]-1) * 20;
-        let totalDuration = next['date'] - target['date'];
-        let currentDuration = today - target['date'];
+        let fill_percent = (target["order"] - 1) * 20;
+        let totalDuration = next["date"] - target["date"];
+        let currentDuration = today - target["date"];
         fill_percent += (currentDuration / totalDuration) * 20;
         bar.style.width = String(fill_percent) + "%";
     }
@@ -437,14 +452,37 @@ function navClicker(e) {
 
     flightID = e.getAttribute("flight-id");
     if (flightID) {
-        document.querySelectorAll(".schedule-table").forEach((i) => {
-            if (i.getAttribute("flight") == flightID) {
-                i.hidden = false;
-            } else {
-                i.hidden = true;
-            }
-        });
+        moveFocusToFlight(flightID);
     }
+}
+
+function switchNavTab(flight_id) {
+    document.querySelectorAll(".flight-tab").forEach((i) => {
+        let flightID = i.getAttribute("flight-id");
+        if (flightID == flight_id) {
+            i.classList.add("active");
+        } else {
+            i.classList.remove("active");
+        }
+    });
+    document.querySelectorAll(".nav-info-tab").forEach((i) => {
+        let flightID = i.getAttribute("flight-id");
+        if (flightID == flight_id) {
+            i.hidden = false;
+        } else {
+            i.hidden = true;
+        }
+    });
+}
+
+function moveFocusToFlight(flightID) {
+    document.querySelectorAll(".schedule-table").forEach((i) => {
+        if (i.getAttribute("flight") == flightID) {
+            i.hidden = false;
+        } else {
+            i.hidden = true;
+        }
+    });
 }
 
 /**
@@ -1092,6 +1130,8 @@ function scheduleFlight(button) {
      */
     function success() {
         flashButtonResult(button, "fe-check-circle", "fg-success", loaderClass, "fe-star");
+        window.location.hash = "flightid=" + String(flightID);
+
         window.location.reload();
     }
     /**
@@ -1103,6 +1143,7 @@ function scheduleFlight(button) {
      */
     function failure() {
         flashButtonResult(button, "fe-x-circle", "fg-failure", loaderClass, "fe-star");
+        window.location.hash = "flightid=" + String(flightID);
         window.location.reload();
     }
     sendToServer(data, success, failure);
@@ -1145,6 +1186,7 @@ function clearFlight(button) {
      */
     function success() {
         flashButtonResult(button, "fe-check-circle", "fg-success", loaderClass, "fe-star");
+        window.location.hash = "flightid=" + String(flightID);
         window.location.reload();
     }
     /**
@@ -1157,6 +1199,7 @@ function clearFlight(button) {
      */
     function failure() {
         flashButtonResult(button, "fe-x-circle", "fg-failure", loaderClass, "fe-star");
+        window.location.hash = "flightid=" + String(flightID);
         window.location.reload();
     }
     sendToServer(data, success, failure);

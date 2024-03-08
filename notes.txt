@@ -32,3 +32,14 @@ sigma plant verison history so user can try tweaking a pretty good flight withou
 pop up when clicking the schedule button - are you sure you want to remake this schedule?
 Mostly Unavailable = Availablity Below Min
 New Rule - Low Priority % - Toggle Parameter 
+
+Elastic beanstalk
+- flask tutorial in beanstalk
+https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/eb-cli3.html
+- high availability = more than one instance available incase one breaks
+
+DynamoDB:
+https://docs.aws.amazon.com/code-library/latest/ug/python_3_dynamodb_code_examples.html
+
+Amplify:https://www.pluralsight.com/resources/blog/cloud/create-a-serverless-python-api-with-aws-amplify-and-flask
+A layer of abstraction higher than elastic beanstalk and dynamo - even more cookicutter

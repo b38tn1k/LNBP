@@ -1045,6 +1045,28 @@ class SingleFlightScheduleTool:
                 target['target_game'].force_player_to_match(p)
                 self.recalculate_players()
 
+    def find_empty_gs_day_neighbours(self, game):
+        neighbours = []
+        for g in self.gameslots:
+            if g.full is False:
+                if g.day_number == game.day_number:
+                    neighbours.append()
+        return neighbours
+
+
+    def reduce_lp_by_moving_games(self):
+        source_games = []
+        game_counter = 0
+        for g in self.gameslots:
+            if g.full is True:
+                game_counter += 1
+                if g.has_player_with_lp():
+                    source_games.append(g)
+        for g in source_games:
+            n = self.find_gs_day_neighbours(g)
+        print(game_counter, len(source_games))
+
+
     def optimise(self):
         """
         This function optimises the game schedule by recalculating players and
@@ -1055,6 +1077,7 @@ class SingleFlightScheduleTool:
         # self.balance_unscheduled_players()
         keep_trying = self.fix_unscheduled_players()
         self.fix_double_players()
+        self.reduce_lp_by_moving_games()
         # if keep_trying:
         #     self.fix_double_players()
         #     # self.fix_lp_schedules()

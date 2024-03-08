@@ -37,24 +37,10 @@
                 </li>
 
                 {% set is_first_tab = false %} {% endfor %} {% endif %}
-
-                <li class="nav-item">
-                    <a
-                        href="javascript:void(0);"
-                        class="nav-link flight-tab"
-                        onclick="navClicker(this)"
-                        target="schedule-rules"
-                    >
-                        <div>
-                            <div><strong>League Rules</strong></div>
-                            <div><br /></div>
-                        </div>
-                    </a>
-                </li>
             </ul>
             {% for flight in league.flights %}
             <div class="nav-info-tab" id="flight-tab-{{ flight.id }}" {% if loop.index>
-                1 %} hidden {% endif %}>
+                1 %} hidden {% endif %} flight-id="{{ flight.id }}" >
                 <div>
                     <div class="flex-row">
                         <button onclick="scheduleFlight(this)" flight-id="{{flight.id}}" class="btn btn-primary col-3">
@@ -90,7 +76,6 @@
                 {%endif%} {%endif%}
             </div>
             {% endfor %}
-            <div class="nav-info-tab" id="schedule-rules" hidden>{% include 'league/lh_rules.html' %}</div>
         </div>
     </div>
 </div>
