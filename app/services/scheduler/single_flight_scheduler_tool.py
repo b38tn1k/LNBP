@@ -3,6 +3,9 @@ from itertools import combinations
 from .constants import *
 import math
 
+doRandomize = True
+max_repeat_compete = 0.5
+
 
 def init_histories(players):
     """
@@ -398,8 +401,14 @@ class SingleFlightScheduleTool:
             self.mutate_mode = "Availability score ordered shift"
             # print("SHIFTER")
         elif self.mutate > 2 * len(ts):
-            shuffle(self.gameslots)
-            self.mutate_mode = "Random shuffle"
+            if doRandomize is True:
+                shuffle(self.gameslots)
+                self.mutate_mode = "Random shuffle"
+            else:
+                self.do_voting()
+                self.gameslots = shift_blocks(self.gameslots, self.mutate - len(ts))
+                self.mutate_mode = "Availability score ordered shift"
+
             # print("SHUFFLER")
         else:
             self.do_voting()
@@ -597,6 +606,7 @@ class SingleFlightScheduleTool:
                                 p.other_player_history[q.id] = 1
         for p in self.players:
             p.satisfied = satisfied[p.id] >= p.rules["min_games_total"]
+            
 
     def return_events(self):
         """
@@ -1045,27 +1055,123 @@ class SingleFlightScheduleTool:
                 target['target_game'].force_player_to_match(p)
                 self.recalculate_players()
 
-    def find_empty_gs_day_neighbours(self, game):
-        neighbours = []
-        for g in self.gameslots:
-            if g.full is False:
-                if g.day_number == game.day_number:
-                    neighbours.append()
-        return neighbours
-
+    def swap_game_events(self, dest, src):
+        if dest.full is True:
+            return
+        for p in src.game_event:
+            dest.force_player_to_match(p)
+        src.game_event = []
+        src.full = False
 
     def reduce_lp_by_moving_games(self):
-        source_games = []
-        game_counter = 0
+        lp_games = []
+        empty_games_by_day = {}
         for g in self.gameslots:
             if g.full is True:
-                game_counter += 1
                 if g.has_player_with_lp():
-                    source_games.append(g)
-        for g in source_games:
-            n = self.find_gs_day_neighbours(g)
-        print(game_counter, len(source_games))
+                    lp_games.append(g)
+            else:
+                if g.day_number in empty_games_by_day:
+                    empty_games_by_day[g.day_number].append(g)
+                else:
+                    empty_games_by_day[g.day_number] = [g]
+        for g in lp_games:
+            lp_count = len([p for p in g.game_event if p.availability[g.timeslot_id] == AVAILABLE])
+            if g.day_number in empty_games_by_day:
+                for alt in empty_games_by_day[g.day_number]:
+                    other_availabilities = len([p for p in g.game_event if p.availability[alt.timeslot_id] == AVAILABLE or p.availability[alt.timeslot_id] == AVAILABLE_LP])
+                    possible = self.rules['players_per_match'] == other_availabilities
+                    if possible:
+                        new_lp_count = len([p for p in g.game_event if p.availability[alt.timeslot_id] == AVAILABLE_LP])
+                        if new_lp_count < lp_count:
+                            self.swap_game_events(alt, g)
+                            break
+        self.recalculate_players()
 
+    def swap_players(self, src_g, dest_g, src_p, dest_p):
+        new_src_ge = [p for p in src_g.game_event if p.id != src_p.id]
+        new_dest_ge = [p for p in dest_g.game_event if p.id != dest_p.id]
+        src_g.game_event = new_src_ge
+        dest_g.game_event = new_dest_ge
+        src_g.force_player_to_match(dest_p)
+        dest_g.force_player_to_match(src_p)
+
+    
+    def reduce_lp_by_swapping_players(self):
+        lp_games = []
+        available_games_by_day = {}
+        for g in self.gameslots:
+            if g.full is True:
+                lp_players = g.get_players_with_lp()
+                if len(lp_players) > 0:
+                    lp_games.append({'game': g, "players" : lp_players})
+                else:
+                    if g.day_number in available_games_by_day:
+                        available_games_by_day[g.day_number].append(g)
+                    else:
+                        available_games_by_day[g.day_number] = [g]
+        for game in lp_games:
+            g = game['game']
+            players = game['players']
+            if g.day_number in available_games_by_day:
+                for alt in available_games_by_day[g.day_number]:
+                    for p in players:
+                        if p.availability[alt.timeslot_id] == AVAILABLE:
+                            for q in alt.game_event:
+                                if q.availability[g.timeslot_id] == AVAILABLE:
+                                    self.swap_players(g, alt, p, q)
+                                    break
+        self.recalculate_players()
+    
+    def reduce_frequent_pairings(self):
+        problem_pairs = {}
+        thresh = round(self.rules['min_games_total'] * max_repeat_compete)
+        for p in self.players:
+            for k in p.other_player_history:
+                p.other_player_history[k] = 0
+        for game in self.gameslots:
+            if game.full is True:
+                for q in game.game_event:
+                    if p != q:
+                        if q.id in p.other_player_history:
+                            p.other_player_history[q.id] += 1
+                        else:
+                            p.other_player_history[q.id] = 1
+        for p in self.players:
+            for key in p.other_player_history:
+                if p.other_player_history[key] > thresh:
+                    leading_key = min(p.id, key)
+                    second_key = max(p.id, key)
+                    problem_pairs[leading_key] = second_key
+        options = []
+        for key in problem_pairs:
+            shared_games = []
+            full_games = []
+            for g in self.gameslots:
+                if g.full is True:
+                    full_games.append(g)
+                    ids = [p.id for p in g.game_event]
+                    if key in ids and problem_pairs[key] in ids and key != problem_pairs[key]:
+                        options.append({'shared_game': g, 'alts':[], 'problem_players': [key, problem_pairs[key]] })
+                        shared_games.append(g)
+            for g in full_games:
+                for sg in options:
+                    if g.timeslot_id == sg['shared_game'].timeslot_id and g.facility_id != sg['shared_game'].facility_id:
+                        sg['alts'].append(g)
+            for sg in options:
+                if len(sg['alts']) > 0:
+                    dest_game = sg['alts'][0]
+                    src_game = sg['shared_game']
+                    if len(dest_game.game_event) == self.rules['players_per_match'] and len(src_game.game_event) == self.rules['players_per_match']:
+                        ps = [p for p in src_game.game_event if p.id in sg['problem_players']]
+                        src_player = None
+                        dest_player = None
+                        if len(ps) != 0:
+                            src_player = ps[0]
+                        if len(dest_game.game_event) != 0:
+                            dest_player = dest_game.game_event[0]
+                        if src_player and dest_player:
+                            self.swap_players(src_game, dest_game, src_player, dest_player)
 
     def optimise(self):
         """
@@ -1074,10 +1180,15 @@ class SingleFlightScheduleTool:
 
         """
         self.recalculate_players()
-        # self.balance_unscheduled_players()
         keep_trying = self.fix_unscheduled_players()
         self.fix_double_players()
         self.reduce_lp_by_moving_games()
+        self.reduce_lp_by_swapping_players()
+        # self.reduce_frequent_pairings()
+        for g in self.gameslots:
+            if len(g.game_event) != self.rules['players_per_match']:
+                g.game_event = []
+                self.recalculate_players()
         # if keep_trying:
         #     self.fix_double_players()
         #     # self.fix_lp_schedules()

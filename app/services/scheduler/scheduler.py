@@ -223,7 +223,7 @@ class Scheduler:
 
             # player playing other player too many times
             collisions = p["collisions"]
-            thresh = round(p["game_count"] * max_repeat_compete)
+            thresh = round(rules["min_games_total"] * max_repeat_compete)
             for c in collisions:
                 if collisions[c] > thresh and c != player:
                     record_broken_rules(
@@ -428,10 +428,13 @@ def unpack_report(league, candidate):
     for d in candidate["res"]["details"]:
         br = d["broken_rule"]
         if "max_repeat_compete" in br:
-            p1 = league.club.get_player_by_id(int(d["broken_rule"].split(":")[-1]))
-            p2 = league.club.get_player_by_id(d["player"])
+            p1ID = int(d["broken_rule"].split(":")[-1])
+            # p1 = league.club.get_player_by_id(int(d["broken_rule"].split(":")[-1]))
+            p1 = league.club.get_player_by_id(p1ID)
+            p2ID = d["player"]
+            p2 = league.club.get_player_by_id(p2ID)
             order = sorted([p1.full_name, p2.full_name])
-            my_string = order[0] + " & " + order[1]
+            my_string = order[0] + " & " + order[1] #+ " " + str(p1ID) + " " + str(p2ID)
             title = messages["max_repeat_compete"]
 
             if "max_repeat_compete" in report:

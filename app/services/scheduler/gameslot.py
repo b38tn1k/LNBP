@@ -96,6 +96,13 @@ class GameSlot:
             if p.availability[self.timeslot_id] == AVAILABLE_LP:
                 res = True
         return res
+    
+    def get_players_with_lp(self):
+        res = []
+        for p in self.game_event:
+            if p.availability[self.timeslot_id] == AVAILABLE_LP:
+                res.append(p)
+        return res
 
 
     def log(self, dofilter=True):

@@ -102,15 +102,15 @@ function doScheduleLegend(p, f) {
             if (parseInt(po.getAttribute("player-id")) == parseInt(p)) {
                 c.classList.remove("bg-free", "bg-busy", "bg-unavailable", "bg-populated");
                 c.classList.add("bg-populated");
-                if (colorColumns) {
-                    let columnCells = getCellsInColumn(c);
-                    columnCells.forEach((cell) => {
-                        if (!cell.classList.contains("subs")) {
-                            cell.classList.remove("bg-free", "bg-busy", "bg-unavailable", "bg-populated");
-                            cell.classList.add("bg-populated");
-                        }
-                    });
-                }
+                // if (colorColumns) {
+                //     let columnCells = getCellsInColumn(c);
+                //     columnCells.forEach((cell) => {
+                //         if (!cell.classList.contains("subs")) {
+                //             cell.classList.remove("bg-free", "bg-busy", "bg-unavailable", "bg-populated");
+                //             cell.classList.add("bg-populated");
+                //         }
+                //     });
+                // }
             }
         });
     });
