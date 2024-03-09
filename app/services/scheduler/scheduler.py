@@ -292,12 +292,13 @@ class Scheduler:
         based on their preferences and restrictions.
 
         """
-        print("GENERATE REPORT")
         for flight in self.league.flights:
+            print("GENERATE REPORT")
             flight.report = {}
             res, scheduler = self.copy_flight_with_games(flight)
             report = unpack_report(self.league, {"scheduler": scheduler, "res": res})
             print(report)
+
             flight.report = report
         print("DONE")
 
@@ -436,8 +437,7 @@ def unpack_report(league, candidate):
             order = sorted([p1.full_name, p2.full_name])
             my_string = order[0] + " & " + order[1] #+ " " + str(p1ID) + " " + str(p2ID)
             title = messages["max_repeat_compete"]
-
-            if "max_repeat_compete" in report:
+            if title in report:
                 report[title].add(my_string)
             else:
                 report[title] = set([my_string])
@@ -450,7 +450,6 @@ def unpack_report(league, candidate):
                 else:
                     player = league.club.get_player_by_id(d["player"])
                     report[title] = set([player.full_name])
-
     print()
     issue_count = 0
     for key in report:

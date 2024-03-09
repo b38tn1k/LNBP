@@ -675,7 +675,7 @@ class SingleFlightScheduleTool:
 
         """
         counter = 0
-        while counter < 50:
+        while counter < 100:
             good = True
             assigned = set()
             self.recalculate_players()
@@ -1169,7 +1169,15 @@ class SingleFlightScheduleTool:
                         if len(ps) != 0:
                             src_player = ps[0]
                         if len(dest_game.game_event) != 0:
-                            dest_player = dest_game.game_event[0]
+                            for p in src_game.game_event:
+                                ok = True
+                                for q in dest_game.game_event:
+                                    if p.id in q.other_player_history:
+                                        if q.other_player_history[p.id] >= thresh:
+                                            ok = False
+                                if ok is True:
+                                    dest_player = p
+                                    break
                         if src_player and dest_player:
                             self.swap_players(src_game, dest_game, src_player, dest_player)
 
@@ -1188,7 +1196,7 @@ class SingleFlightScheduleTool:
         for g in self.gameslots:
             if len(g.game_event) != self.rules['players_per_match']:
                 g.game_event = []
-                self.recalculate_players()
+        self.recalculate_players()
         # if keep_trying:
         #     self.fix_double_players()
         #     # self.fix_lp_schedules()
