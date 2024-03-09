@@ -305,6 +305,11 @@ class SingleFlightScheduleTool:
 
     
     def do_voting(self):
+        """
+        computes availability-based voting scores for players and reserves games
+        for the highest-scoring players based on their availability and game preferences.
+
+        """
         ascores = [p.availability_score for p in self.players]
         pv = []
         gv = []
@@ -1056,6 +1061,32 @@ class SingleFlightScheduleTool:
                 self.recalculate_players()
 
     def swap_game_events(self, dest, src):
+        """
+        updates the game events in two dictionaries, `dest` and `src`, by transferring
+        events from `src` to `dest`. It then clears the events in `src` and sets
+        `src.full` to `False`.
+
+        Args:
+            dest (`Game` object.): destination game event list to which the events
+                from the `src` parameter will be transferred.
+                
+                		- `full`: A boolean attribute indicating whether the `dest`
+                object is fully initialized.
+                		- `game_event`: An array containing the game events to be swapped
+                with the events in `src`.
+                
+            src (`EventSequence`.): game events to be swapped with the `dest` parameter.
+                
+                		- `full`: A boolean attribute that indicates whether `src` is a
+                full game event or not. If `full` is `True`, then `src` contains
+                all the game events, otherwise it only contains some events.
+                		- `game_event`: A list of Python objects representing the game
+                events in `src`. Each object in the list has attributes such as
+                `player`, `match`, and `card`, which hold information about the
+                corresponding event in the game.
+                
+
+        """
         if dest.full is True:
             return
         for p in src.game_event:
@@ -1064,6 +1095,12 @@ class SingleFlightScheduleTool:
         src.full = False
 
     def reduce_lp_by_moving_games(self):
+        """
+        analyzes gameslots and game events to determine which players are available
+        for each match based on rules and player availability, moving players
+        between slots if possible to meet the required number of available players.
+
+        """
         lp_games = []
         empty_games_by_day = {}
         for g in self.gameslots:
@@ -1089,6 +1126,52 @@ class SingleFlightScheduleTool:
         self.recalculate_players()
 
     def swap_players(self, src_g, dest_g, src_p, dest_p):
+        """
+        modifies the game event list and forces two players to match.
+
+        Args:
+            src_g (GameEvent object.): game object that contains the events to be
+                swapped.
+                
+                		- `src_g`: A Game object representing the current game state,
+                which contains various attributes such as `game_event`, `players`,
+                and `matches`.
+                		- `dest_g`: A Game object representing the desired game state
+                after the player swap.
+                		- `src_p`: A Player object representing the player to be swapped
+                from the source game to the destination game.
+                		- `dest_p`: A Player object representing the player to be swapped
+                from the destination game to the source game.
+                
+            dest_g (GameEvent object.): 2nd player's game events, which are modified
+                to reflect the swap of the 2 players.
+                
+                		- `game_event`: A list of `GameEvent` objects, representing the
+                events occurring in the destination game.
+                		- `force_player_to_match`: A method that forces a player to be
+                matched with another player.
+                
+            src_p ("Player" object reference.): player whose position is swapped
+                with another player's position in the given game event.
+                
+                		- `id`: The unique identifier of the player to be swapped.
+                		- `game_event`: The game event in which the player is participating.
+                
+            dest_p (`Player` object.): player that should be matched with the
+                updated game events in the `dest_g` game instance.
+                
+                		- `id`: A unique identifier for each player in the game, used
+                to distinguish between different players.
+                		- `team`: The team that a player belongs to, indicating their
+                affiliation within the game's multiplayer framework.
+                		- `position`: The position of the player on the map at the start
+                of the function, which is updated as part of the swap.
+                		- `game_event`: A reference to the event object associated with
+                the player, providing additional information about the player's
+                status and actions within the game.
+                
+
+        """
         new_src_ge = [p for p in src_g.game_event if p.id != src_p.id]
         new_dest_ge = [p for p in dest_g.game_event if p.id != dest_p.id]
         src_g.game_event = new_src_ge
@@ -1098,6 +1181,11 @@ class SingleFlightScheduleTool:
 
     
     def reduce_lp_by_swapping_players(self):
+        """
+        recursively swaps players between games and timeslots to maximize the total
+        available LP for each player, while respecting availability constraints.
+
+        """
         lp_games = []
         available_games_by_day = {}
         for g in self.gameslots:
@@ -1124,6 +1212,11 @@ class SingleFlightScheduleTool:
         self.recalculate_players()
     
     def reduce_frequent_pairings(self):
+        """
+        identifies pairs of players who have played together too many times and
+        swaps them to balance play across all players.
+
+        """
         problem_pairs = {}
         thresh = round(self.rules['min_games_total'] * max_repeat_compete)
         for p in self.players:
